@@ -45,24 +45,6 @@ class KRnd:
 ########## AltBaseFunc
 
 """
-Generates a function F that takes a boolean sequence 
-B as input and outputs its termination status.
-Elements of B are True if they fail metrics of <APRNGGauge>.
-
-seq_size := the number of False elements in a row; considers the 
-            last [-seq_size:] subsequence of input to F. 
-ratio := (optional) / ratio that must be satisfied
-"""
-def generate_term_cond_for_boolseq(seq_size=None,ratio:float=None):
-    if type(ratio) != type(None):
-        return lambda bseq: bseq[-seq_size:].count(True) == seq_size \
-            and round(bseq[-seq_size:].count(True) / seq_size,5) >= ratio
-    return lambda bseq: bseq[-seq_size:].count(True) == seq_size
-
-def generate_cov_uwpd_score_to_bool_function(cov_min:float,uwpd_min:float):
-    return lambda x: x[0] <= cov_min and x[1] <= uwpd_min 
-
-"""
 lightweight database to determine 
 terminated base-pair functions belonging
 to an <AltBaseFunc> instance. 
@@ -139,7 +121,10 @@ class BaseFuncTDetectDB:
 
     """
     check rule:
-    if size of 
+    - measures the cycle of `bp_container` at 
+      `f_index`; converts the 
+      (coverage,normed. uwpd) score to a 
+      boolean `b`, logs `b` to `bp_log`.
     """
     def check(self,f_index):
         cycle = np.array(self.bp_container[f_index])
@@ -163,6 +148,21 @@ class BaseFuncTDetectDB:
             return True
         return False
 
+"""
+decision structure to output a float f
+given two inputs a,b, by randomly 
+selecting a base-pair function B in 
+`base_pairs`,
+B(a,b) -> f. 
+
+If the class function 
+`attach_base_func_tdetect_db`
+is called, then AltBaseFunc can
+determine which functions of 
+`base_pairs` have terminated by a 
+pseudo-randomness measure, otherwise 
+a default `BaseFuncTDetectDB`.
+"""
 class AltBaseFunc:
 
     def __init__(self,base_pairs,rnd_struct,\
@@ -239,12 +239,30 @@ class AltBaseFunc:
     def t_stat(self):
         return self.bftd.prev_vstat
 
-###############################
-
-def basic_refvec_op(refvec,bounds):
-    return -1 
-
 ####################################################
+####### default basic generator functions
+####### for the classes and functions pertinent
+####### to this file. 
+
+
+"""
+Generates a function F that takes a boolean sequence 
+B as input and outputs its termination status.
+Elements of B are True if they fail metrics of <APRNGGauge>.
+
+seq_size := the number of False elements in a row; considers the 
+            last [-seq_size:] subsequence of input to F. 
+ratio := (optional) / ratio that must be satisfied
+"""
+def generate_term_cond_for_boolseq(seq_size=None,ratio:float=None):
+    if type(ratio) != type(None):
+        return lambda bseq: bseq[-seq_size:].count(True) == seq_size \
+            and round(bseq[-seq_size:].count(True) / seq_size,5) >= ratio
+    return lambda bseq: bseq[-seq_size:].count(True) == seq_size
+
+def generate_cov_uwpd_score_to_bool_function(cov_min:float,uwpd_min:float):
+    return lambda x: x[0] <= cov_min and x[1] <= uwpd_min 
+
 
 def term_cond_for_boolseq_sample_1():
     seq_size = 5
