@@ -80,7 +80,9 @@ corr_func := corresponding function that outputs the
             `y` value for input into numpy std. function
 """
 def generate_2dmod__np_std(dim0,dim1,npstd_func,corr_func=None):
-    assert npstd_func in {np.add,np.subtract,np.multiply,np.divide}
+    #stat1 = npstd_func in {np.add,np.subtract,np.multiply,np.divide}
+    #stat2 = str(type(npstd_func)) == "<class 'function'>"
+    #assert stat1 or stat2
 
     assert len(dim0) == 2 
     assert len(dim0) == len(dim1)
@@ -108,7 +110,6 @@ class DefaultLPSMod:
 
     def __init__(self,lps,drange,splitsz,splitsz_delta):
         self.lps = lps
-
         assert matrix_methods.is_proper_bounds_vector(drange)
         assert drange.shape == (2,2)
         assert type(splitsz) == int and splitsz > 0

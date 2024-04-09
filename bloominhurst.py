@@ -18,8 +18,7 @@ class OptimaBloomFunc:
     bloom_func := AltBaseFunc, operates on the integers
     """
     def __init__(self,optima_seedlings,drange,selector_func,bloom_func,\
-        d:int,split_sz:int,splitsz_delta=DEFAULT_OPTIMA_BLOOM_SZ_DELTA_FUNC,\
-        ):
+        d:int,split_sz:int,splitsz_delta=DEFAULT_OPTIMA_BLOOM_SZ_DELTA_FUNC):
         assert type(d) == int and d > 0
         assert type(split_sz) == int and split_sz > 0
         assert type(selector_func) in {Index2DMod,type(None)}
@@ -44,14 +43,18 @@ class OptimaBloomFunc:
     def declare_sfunc(self):
         # declare <BatchIncrStruct>
         m_ = max(self.oseeds.shape)
+        ##print("batch incrementor on: [{},2]".format(m_))
         bis = aprng_gauge.BatchIncrStruct(m_,True,True,2)
 
         # declare <DefaultLPSMod>
-        lpsm = DefaultLPSMod(None,deepcopy(self.drange),\
+        drange = np.array([(0,self.oseeds.shape[0]),\
+            (0,self.oseeds.shape[1])])
+            
+        lpsm = DefaultLPSMod(None,deepcopy(drange),\
             self.split_sz,self.splitsz_delta)
         fx = DefaultLPSMod.load_DefaultLPSMod_function(lpsm,\
-            self.bloom_func)
-        i2dm = Index2DMod(self.drange,bis,f=fx)
+            np.add)
+        i2dm = Index2DMod(drange,bis,f=fx)
         self.selector_func = i2dm
         return i2dm
 
@@ -77,6 +80,8 @@ class OptimaBloomFunc:
             i1 = next(self.selector_func)
             i2 = next(self.selector_func) 
 
+            ##print("next indices: {} and {}".format(i1,i2))
+
             stat1 = type(i1) == type(None)
             stat2 = type(i2) == type(None)
 
@@ -88,5 +93,25 @@ class OptimaBloomFunc:
             # two indices
             v1 = deepcopy(self.oseeds[i1[0],i1[1]])
             v2 = deepcopy(self.oseeds[i2[0],i2[1]])
-            return self.bloom_func(v1,v2)
-        return f() 
+            q = self.bloom_func(v1,v2)
+            ##print("performing bloom on: {}, {} --> {}".format(v1,v2,q))
+            return q 
+
+        def g():
+            v = []
+            for i in range(self.d):
+                q = f()
+                if type(q) == type(None):
+                    break
+
+                i_ = i % self.drange.shape[0]
+                q = q % (self.drange[i_,1] - self.drange[i_,0]) +\
+                    self.drange[i_,0]
+                v.append(q)
+
+            if len(v) != self.d:
+                v = [0. for _ in range(self.d)]
+            ##print("bloom value: ",v)
+            return np.array(v) 
+
+        return g() 
