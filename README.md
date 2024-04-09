@@ -9,4 +9,10 @@ The gist of the project:
 
 ---------------------------------------------------------------
 
+# A Possible Application
+- designing <puissec> to deal with the cracking attempts from
+  `FEDS_shield`; see the below image for the permutative 
+  apparatus that aids in the mapping
+  `char to be encrypted --> integer vector sequence`
+
 ![alt text](2024-04-09__centerion_fire.PNG)
