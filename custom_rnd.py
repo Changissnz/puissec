@@ -4,7 +4,7 @@ from morebs2 import aprng_gauge
 The `Euler's number type q` function has 
 the form: 
 
-f(1 + c1 * e ** e1) / g() 
+f(1 + c1 * e ** e1) / g(e2) 
 """
 def generate_efunc_type_q(c1:float,\
     c2:float,f,g):
@@ -30,16 +30,25 @@ class KRnd:
     def __init__(self):
         return -1
 
-    def initialize_from(args):
+    def initialize_from(self,args):
         if type(args) == int:
             return -1 
         return -1 
 
-    def randrange(self):
+    def random(self): 
         return -1
 
-    def output_gen(self):
+    def uniform(self):
+        return -1
+
+    def choice(self):
+        return -1
+    
+    def shuffle(self):
         return -1 
+
+    def randrange(self):
+        return -1
 
 ##################################################
 ########## AltBaseFunc
@@ -238,6 +247,10 @@ class AltBaseFunc:
 
     def t_stat(self):
         return self.bftd.prev_vstat
+
+    @staticmethod
+    def load_AltBaseFunc_function(abf):
+        return abf.output
 
 ####################################################
 ####### default basic generator functions

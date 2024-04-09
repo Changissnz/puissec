@@ -30,9 +30,9 @@ class Index2DModClass(unittest.TestCase):
     def test__Index2DMod__next__case1(self):
         drange = imod_test_sample_input_1()
         lpsm = DefaultLPSMod(None,drange,4,lambda x: int(x * 2))
-
         fx = DefaultLPSMod.load_DefaultLPSMod_function(lpsm,\
             np.add)
+            
         bis = aprng_gauge.BatchIncrStruct(5,True,True,2)
         dim2d = np.array([[0,3],[0,6]])
 

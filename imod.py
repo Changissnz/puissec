@@ -206,7 +206,7 @@ class Index2DMod:
 
     def __next__(self):
         if self.fin_stat: 
-            return
+            return None
 
         q = next(self.bis)
         ##print("q: ",q)
