@@ -6,14 +6,8 @@ import unittest
 python3 -m tests.test_imod
 """
 ###
-"""
-lpsm = DefaultLPSMod(None,drange,4,lambda x: int(x * 2))
 
-fx = DefaultLPSMod.load_DefaultLPSMod_function(lpsm,\
-    np.add)
-"""
 random.seed(7) 
-
 
 def imod_test_sample_input_1():
     drange = np.array([[-1,1.0],\
@@ -50,7 +44,8 @@ class Index2DModClass(unittest.TestCase):
                 print('finished at {}'.format(i))
                 tindex = i
                 break
-            ##print("next: ", next(i2dm))
+            q = next(i2dm)
+            #print("next: ", q)
         assert tindex == 26 
 
 if __name__ == '__main__':
