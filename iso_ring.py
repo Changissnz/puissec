@@ -4,6 +4,13 @@ for use with single elements of a secret
 from sec_seq import * 
 from defaults import * 
 from obj_func import * 
+from bloominhurst import *
+
+class IsoRingBloomer:
+
+    def __init__(self,obf):
+        assert False
+        return -1 
 
 class IsoRing:
 
