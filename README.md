@@ -6,3 +6,7 @@ The gist of the project:
 
 `retellingsofcricxus`, `malthusian`, `pro-corporatist deceit`,
 `psyceptionism`,`mourninjurst`.
+
+---------------------------------------------------------------
+
+![alt text](2024-04-09__centerion_fire.PNG)
