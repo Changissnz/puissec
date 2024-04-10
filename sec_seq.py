@@ -43,13 +43,20 @@ class OptimaBloomFuncSecRep:
 
         self.obf = obf
         self.sz_map = sz_map
-        self.immutable_dim = immutable_dim
+
+        self.tdim = [immutable_dim]
         #self.bloom_sz_limit = bloom_sz_limit
 
         self.sz = self.obf.oseeds.shape[1]
         self.bpoints = {} 
         self.bpoints[self.sz] = deepcopy(\
             self.obf.oseeds)
+        
+        # dimension d -> 
+        # [0] reference dimension of optima 
+        #     points used to generate d-points
+        # [1] vector of greatest similarity. 
+        self.bpoint_dim_ref = {}
 
         # terminate at dim `sz` 
         self.tstat = False
@@ -60,7 +67,7 @@ class OptimaBloomFuncSecRep:
         self.sz = self.obf.oseeds.shape[1]
 
         self.sz = self.sz_map(self.sz)
-        if self.sz == self.immutable_dim:
+        if self.sz in self.tdim:
             if attempts > 0:
                 return self.set_size(attempts - 1)
             return None 
@@ -74,11 +81,16 @@ class OptimaBloomFuncSecRep:
 
     def __next__(self):
         self.obf.d = self.sz
+        if self.sz in self.tdim:
+            return None
+
         d = next(self.obf)
         if type(d) == type(None):
             ##print("[!!] TSTAT")
             self.tstat = True
+            self.tdim.append(self.sz)
             return None
+
         ##print("D: ", d)
         if self.sz not in self.bpoints:
             ##print("D: ",d)
@@ -86,6 +98,8 @@ class OptimaBloomFuncSecRep:
         else:
             v = self.bpoints[self.sz]
             self.bpoints[self.sz] = np.vstack((v,d))
+
+        self.assign_next_value_to_pred(d)
         ##
         """
         print("BPOINTS")
@@ -94,6 +108,34 @@ class OptimaBloomFuncSecRep:
         """
         ##
         return d
+
+    def assign_next_value_to_pred(self,next_val):
+
+        px1 = self.obf.prev_i1
+        px2 = self.obf.prev_i2
+        ##
+        """
+        print("-- ASSIGN NEXT VALUE")
+        print("p1: ",px1)
+        print("p2: ",px2)
+        """
+        ##
+        cnt = Counter()
+        for (i,j) in zip(px1,px2):
+            cnt[i[0]] += 1
+            cnt[j[0]] += 1
+        d = [(k,v) for k,v in cnt.items()]
+        assert len(d) > 0
+
+        d = sorted(d,key=lambda x: x[0])
+        d = sorted(d,key=lambda x: x[1])
+        ans = d[0][0] 
+
+        if self.sz not in self.bpoint_dim_ref:
+            self.bpoint_dim_ref[self.sz] = [self.obf.oseeds.shape[1],\
+                [ans]]
+        else: 
+            self.bpoint_dim_ref[self.sz][1].append(ans)
 
     def sample_size_at_i(self,i):
         if i not in self.bpoints: return 0
@@ -134,9 +176,11 @@ class Sec:
         szm = generate_default_szmult_mod(multiplier)
 
         # initialize the <OptimaBloomFunc>
+        ks = sorted(list(self.opm.keys()))
         optima_points = [matrix_methods.string_to_vector(v,float) for v in \
-                    self.opm.keys()]
+                    ks]
         optima_points = np.array(optima_points)
+        ##print("OPTIMA POINT SHAPE: ",optima_points.shape)
         bounds = np.array([deepcopy(self.singleton_range) for _ in \
             range(len(self.seq))])
 

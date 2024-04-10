@@ -101,11 +101,21 @@ class OptimaBloomFunc:
                 return
 
             # retrieve the values of the 
-            # two indices
+            # two indices            
             v1 = deepcopy(self.oseeds[i1[0],i1[1]])
             v2 = deepcopy(self.oseeds[i2[0],i2[1]])
             q = self.bloom_func(v1,v2)
-            ##print("performing bloom on: {}, {} --> {}".format(v1,v2,q))
+
+            ##
+            """
+            print("OSEEDS")
+            print(self.oseeds)
+            print("OSEED INDEX: ", i1, i2)
+            print("OSEED ON:\n{}\n{}\n".format(v1,v2))
+            print("performing bloom on: {}, {} --> {}".format(v1,v2,q))
+            """
+            ##
+            
             return q 
 
         def g():
