@@ -33,7 +33,6 @@ def default_AltBaseFunc_for_IsoRing():
 
 ############################################
 
-
 class OptimaBloomFuncSecRep:
 
     def __init__(self,obf,sz_map,immutable_dim:int):#,bloom_sz_limit:int=1000):
@@ -59,6 +58,7 @@ class OptimaBloomFuncSecRep:
         self.bpoint_dim_ref = {}
 
         # terminate at dim `sz` 
+        self.fstat = False
         self.tstat = False
         self.set_sz()
 
@@ -141,6 +141,9 @@ class OptimaBloomFuncSecRep:
         if i not in self.bpoints: return 0
         s = self.bpoints[i].shape 
         return s[0] * s[1] 
+
+    def check_fstat(self,dimset):
+        self.fstat = set(self.tdim) == dimset 
 
 class Sec:
 
