@@ -36,27 +36,36 @@ def default_AltBaseFunc_for_IsoRing():
 
 class OptimaBloomFuncSecRep:
 
-    def __init__(self,obf,sz_map,bloom_sz_limit:int=1000):
+    def __init__(self,obf,sz_map,immutable_dim:int):#,bloom_sz_limit:int=1000):
         assert type(obf) == OptimaBloomFunc
-        assert type(bloom_sz_limit) == int and bloom_sz_limit > 0
+        assert type(immutable_dim) == int and immutable_dim >= 0
+        #assert type(bloom_sz_limit) == int and bloom_sz_limit > 0
 
         self.obf = obf
         self.sz_map = sz_map
-        self.bloom_sz_limit = bloom_sz_limit
+        self.immutable_dim = immutable_dim
+        #self.bloom_sz_limit = bloom_sz_limit
 
-        self.sz = None
+        self.sz = self.obf.oseeds.shape[1]
         self.bpoints = {} 
         self.bpoints[self.sz] = deepcopy(\
             self.obf.oseeds)
 
+        # terminate at dim `sz` 
+        self.tstat = False
         self.set_sz()
-        self.bpoints = {}
 
-    def set_sz(self):
+    def set_sz(self,attempts=10):
         # get dim of OptimaBloomFunc
         self.sz = self.obf.oseeds.shape[1]
+
         self.sz = self.sz_map(self.sz)
-        print("SZ IS: {}".format(self.sz))
+        if self.sz == self.immutable_dim:
+            if attempts > 0:
+                return self.set_size(attempts - 1)
+            return None 
+
+        ##print("SZ IS: {}".format(self.sz))
         return self.sz
 
     def iso_appear(self,i):
@@ -64,31 +73,27 @@ class OptimaBloomFuncSecRep:
         return deepcopy(self.bpoints[i])
 
     def __next__(self):
-        stat = self.stat_at_i(self.sz) 
-
-        # case: reset the sz
-        if not stat: 
-            self.set_sz()
-            return None
-
         self.obf.d = self.sz
-
-
         d = next(self.obf)
         if type(d) == type(None):
+            ##print("[!!] TSTAT")
+            self.tstat = True
             return None
-
+        ##print("D: ", d)
         if self.sz not in self.bpoints:
+            ##print("D: ",d)
             self.bpoints[self.sz] = np.array([d])
         else:
             v = self.bpoints[self.sz]
-            self.bpoints = np.vstack((v,d))
-
+            self.bpoints[self.sz] = np.vstack((v,d))
+        ##
+        """
+        print("BPOINTS")
+        print(self.bpoints)
+        print("------------")
+        """
+        ##
         return d
-
-    def stat_at_i(self,i):
-        sample_sz = self.sample_size_at_i(i)
-        return sample_sz < self.bloom_sz_limit
 
     def sample_size_at_i(self,i):
         if i not in self.bpoints: return 0
@@ -98,7 +103,7 @@ class OptimaBloomFuncSecRep:
 class Sec:
 
     def __init__(self,sequence,singleton_range,\
-        optima_pr_map,dep_map,codep_map):
+        optima_pr_map,dep_map,codep_map,obfsr=None):
 
         assert matrix_methods.is_vector(sequence)
         assert np.array(singleton_range).ndim == 1 and \
@@ -114,7 +119,9 @@ class Sec:
         self.dm = dep_map
         self.cdm = codep_map
 
-        self.declare_obf()
+        self.obfsr = obfsr
+        if type(self.obfsr) == type(None):
+            self.declare_obf()
 
     def declare_obf(self):
 
@@ -135,7 +142,8 @@ class Sec:
 
         obf = OptimaBloomFunc(optima_points,bounds,\
             None,bloom_func,optima_points.shape[0],8)
-        self.obfsr = OptimaBloomFuncSecRep(obf,szm,DEFAULT_OBF_SECREP_BLOOM_SZ_LIMIT)
+        self.obfsr = OptimaBloomFuncSecRep(obf,szm,\
+            optima_points.shape[1])
         return
 
     """

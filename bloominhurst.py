@@ -121,6 +121,7 @@ class OptimaBloomFunc:
                 v.append(q)
 
             if len(v) != self.d:
+                return None 
                 v = [0. for _ in range(self.d)]
             ##print("bloom value: ",v)
             return np.array(v) 
