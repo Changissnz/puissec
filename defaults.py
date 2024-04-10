@@ -31,6 +31,9 @@ DEFAULT_REPLACE_INF = lambda x: round(x,5) if (not np.isnan(x) \
 DEFAULT_TERMINATE_DETECT_FUNC = lambda l,l2: not (l == l2).all() if \
     type(l2) != type(None) else True  
 
+DEFAULT_OBF_SECREP_BLOOM_SZ_LIMIT = 1000
+
+
 idn_fx = lambda x: x 
 sqrt_fx = lambda x: math.sqrt(x)
 
