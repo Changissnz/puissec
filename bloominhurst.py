@@ -25,19 +25,20 @@ class OptimaBloomFunc:
 
         self.oseeds = None
         self.drange = None
-        self.reset_oseeds(optima_seedlings,drange)
-        self.split_sz = split_sz
-        self.splitsz_delta = splitsz_delta
-
+        self.selector_func = selector_func
         # function that takes two float values as input
         self.bloom_func = bloom_func
         # wanted dimension of vector output
         self.d = d
-        self.selector_func = selector_func
+        self.split_sz = split_sz
+        self.splitsz_delta = splitsz_delta
+        self.reset_oseeds(optima_seedlings,drange,False)
+
         if type(selector_func) == type(None):
             self.declare_sfunc()
 
         self.finished_stat = False
+        self.prev_i1,self.prev_i2 = None,None
 
     # declares a selector function
     def declare_sfunc(self):
@@ -58,7 +59,7 @@ class OptimaBloomFunc:
         self.selector_func = i2dm
         return i2dm
 
-    def reset_oseeds(self,optima_seedlings,drange):
+    def reset_oseeds(self,optima_seedlings,drange,update_sfunc:bool):
         assert type(optima_seedlings) == np.ndarray
         assert optima_seedlings.ndim == 2 and \
             min(optima_seedlings.shape) > 0 
@@ -69,10 +70,15 @@ class OptimaBloomFunc:
         self.oseeds = optima_seedlings
         self.drange = drange
 
+        if update_sfunc: 
+            self.declare_sfunc() 
+
     def shape(self):
         return self.oseeds.shape
 
     def __next__(self):
+
+        self.prev_i1,self.prev_i2 = [],[]
 
         def f():
             if self.finished_stat:
@@ -81,7 +87,9 @@ class OptimaBloomFunc:
 
             # select two indices
             i1 = next(self.selector_func)
-            i2 = next(self.selector_func) 
+            i2 = next(self.selector_func)
+            self.prev_i1.append(i1)
+            self.prev_i2.append(i2)
 
             ##print("next indices: {} and {}".format(i1,i2))
 

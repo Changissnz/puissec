@@ -80,10 +80,6 @@ corr_func := corresponding function that outputs the
             `y` value for input into numpy std. function
 """
 def generate_2dmod__np_std(dim0,dim1,npstd_func,corr_func=None):
-    #stat1 = npstd_func in {np.add,np.subtract,np.multiply,np.divide}
-    #stat2 = str(type(npstd_func)) == "<class 'function'>"
-    #assert stat1 or stat2
-
     assert len(dim0) == 2 
     assert len(dim0) == len(dim1)
 
