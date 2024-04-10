@@ -69,6 +69,9 @@ class OptimaBloomFunc:
         self.oseeds = optima_seedlings
         self.drange = drange
 
+    def shape(self):
+        return self.oseeds.shape
+
     def __next__(self):
 
         def f():

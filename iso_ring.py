@@ -6,83 +6,116 @@ from defaults import *
 from obj_func import * 
 from bloominhurst import *
 
+def generate_default_szmult_mod(m,drange):
+    assert len(drange) == 2 and drange[0] <= drange[1]
+
+    def f(x):
+        q = (x * m) % (drange[1] - drange[0])
+        return q + drange[0] 
+    return f 
+
 class IsoRingBloomer:
 
-    def __init__(self,obf):
-        assert False
+    def __init__(self,obf,sz_map):
+        assert type(obf) == OptimaBloomFunc
+        self.obf = obf
+        self.sz_map = sz_map
+        self.sz = None
+        self.set_sz()
+        self.bpoints = []
         return -1 
 
+    def stat(self):
+        return self.obj.finished_stat
+
+    def set_sz(self):
+        # get dim of OptimaBloomFunc
+        self.sz = self.obf.shape[1]
+        self.sz = self.sz_map(self.sz)
+        return self.sz
+
+    def bloom_one(self):
+        if self.stat(): return 
+
+        self.obf.d = self.sz
+        d = next(self.obf)
+        self.bpoints.append(deepcopy(d))
+        return d 
+
+    def reset_obf(self):
+        self.bpoints = np.array(self.bpoints)
+
+        return -1 
+
+class IsoRingMem:
+
+    def __init__(self,bounds,optima_points,actual_optima):
+        self.bounds = bounds
+        self.optima_points = optima_points
+        self.actual_optima = actual_optima
+
+##############################################
+
+def default_AltBaseFunc_for_IsoRing():
+    q = generate_efunc_type_q(1,1,1,1)
+    q2 = generate_efunc_type_q(0.5,1.0,0.5,1.0)
+    mfs = deepcopy(DEFAULT_PAIRWISE_VEC_FUNCS)
+    mfs = mfs + [q,q2] 
+    return AltBaseFunc(mfs,random)
+    return
+
+"""
+See arguments for <SecSeq> 
+"""
 class IsoRing:
 
-    def __init__(self,contents,rnd_seed = None,\
-                 local_optima=None, obj_func=None,\
-                    is_entry_point=False):
-        assert morebs2.is_proper_bounds_vector(contents)
-        self.contents = contents
-        self.rnd_seed = rnd_seed
-        if type(self.rnd_seed) == type(int):
-            random.seed(self.rnd_seed)
-            np.random.seed(self.rnd_seed) 
-        self.local_optima = local_optima
-        self.ofunc = obj_func
-        self.is_entry_point = is_entry_point
-        self.instantiate()
+    def __init__(self,bounds,optima_points,\
+        actual_optima,objf):
+        assert matrix_methods.is_proper_bounds_vector(bounds)
+        for p in optima_points:
+            assert matrix_methods.point_in_bounds(bounds,p)
+        assert matrix_methods.point_in_bounds(bounds,\
+            actual_optima)
+        assert type(objf) == ObjFunc
 
-    def instantiate(self):
-        print("instantiating")
-        if type(self.local_optima) == type(None):
-            print("generating L.O.")
-            self.generate_pr_local_optima()
-        
-        if type(self.ofunc) == type(None):
-            return "TODO"
-        return 
+        self.bounds = bounds
+        self.optima_points = optima_points
+        self.actual_optima = actual_optima
+        self.irm = IsoRingMem(bounds,optima_points,\
+            actual_optima)
 
-    def generate_pr_local_optima(self):
-        print("-->")
-        nr = random.randrange(DEFAULT_ISO_RING_LOCAL_OPTIMA_SIZE_RANGE[0],\
-            DEFAULT_ISO_RING_LOCAL_OPTIMA_SIZE_RANGE[1] + 1)
-        self.local_optima = []
-        print("NR: ",nr)
-        for i in range(nr):
-            p = self.generate_pr_local_optimum()
-            self.local_optima.append(p)
-        self.local_optima = np.array(self.local_optima)
-        
+        self.objf = objf
+        self.irb = None
+        self.set_irb()
         return
 
     """
+    outputs a score for each of the optima points
     """
-    def generate_pr_local_optimum(self):
-        l = len(self.contents)
+    def register_attempt(self,p):
+        q = np.zeros((self.optima_points.shape[0],))
+        rx = [self.objf.output(p_,p) for p_ in self.optima_points]
+        return np.array(rx)
+        
+    def set_irb(self):
+        # set the default <AltBaseFunc> as the
+        # bloom function. 
+        abf = default_AltBaseFunc_for_IsoRing()
+        bloom_func = abf.load_AltBaseFunc_function(abf)
 
-        diff = self.contents[::,1] - self.contents[::,0]
-        ##
-        x = np.random.choice(deepcopy(DEFAULT_SINGLETON_RANGE),\
-            (l,)) 
-        additive = np.round(diff * x,5)
-        return np.round(self.contents[::,0] + additive,5)
+        # generate the size-delta function for
+        # the <IsoRingBloomer>
+        drange = deepcopy(DEFAULT_SINGLETON_RANGE)
+        multiplier = 3.13
+        szm = generate_default_szmult_mod(multiplier,drange)
 
-    def register_hypothesis(self,p):
-        i = self.closest_optimum(p)
-        r = self.local_optima[i,:]
-        # TODO: check this
-        return self.ofunc(r,p)
+        # initialize the <OptimaBloomFunc>
+        obf = OptimaBloomFunc(deepcopy(self.optima_points),\
+            deepcopy(self.bounds),selector_func=None,\
+            bloom_func,d=self.bounds.shape[0],\
+            split_sz=8,\
+            splitsz_delta=DEFAULT_OPTIMA_BLOOM_SZ_DELTA_FUNC)
 
-    def closest_optimum(self,p):
-        assert len(p) == len(self.contents) 
-
-        # get the closest local optimum to p
-        x = np.array([morebs2.matrix_methods.euclidean_point_distance(\
-            lo,p) for lo in self.local_optima])
-        i = -1
-        if len(x) > 0:
-            i = np.argmin(x)
-        return i
-
-    """
-    mark if the previous cracking attempt 
-    is detected by the instance's owner. 
-    """
-    def is_detected(self):
-        return -1
+        # initialize the IsoRingBloomer
+        self.irb = IsoRingBloomer(obf,szm)
+        return

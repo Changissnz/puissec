@@ -1,10 +1,14 @@
 from defaults import *
 from morebs2 import aprng_gauge
+from lcg2h import *
+
 """
 The `Euler's number type q` function has 
 the form: 
 
-f(1 + c1 * e ** e1) / g(e2) 
+f(1 + c1 * e ** e1) / g(1 + c2 * e ** e2);
+e1 and e2 are input variables to output
+function `F`. 
 """
 def generate_efunc_type_q(c1:float,\
     c2:float,f,g):
