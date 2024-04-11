@@ -76,6 +76,10 @@ class OptimaBloomFunc:
     def shape(self):
         return self.oseeds.shape
 
+    """
+    return:
+    - a vector 
+    """
     def __next__(self):
 
         self.prev_i1,self.prev_i2 = [],[]

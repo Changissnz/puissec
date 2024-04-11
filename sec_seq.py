@@ -1,5 +1,5 @@
-from defaults import *
-from collections import defaultdict 
+from ep_corrmap import * 
+#from collections import defaultdict 
 from bloominhurst import *
 
 def generate_default_szmult_mod(m,drange=[2,11]):
@@ -35,7 +35,8 @@ def default_AltBaseFunc_for_IsoRing():
 
 class OptimaBloomFuncSecRep:
 
-    def __init__(self,obf,sz_map,immutable_dim:int):#,bloom_sz_limit:int=1000):
+    def __init__(self,obf,sz_map,immutable_dim:int,\
+        corr_type="e"):#,bloom_sz_limit:int=1000):
         assert type(obf) == OptimaBloomFunc
         assert type(immutable_dim) == int and immutable_dim >= 0
         #assert type(bloom_sz_limit) == int and bloom_sz_limit > 0
@@ -44,7 +45,7 @@ class OptimaBloomFuncSecRep:
         self.sz_map = sz_map
 
         self.tdim = [immutable_dim]
-        #self.bloom_sz_limit = bloom_sz_limit
+        self.corr_type = corr_type
 
         self.sz = self.obf.oseeds.shape[1]
         self.bpoints = {} 
@@ -62,6 +63,11 @@ class OptimaBloomFuncSecRep:
         self.tstat = False
         self.set_sz()
 
+        self.set_dpm() 
+
+    def set_dpm(self):
+        self.dpm = DerivatorPrMap() 
+
     def set_sz(self,attempts=10):
         # get dim of OptimaBloomFunc
         self.sz = self.obf.oseeds.shape[1]
@@ -69,7 +75,7 @@ class OptimaBloomFuncSecRep:
         self.sz = self.sz_map(self.sz)
         if self.sz in self.tdim:
             if attempts > 0:
-                return self.set_size(attempts - 1)
+                return self.set_sz(attempts - 1)
             return None 
 
         ##print("SZ IS: {}".format(self.sz))
@@ -110,32 +116,21 @@ class OptimaBloomFuncSecRep:
         return d
 
     def assign_next_value_to_pred(self,next_val):
-
         px1 = self.obf.prev_i1
         px2 = self.obf.prev_i2
+        self.dpm.process_index_pair(px1,px2)
+        return
+
+    def finalize_dcount(self,pred_opt2pr_map:defaultdict):
+        # get the dimension of predecessor
         ##
         """
-        print("-- ASSIGN NEXT VALUE")
-        print("p1: ",px1)
-        print("p2: ",px2)
+        print("CHECK HERE")
+        print(pred_opt2pr_map)
         """
-        ##
-        cnt = Counter()
-        for (i,j) in zip(px1,px2):
-            cnt[i[0]] += 1
-            cnt[j[0]] += 1
-        d = [(k,v) for k,v in cnt.items()]
-        assert len(d) > 0
-
-        d = sorted(d,key=lambda x: x[0])
-        d = sorted(d,key=lambda x: x[1])
-        ans = d[0][0] 
-
-        if self.sz not in self.bpoint_dim_ref:
-            self.bpoint_dim_ref[self.sz] = [self.obf.oseeds.shape[1],\
-                [ans]]
-        else: 
-            self.bpoint_dim_ref[self.sz][1].append(ans)
+        pr_vec = self.dpm.fin_count(self.corr_type,pred_opt2pr_map)
+        self.set_dpm()
+        return pr_vec  
 
     def sample_size_at_i(self,i):
         if i not in self.bpoints: return 0
@@ -167,6 +162,23 @@ class Sec:
         self.obfsr = obfsr
         if type(self.obfsr) == type(None):
             self.declare_obf()
+        
+        self.declared_dir = [] 
+
+    def optima_points(self):
+        ks = sorted(list(self.opm.keys()))
+        optima_points = [matrix_methods.string_to_vector(v,float) for v in \
+                    ks]
+        optima_points = np.array(optima_points)
+        return optima_points
+
+    def optima_points_to_index_pr_map(self):
+
+        ks = sorted(list(self.opm.keys()))
+        ks = [(i,self.opm[k]) for (i,k) in enumerate(ks)]
+
+        d = defaultdict(float,ks) 
+        return d
 
     def declare_obf(self):
 
@@ -179,11 +191,7 @@ class Sec:
         szm = generate_default_szmult_mod(multiplier)
 
         # initialize the <OptimaBloomFunc>
-        ks = sorted(list(self.opm.keys()))
-        optima_points = [matrix_methods.string_to_vector(v,float) for v in \
-                    ks]
-        optima_points = np.array(optima_points)
-        ##print("OPTIMA POINT SHAPE: ",optima_points.shape)
+        optima_points = self.optima_points()
         bounds = np.array([deepcopy(self.singleton_range) for _ in \
             range(len(self.seq))])
 
@@ -206,9 +214,23 @@ class Sec:
         q2 = np.array([self.obfsr.obf.prev_i1,self.obfsr.obf.prev_i2])
         return q, q2
 
-    @staticmethod
-    def generate_Sec(seq,rnd_struct):
-        return -1
+    def process_one_bloomiso(self):
+        stat = True 
+        while stat: 
+            # next value, indices of derivators
+            b1,b2 = self.__next__()
+            stat = not (type(b1) == type(None))
+            if not stat:
+                ##self.declare_another_Sec(self.obfsr.sz)
+                # case: obfsr needs to be reset
+                self.obfsr.set_sz()
+            return -1 
+
+        return -1 
+
+    def lone_pr_vec_for_bloom(self):
+        x = self.optima_points_to_index_pr_map()
+        return self.obfsr.finalize_dcount(x)
 
 class SecSeq:
 
