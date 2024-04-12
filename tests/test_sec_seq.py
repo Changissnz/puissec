@@ -44,24 +44,14 @@ class SecClass(unittest.TestCase):
             assert np.min(v) >= singleton_range[0]
             assert np.max(v) <= singleton_range[1]
 
-        #d = {2: [3, [1, 3, 2, 0]]}
-        #assert sec.obfsr.bpoint_dim_ref == d
-
         counter_ans = [Counter({0: 2, 1: 1, 2: 1}),\
                 Counter({0: 3, 3: 1}),\
                 Counter({2: 4}),\
                 Counter({0: 4})]
         assert sec.obfsr.dpm.cnt == counter_ans
 
-        """
-        opm = sec.opm
-        x = sec.optima_points_to_index_pr_map()
-        vx = sec.obfsr.finalize_dcount(x)
-        print()
-        """
         vx = sec.lone_pr_vec_for_bloom()
         assert vx == [0.2, 0.2, 0.4, 0.2]
-
         return
 
 if __name__ == '__main__':

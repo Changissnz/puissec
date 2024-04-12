@@ -51,12 +51,6 @@ class OptimaBloomFuncSecRep:
         self.bpoints = {} 
         self.bpoints[self.sz] = deepcopy(\
             self.obf.oseeds)
-        
-        # dimension d -> 
-        # [0] reference dimension of optima 
-        #     points used to generate d-points
-        # [1] vector of greatest similarity. 
-        self.bpoint_dim_ref = {}
 
         # terminate at dim `sz` 
         self.fstat = False
@@ -221,9 +215,11 @@ class Sec:
             b1,b2 = self.__next__()
             stat = not (type(b1) == type(None))
             if not stat:
+                continue
+
                 ##self.declare_another_Sec(self.obfsr.sz)
                 # case: obfsr needs to be reset
-                self.obfsr.set_sz()
+                ##self.obfsr.set_sz()
             return -1 
 
         return -1 
@@ -231,6 +227,10 @@ class Sec:
     def lone_pr_vec_for_bloom(self):
         x = self.optima_points_to_index_pr_map()
         return self.obfsr.finalize_dcount(x)
+
+    def generate_next_Sec(self):
+
+        return -1 
 
 class SecSeq:
 
