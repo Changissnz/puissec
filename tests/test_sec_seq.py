@@ -51,7 +51,10 @@ class SecClass(unittest.TestCase):
         assert sec.obfsr.dpm.cnt == counter_ans
 
         vx = sec.lone_pr_vec_for_bloom()
-        assert vx == [0.2, 0.2, 0.4, 0.2]
+        assert vx[0] == [0.2, 0.2, 0.4, 0.2]
+        assert vx[1] == defaultdict(float,\
+            {'0,1': 0.0})
+            
         return
 
 if __name__ == '__main__':

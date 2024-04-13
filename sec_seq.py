@@ -122,9 +122,10 @@ class OptimaBloomFuncSecRep:
         print("CHECK HERE")
         print(pred_opt2pr_map)
         """
-        pr_vec = self.dpm.fin_count(self.corr_type,pred_opt2pr_map)
+        pr_vec,dep_map = self.dpm.fin_count(self.corr_type,\
+            self.sz,pred_opt2pr_map)
         self.set_dpm()
-        return pr_vec  
+        return pr_vec,dep_map 
 
     def sample_size_at_i(self,i):
         if i not in self.bpoints: return 0

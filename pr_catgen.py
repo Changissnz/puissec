@@ -1,5 +1,6 @@
 
 from defaults import *
+from morebs2 import measures,matrix_methods,aprng_gauge
 
 """
 Contains basic functions for calculating 
@@ -11,10 +12,19 @@ def default_dotkey_func():
     f = lambda s1,s2: matrix_methods.vector_to_string(s1 + s2,int)
     return f
 
+def map_freq2pr(m):
+    assert type(m) in {defaultdict,dict,Counter}
+    s = sum(list(m.values()))
+    m_ = defaultdict(float,\
+        [(k,measures.zero_div(v,s,0.0)) \
+        for (k,v) in m.items()])
+    return m_ 
+
+
 def map_dot_product(d1,d2,x2x2_func=np.multiply,\
     dotkey_func=default_dotkey_func()):
-    assert type(d1) in {defaultdict,dict}
-    assert type(d2) in {defaultdict,dict}
+    assert type(d1) in {defaultdict,dict,Counter}
+    assert type(d2) in {defaultdict,dict,Counter}
 
     dx = defaultdict(float)
     for (k,v) in d1.items():
@@ -133,6 +143,9 @@ def exact_correlation_dep_Pr(d2_rsz,pred_corrmap,pred_opt2pr_map):
         vstr = matrix_methods.vector_to_string(pr_index,int)
 
         # old key 
+        ##print("PR INDEX: ",pr_index)
+        ##print("PRED CORRMAP\n{}\n".format(pred_corrmap))
+
         pm1 = pred_corrmap[pr_index[0]]
         pm2 = pred_corrmap[pr_index[1]]
         v2 = sorted([pm1,pm2])
@@ -167,7 +180,7 @@ def partial_correlation_dep_Pr__process_func(index,pred_exact_corrmap,\
     md2 = {}
     i = 0 
     for (k,v) in map_dot.items():
-        md2[i] = v * pred_opt2pr_map
+        md2[i] = v * pred_opt2pr_map[k] 
         i += 1
 
     if len(md2) == 0: return 0.0
@@ -175,6 +188,8 @@ def partial_correlation_dep_Pr__process_func(index,pred_exact_corrmap,\
     return round(q,5)
 
 """
+d2_rsz := number of rows belonging to dist. D2 
+pred_exact_corrmap := index of D2 -> index of D1
 pred_corrmap := index of D2 -> index of D1 -> bond strength 
 pred_opt2pr_map := 2-d index of D1 -> probability 
 

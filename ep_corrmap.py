@@ -34,8 +34,13 @@ class DerivatorPrMap:
         self.cnt.append(c)
         return c
 
+    """
+    corr_type := e|p 
+    pred_opt2pr_map := 2-d index of D1 -> probability 
+
+    """
     def fin_count(self,corr_type:str,\
-        pred_opt2pr_map:defaultdict):
+        d2_rsz:int,pred_opt2pr_map:defaultdict):
         assert corr_type in {"e","p"}
         cf = partial_correlation_pr if corr_type == "p" \
             else exact_correlation_pr
@@ -43,17 +48,37 @@ class DerivatorPrMap:
         #sz = float('inf') if type(sz) == type(None) \
         #    else sz 
         i = 0
-        pr_vec = []
+
         # lone Pr 
+        pr_vec = []
+        exact_corr = {}
+        pred_corrmap = defaultdict(float)
         while len(self.cnt) > 0:# and i < sz:
+            # collect frequency for lone Pr 
             cnt = self.cnt.pop(0)
             pr = self.output_Pr(cnt,cf,pred_opt2pr_map)
             pr_vec.append(pr)
+
+
+            # collect values for e.c. pr. 
+            exact_corr[i] = exact_correlation(cnt)
+
+            # update correlation map for predecessors
+            pred_corrmap[i] = map_freq2pr(cnt)
             i += 1 
 
-        # dependent and codependent Pr
-        return pr_vec
+        # dependency map
+        prq = None
+        if corr_type == "p":
+            prq = partial_correlation_dep_Pr(\
+                d2_rsz,exact_corr,\
+                pred_corrmap,pred_opt2pr_map)
+        else: 
+            prq = exact_correlation_dep_Pr(\
+                d2_rsz,exact_corr,pred_opt2pr_map)
+
+        ## TODO: normalize this. 
+        return pr_vec,prq 
 
     def output_Pr(self,cnt,cf,pred_opt2pr_map:defaultdict):
         return cf(cnt,pred_opt2pr_map)
-        
