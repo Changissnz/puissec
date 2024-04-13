@@ -35,9 +35,14 @@ class DerivatorPrMap:
         return c
 
     """
+    - arguments: 
     corr_type := e|p 
+    d2_rsz := int, dimension of dist. D2 
     pred_opt2pr_map := 2-d index of D1 -> probability 
 
+    - return: 
+    [0] vector, lone Pr.
+    [1] defaultdict(float)
     """
     def fin_count(self,corr_type:str,\
         d2_rsz:int,pred_opt2pr_map:defaultdict):
@@ -59,7 +64,6 @@ class DerivatorPrMap:
             pr = self.output_Pr(cnt,cf,pred_opt2pr_map)
             pr_vec.append(pr)
 
-
             # collect values for e.c. pr. 
             exact_corr[i] = exact_correlation(cnt)
 
@@ -77,7 +81,6 @@ class DerivatorPrMap:
             prq = exact_correlation_dep_Pr(\
                 d2_rsz,exact_corr,pred_opt2pr_map)
 
-        ## TODO: normalize this. 
         return pr_vec,prq 
 
     def output_Pr(self,cnt,cf,pred_opt2pr_map:defaultdict):

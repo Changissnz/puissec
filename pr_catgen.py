@@ -124,6 +124,9 @@ calculates the map of
 
 pred_corrmap := index of D2 -> index of D1
 pred_opt2pr_map := predecessor map; pair-set index -> bond measure. 
+
+- return: 
+defaultdict, index pair of D2 -> bond strength 
 """
 #def exact_correlation_dep_Pr(opt2freq_map,pred_corrmap,pred_opt2pr_map):
 def exact_correlation_dep_Pr(d2_rsz,pred_corrmap,pred_opt2pr_map):
@@ -194,16 +197,14 @@ pred_corrmap := index of D2 -> index of D1 -> bond strength
 pred_opt2pr_map := 2-d index of D1 -> probability 
 
 return:
-- 
+- defaultdict, index pair of D2 -> bond strength 
 """
 def partial_correlation_dep_Pr(d2_rsz,pred_exact_corrmap,\
     pred_corrmap,pred_opt2pr_map):
 
     # make the index gen. 
     bis = aprng_gauge.BatchIncrStruct(d2_rsz,is_perm=True,\
-        is_reflective=True,subset_size=2)
-    
-    ##partial_correlation_pr_v2(pm)
+        is_reflective=True,subset_size=2)    
     stat = True
     pr_map = defaultdict(float)
     l = 0

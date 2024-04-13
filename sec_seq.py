@@ -1,6 +1,7 @@
 from ep_corrmap import * 
-#from collections import defaultdict 
 from bloominhurst import *
+
+default_rnd_boolean_index_splitter = lambda x: True if random.randrange(0,2) else False 
 
 def generate_default_szmult_mod(m,drange=[2,11]):
     assert len(drange) == 2 and drange[0] <= drange[1]
@@ -117,11 +118,6 @@ class OptimaBloomFuncSecRep:
 
     def finalize_dcount(self,pred_opt2pr_map:defaultdict):
         # get the dimension of predecessor
-        ##
-        """
-        print("CHECK HERE")
-        print(pred_opt2pr_map)
-        """
         pr_vec,dep_map = self.dpm.fin_count(self.corr_type,\
             self.sz,pred_opt2pr_map)
         self.set_dpm()
@@ -167,6 +163,14 @@ class Sec:
         optima_points = np.array(optima_points)
         return optima_points
 
+    """
+    converts opm map 
+        key := stringized point
+        value := Pr. value
+    to a map w/ 
+        key := index of ordering for stringized point
+        value := Pr. value 
+    """
     def optima_points_to_index_pr_map(self):
 
         ks = sorted(list(self.opm.keys()))
@@ -230,8 +234,42 @@ class Sec:
         return self.obfsr.finalize_dcount(x)
 
     def generate_next_Sec(self):
+        assert not self.obfsr.fstat
 
-        return -1 
+        # get the (lone Pr.,dependency Pr.) maps
+        q = self.lone_pr_vec_for_bloom()
+
+        # split the dependency map w/ co-dep map
+        dep_map,codep_map = {},{}
+        for (k,v) in q[1].items():
+            stat = default_rnd_boolean_index_splitter(v)
+            if stat: 
+                dep_map[k] = v
+            else: 
+                codep_map[k] = v
+        dep_map,codep_map = defaultdict(float,dep_map),\
+            defaultdict(float,codep_map)
+
+        # construct  <optima_pr_map>
+        ## new optima point -> Pr value
+        ##
+        ## * uses exact-correlation 
+        om = defaultdict(float)
+        lo = self.optima_points()
+
+        index = max([(i,q_) for (i,q_) in enumerate(q[0])],key=lambda x: x[1])
+        index = index[0]
+        sample = deepcopy(lo[index])
+
+        optima_pr_map = {}
+        for i,q_ in enumerate(q[0]):
+            vs = matrix_methods.vector_to_string(lo[i],float)
+            optima_pr_map[vs] = q_
+
+        s = Sec(sample,self.singleton_range,\
+            optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)
+        self.obfsr = None
+        return s
 
 class SecSeq:
 
