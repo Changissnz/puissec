@@ -16,6 +16,7 @@ used to generate points by Python standard
 `random` library. 
 """
 def generate_pointgen_stdrand(bounds,num_points,rnd_struct):
+
     assert matrix_methods.is_proper_bounds_vector(bounds)
     
     ps = []
@@ -242,7 +243,6 @@ class Sec:
             ##print("one bloom pt.")
             # next value, indices of derivators
             b1,b2 = self.__next__()
-
             ##
             """
             print("SEC NEXT")
@@ -252,15 +252,9 @@ class Sec:
             print("-----")
             """
             ##
-
             stat = not (type(b1) == type(None))
             if not stat:
                 continue
-
-                ##self.declare_another_Sec(self.obfsr.sz)
-                # case: obfsr needs to be reset
-                ##self.obfsr.set_sz()
-            ###return -1 
         return
 
     # TODO: bug here. 
@@ -314,12 +308,18 @@ class Sec:
         s = Sec(nu_pt,deepcopy(self.singleton_range),\
             optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)
         sz0 = s.obfsr.sz
+        ##
+        """
         print("-- RESETTING OSEEDS")
+        print("\t-- ORIGINAL")
+        print(self.obfsr.obf.oseeds)
+        print("\t-- NEW")
+        print(bps)
+        print()
+        """
+        ##
         sr_mat = np.array([deepcopy(self.singleton_range) for _ in range(sz0)])
         self.obfsr.obf.reset_oseeds(bps,sr_mat,True)
-        print("optima")
-        print(bps)
-
         self.obfsr = None
         s.obfsr.set_sz()
         s.obfsr.tstat = False 

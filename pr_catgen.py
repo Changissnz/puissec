@@ -141,8 +141,7 @@ formula for partial correlation probability p is
 l := sum(pr_i * f_j)
 p := l / |pr_i|.
 
-The output map <opt2freq_map>
-
+<opt2freq_map>
 """
 def partial_correlation_pr(opt2freq_map,pred_opt2pr_map):
     ##
@@ -163,6 +162,11 @@ def partial_correlation_pr_v2(pm):
     if len(pm) == 0.0: return 0.0 
     return sum(list(pm.values())) / len(pm)
 
+"""
+opt2freq_map := optima index-> frequency of occurence as derivator
+                                element.
+pred_opt2pr_map := optima index -> Pr that it is the answer. 
+"""
 def partial_correlation_map(opt2freq_map,pred_opt2pr_map):
     ##
     l = list(opt2freq_map.values())

@@ -73,6 +73,8 @@ class OptimaBloomFunc:
         if update_sfunc: 
             self.declare_sfunc() 
 
+        self.finished_stat = False 
+
     def shape(self):
         return self.oseeds.shape
 
