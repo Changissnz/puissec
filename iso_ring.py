@@ -44,6 +44,33 @@ class IsoRing:
 
         self.ofunc = ofunc 
         self.bounds = bounds 
+        # bloom stat 
+        self.bstat = True
+        # index of repr in `sec_cache`
+        self.repi = 0
+
+    def operating_sec(self): 
+        if self.bstat:
+            return self.sec_cache[-1]
+        return self.sec_cache[self.repi] 
+
+    def run_Sec_till_fstat(self,guesser_func):
+        sec = self.operating_sec()
+        stat = sec.obfsr.fstat
+
+        while stat:
+            # get the length of output 
+            p = guesser_func(sec.obfsr.sz)
+            q,s = self.register_attempt(p)
+            print("guess is")
+            print(q)
+            print(s)
+            print()
+
+            sec = self.operating_sec()
+            stat = sec.obfsr.fstat 
+
+        print("done")
 
     def register_attempt(self,p):
         sq = self.sec_cache[-1]
@@ -53,9 +80,13 @@ class IsoRing:
         # case: generate an element for next repr. 
         if not stat2: 
             x1,x2 = next(sq) 
+
+            if type(x1) == type(None):
+                print("recursing on register")
+                return self.register_attempt(p)
         #       declare another <Sec> instance
         else:
-            sec2 = sq.generate_next_Sec()
+            sec2,previous_sz,current_sz = sq.generate_next_Sec()
             self.sec_cache.append(sec2) 
 
         # calculate feedback for attempt
@@ -71,6 +102,8 @@ class IsoRing:
     """ 
     def register_attempt_(self,p):
         assert matrix_methods.is_vector(p) 
+
+
 
         ops = self.sec.optima_points() 
         if len(p) != ops.shape[1]:

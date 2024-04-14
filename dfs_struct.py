@@ -170,7 +170,7 @@ class DFSCache:
                 #print("appending")
                 #print(p2)
                 paths.insert(0,p2)
-            print()
+            ##print()
             #print("len of cft_copy: ",len(cft_copy))
             #del cft_copy[t]
         return results 

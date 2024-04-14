@@ -42,7 +42,7 @@ class DerivatorPrMap:
 
     - return: 
     [0] vector, lone Pr.
-    [1] defaultdict(float)
+    [1] defaultdict(float), key is 
     """
     def fin_count(self,corr_type:str,\
         d2_rsz:int,pred_opt2pr_map:defaultdict):

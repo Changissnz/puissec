@@ -1,12 +1,66 @@
 
-from defaults import *
-from morebs2 import measures,matrix_methods,aprng_gauge
+#from defaults import *
+from morebs2 import measures
+from imod import * 
 
 """
 Contains basic functions for calculating 
 exact-correlation and partial-correlation
 probabilities. 
 """
+
+def generate_2d_match_pr(dim):
+    assert len(dim) == 2
+    assert min(dim) > 0
+
+    bis = aprng_gauge.BatchIncrStruct(max(dim),\
+        True,True,2)
+    d_ = np.array([[0,dim[0]],\
+            [0,dim[1]]])
+    i2dm = Index2DMod(d_,bis)
+
+    stat = True
+    pr_map = defaultdict(float)
+    while stat: 
+        ind = next(i2dm)
+        stat = not type(ind) == type(None)
+        if not stat: continue
+
+        sind = matrix_methods.vector_to_string(ind,int)
+        pr_map[sind] = random.random() 
+    return pr_map
+
+def generate_pr_dist_D1_to_D2(d1_sz,d2_sz):
+    prdist = defaultdict(None)
+    for i in range(d2_sz):
+        prdist[i] = defaultdict(float)
+        for j in range(d1_sz):
+            prdist[i][j] = random.random()
+
+        s = sum(list(prdist[i].values()))
+        for j in range(d1_sz):
+            prdist[i][j] = measures.zero_div(prdist[i][j],s,0.0)
+            prdist[i][j] = round(prdist[i][j],5)
+    return prdist
+
+def replace_map_key(m,f):
+    m_ = defaultdict(None)
+    for (k,v) in m.items():
+        m_[f(k)] = v 
+    return m_ 
+
+def split_map(m,ratio=0.5):
+    m_ = defaultdict(None)
+    m2_ = defaultdict(None)
+
+    for (k,v) in m.items():
+        if random.random() >= ratio:
+            m2_[k] = v
+        else: 
+            m_[k] = v 
+    return m_,m2_ 
+
+############################################
 
 def default_dotkey_func():
     f = lambda s1,s2: matrix_methods.vector_to_string(s1 + s2,int)
@@ -29,9 +83,18 @@ def map_dot_product(d1,d2,x2x2_func=np.multiply,\
     dx = defaultdict(float)
     for (k,v) in d1.items():
         for (k2,v2) in d2.items():
-            k3 = dotkey_func(k,k2) 
+            print("K: ", k,"\tK2: ", k2)
+            k3 = dotkey_func([k],[k2]) 
             dx[k3] = x2x2_func(v,v2)
     return dx 
+
+def map_dot_product_(d1,d2):
+
+    dx = defaultdict(float)
+    for (k,v) in d1.items():
+        dx[k] = v * d2[k] 
+    return dx 
+
 
 ################################ lone Pr calculations
 
@@ -158,7 +221,7 @@ def exact_correlation_dep_Pr(d2_rsz,pred_corrmap,pred_opt2pr_map):
         if vstr2 in pred_opt2pr_map:
             pr_val =  pred_opt2pr_map[vstr2] 
 
-        pr_map[vstr] = pr_val
+        pr_map[vstr] = round(pr_val,5)
 
     return pr_map
 
@@ -174,10 +237,31 @@ def partial_correlation_dep_Pr__process_func(index,pred_exact_corrmap,\
     i0 = pred_exact_corrmap[index[0]]
     i1 = pred_exact_corrmap[index[1]]
 
+    ##
+    """
+    print("PRED CORRMAP")
+    print(pred_corrmap)
+    print()
+    print("PRED OPT2PR MAP")
+    print(pred_opt2pr_map)
+    print()
+    print("----")
+    """
+    ##
+
     x0 = pred_corrmap[i0]
     x1 = pred_corrmap[i1] 
-    map_dot = map_dot_product(x0,x1)
 
+    ##
+    """
+    print("mapping elements")
+    print(x0)
+    print(x1)
+    print()
+    """
+    ##
+
+    map_dot = map_dot_product_(x0,x1)
 
     # 
     md2 = {}

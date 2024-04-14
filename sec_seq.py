@@ -52,9 +52,9 @@ class OptimaBloomFuncSecRep:
         self.bpoints = {} 
         self.bpoints[self.sz] = deepcopy(\
             self.obf.oseeds)
-
-        # terminate at dim `sz` 
+        # finished blooming
         self.fstat = False
+        # terminate at dim `sz` 
         self.tstat = False
         self.set_sz()
 
@@ -66,6 +66,7 @@ class OptimaBloomFuncSecRep:
     def set_sz(self,attempts=10):
         # get dim of OptimaBloomFunc
         self.sz = self.obf.oseeds.shape[1]
+        self.tdim.append(self.sz) 
 
         self.sz = self.sz_map(self.sz)
         if self.sz in self.tdim:
@@ -82,8 +83,9 @@ class OptimaBloomFuncSecRep:
 
     def __next__(self):
         self.obf.d = self.sz
-        if self.sz in self.tdim:
-            return None
+
+        #if self.sz in self.tdim:
+        #    return None
 
         d = next(self.obf)
         if type(d) == type(None):
@@ -116,8 +118,11 @@ class OptimaBloomFuncSecRep:
         self.dpm.process_index_pair(px1,px2)
         return
 
+    ##def finalize_dcount(self,iso_index:int,pred_opt2pr_map:defaultdict):
+        ##q = self.obfsr.iso_appear(iso_index)
     def finalize_dcount(self,pred_opt2pr_map:defaultdict):
         # get the dimension of predecessor
+        ##print("SZ IS: ",self.sz)
         pr_vec,dep_map = self.dpm.fin_count(self.corr_type,\
             self.sz,pred_opt2pr_map)
         self.set_dpm()
@@ -143,6 +148,7 @@ class Sec:
         assert type(optima_pr_map) == type(dep_map) and \
             type(dep_map) == type(codep_map)
         assert type(optima_pr_map) == defaultdict
+        assert matrix_methods.vector_to_string(sequence,float) in optima_pr_map
 
         self.seq = sequence
         self.singleton_range = singleton_range
@@ -154,7 +160,22 @@ class Sec:
         if type(self.obfsr) == type(None):
             self.declare_obf()
         
-        self.declared_dir = [] 
+        self.declared_dir = []
+        self.next_sz = None 
+
+        self.dimso = None 
+
+    def __str__(self):
+        s = "** sequence\n"
+        s += matrix_methods.vector_to_string(self.seq,float)
+        s += "\n" + "** optima pr." + "\n"
+        s += str(self.opm)
+        s += "\n" + "** dep. map" + "\n"
+        s += str(self.dm)
+        s += "\n" + "** co-dep. map" + "\n"
+        s += str(self.cdm)
+
+        return s + "\n"
 
     def optima_points(self):
         ks = sorted(list(self.opm.keys()))
@@ -211,13 +232,27 @@ class Sec:
             return None,None
 
         q2 = np.array([self.obfsr.obf.prev_i1,self.obfsr.obf.prev_i2])
+        
+        self.dimso = len(q)
         return q, q2
 
     def process_one_bloomiso(self):
         stat = True 
         while stat: 
+            ##print("one bloom pt.")
             # next value, indices of derivators
             b1,b2 = self.__next__()
+
+            ##
+            """
+            print("SEC NEXT")
+            print(b1)
+            print()
+            print(b2)
+            print("-----")
+            """
+            ##
+
             stat = not (type(b1) == type(None))
             if not stat:
                 continue
@@ -225,21 +260,35 @@ class Sec:
                 ##self.declare_another_Sec(self.obfsr.sz)
                 # case: obfsr needs to be reset
                 ##self.obfsr.set_sz()
-            return -1 
+            ###return -1 
+        return
 
-        return -1 
-
+    # TODO: bug here. 
     def lone_pr_vec_for_bloom(self):
+        
         x = self.optima_points_to_index_pr_map()
         return self.obfsr.finalize_dcount(x)
+        
+        #####
 
     def generate_next_Sec(self):
         assert not self.obfsr.fstat
-
-        # get the (lone Pr.,dependency Pr.) maps
+        assert self.obfsr.tstat 
+        
         q = self.lone_pr_vec_for_bloom()
 
-        # split the dependency map w/ co-dep map
+        # get the optima points for the `sz`
+        # dimension
+        bps = deepcopy(self.obfsr.bpoints[self.obfsr.sz])
+        assert bps.shape[0] == len(q[0])
+
+        optima_pr_map = defaultdict(float)
+        for i,q_ in enumerate(q[0]):
+            vs = matrix_methods.vector_to_string(bps[i],float)
+            optima_pr_map[vs] = np.round(q_,5)
+
+        # get the dep. maps
+        #   split the dependency map w/ co-dep map
         dep_map,codep_map = {},{}
         for (k,v) in q[1].items():
             stat = default_rnd_boolean_index_splitter(v)
@@ -250,26 +299,32 @@ class Sec:
         dep_map,codep_map = defaultdict(float,dep_map),\
             defaultdict(float,codep_map)
 
-        # construct  <optima_pr_map>
-        ## new optima point -> Pr value
-        ##
-        ## * uses exact-correlation 
-        om = defaultdict(float)
-        lo = self.optima_points()
+        # get the new <seq> vector 
+            # Pr. of old ans. 
+        vsm = matrix_methods.vector_to_string(self.seq,float)
+        pr = self.opm[vsm]
 
-        index = max([(i,q_) for (i,q_) in enumerate(q[0])],key=lambda x: x[1])
-        index = index[0]
-        sample = deepcopy(lo[index])
+        qopm = [(k,v) for k,v in optima_pr_map.items()] 
+        qopm = sorted(qopm,key=lambda x: x[0])
+        nu_pt = min(qopm,key=lambda x: abs(x[1] - pr)) 
+        nu_pt = nu_pt[0]
+        nu_pt = matrix_methods.string_to_vector(nu_pt,float)
+        #nu_pt = np.round(nu_pt,5)
 
-        optima_pr_map = {}
-        for i,q_ in enumerate(q[0]):
-            vs = matrix_methods.vector_to_string(lo[i],float)
-            optima_pr_map[vs] = q_
-
-        s = Sec(sample,self.singleton_range,\
+        s = Sec(nu_pt,deepcopy(self.singleton_range),\
             optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)
+        sz0 = s.obfsr.sz
+        print("-- RESETTING OSEEDS")
+        sr_mat = np.array([deepcopy(self.singleton_range) for _ in range(sz0)])
+        self.obfsr.obf.reset_oseeds(bps,sr_mat,True)
+        print("optima")
+        print(bps)
+
         self.obfsr = None
-        return s
+        s.obfsr.set_sz()
+        s.obfsr.tstat = False 
+        return s,sz0,s.obfsr.sz
+        
 
 class SecSeq:
 
