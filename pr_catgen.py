@@ -314,6 +314,10 @@ def partial_correlation_dep_Pr(d2_rsz,pred_exact_corrmap,\
 ########### bounds generator
 
 """
+*CAUTION*
+- not deterministic when setting seed values for 
+  random and np.random.
+
 - arguments: 
 superbound := bounds vector, the bound that all 
     output bounds have to fall within.

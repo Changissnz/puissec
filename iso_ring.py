@@ -16,17 +16,21 @@ class BoundedObjFunc:
         self.dobjf = default_objf
 
     @staticmethod
-    def generate_BoundedObjFunc(drange,blen,rnd_seed):
+    def generate_BoundedObjFunc(superbound,\
+        spacing_ratio_range,outlier_pr_ratio,\
+        num_bounds,rnd_seed:int):
+
         assert type(rnd_seed) == int 
-        assert type(blen) == int and blen > 0
+        assert type(num_bounds) == int and num_bounds > 0 
 
         r = {0:"e.d.",1:"s.m.",2:"r.n."}
         random.seed(rnd_seed)
 
-        bounds_seq = [deepcopy(drange) for _ in range(blen)]
+        bounds_seq = generate_bounds_vector_sequence(\
+            superbound,spacing_ratio_range,outlier_pr_ratio,num_bounds)
 
         corr_objf = []
-        for i in range(blen):
+        for i in range(num_bounds):
             # choose a random obj_type
             obj_type = random.randrange(0,3)
             obj_type = r[obj_type]
