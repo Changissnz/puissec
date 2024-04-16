@@ -1,6 +1,6 @@
 
 #from defaults import *
-from morebs2 import measures
+from morebs2 import measures,numerical_generator
 from imod import * 
 
 """
@@ -61,6 +61,7 @@ def split_map(m,ratio=0.5):
     return m_,m2_ 
 
 ############################################
+############# map dot products 
 
 def default_dotkey_func():
     f = lambda s1,s2: matrix_methods.vector_to_string(s1 + s2,int)
@@ -308,3 +309,90 @@ def partial_correlation_dep_Pr(d2_rsz,pred_exact_corrmap,\
         key = matrix_methods.vector_to_string(pr_index,int)
         pr_map[key] = pfc 
     return pr_map 
+
+##################################################
+########### bounds generator
+
+"""
+- arguments: 
+superbound := bounds vector, the bound that all 
+    output bounds have to fall within.
+spacing_ratio_range := the permitted range of 
+    ratios (w.r.t. superbound) allowed for the distance 
+    between any two output bounds.
+outlier_pr_ratio := the permitted range of variation,
+    given the remaining allocatable space, 
+    allowed for each bounds.
+num_bounds := int,the number of bounds to be generated.
+
+*Examples*
+(1)
+    spacing_ratio_range = (0.,0.) 
+    - no spacing; all allocated space is contiguous (connected)
+(2) 
+    outlier_pr_ratio = (0.,0.1)
+
+    The default vector length for each bound is 
+        L_d = (superbound[1] - superbound[0]) / num_bounds 
+
+    The range of values that a Python random generator 
+    draws from is [L_d + 0.,L_d + 0.1 * 
+                    (||superbound|| * L_d)]
+
+(3) 
+    outlier_pr_ratio = (1.0,1.0) 
+
+    The range of values that a Python random generator
+    draws from is 
+
+        [B[1], superbound[1]]; B the previous bound.
+"""
+def generate_bounds_vector_sequence(superbound,\
+    spacing_ratio_range,outlier_pr_ratio,num_bounds):
+    assert matrix_methods.is_proper_bounds_vector(superbound)
+    assert num_bounds > 0 and type(num_bounds) == int
+
+    outlier_pr_calibrated = [1/num_bounds,1/num_bounds]
+    outlier_pr_calibrated[0] = max([0.,\
+        outlier_pr_calibrated[0] - outlier_pr_ratio])
+    outlier_pr_calibrated[1] = min([1.,\
+        outlier_pr_calibrated[1] + outlier_pr_ratio])
+
+    sb_diff = superbound[:,1] - superbound[:,0] 
+    bseq = []
+    ref_point = deepcopy(superbound[:,0])
+    next_point = None
+    while num_bounds > 0: 
+
+        # update the next point 
+        next_point = generate_point_for_bvecseq(superbound,\
+        sb_diff,ref_point,outlier_pr_calibrated)
+
+        bd = deepcopy(np.array([ref_point,next_point]).T)
+
+        # update the ref point 
+        ref_point = generate_point_for_bvecseq(superbound,\
+        sb_diff,next_point,spacing_ratio_range)
+
+        bseq.append(bd)
+        num_bounds -= 1
+    return bseq 
+
+def generate_point_for_bvecseq(superbound,\
+    superbound_diff,ref_point,ratio_range):
+    assert len(ratio_range) == 2 
+    assert ratio_range[0] <= ratio_range[1]
+    assert ratio_range[0] >= 0. and ratio_range[1] <= 1.0 
+
+    # get the difference b/t the ref_point 
+    # and the superbound max
+    r_diff = superbound[:,1] - ref_point
+    assert np.min(r_diff) >= 0.0 
+
+
+    # calculate a ratio vecor
+    rvec = numerical_generator.generate_uniform_sequence_in_bounds\
+        (superbound.shape[0], np.array([ratio_range]))
+    
+    adder = r_diff * rvec
+    return np.round(ref_point + adder,5)

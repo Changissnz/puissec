@@ -135,6 +135,26 @@ class PRCatGenFunctionsClass(unittest.TestCase):
         assert pr_dist[0] == ans0 
         return
 
+    def test__generate_bounds_vector_sequence(self):
+        np.random.seed(30)
+
+        superbound = np.array([[0,1.],\
+                    [0,1.],\
+                    [0,1.]]) 
+
+        spacing_ratio_range = [0.,0.1]
+        outlier_pr_ratio = 0.1#1.0
+        num_bounds = 3
+
+        bvseq = generate_bounds_vector_sequence(superbound,\
+            spacing_ratio_range,outlier_pr_ratio,num_bounds)
+
+        for i in range(1,len(bvseq)):
+
+            b1 = bvseq[i -1]
+            b2 = bvseq[i]
+            assert np.all(b2[:,0] - b1[:,1])
+        return
 
 if __name__ == '__main__':
     unittest.main()

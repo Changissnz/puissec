@@ -15,6 +15,32 @@ class BoundedObjFunc:
         self.corr_objf = corr_objf
         self.dobjf = default_objf
 
+    @staticmethod
+    def generate_BoundedObjFunc(drange,blen,rnd_seed):
+        assert type(rnd_seed) == int 
+        assert type(blen) == int and blen > 0
+
+        r = {0:"e.d.",1:"s.m.",2:"r.n."}
+        random.seed(rnd_seed)
+
+        bounds_seq = [deepcopy(drange) for _ in range(blen)]
+
+        corr_objf = []
+        for i in range(blen):
+            # choose a random obj_type
+            obj_type = random.randrange(0,3)
+            obj_type = r[obj_type]
+
+            s2 = random.randrange(100)
+            objf = ObjFunc(obj_type,s2)
+            corr_objf.append(objf)
+        
+        default_objf = deepcopy(corr_objf[0])
+
+        bof = BoundedObjFunc(bounds_seq,corr_objf,\
+            default_objf)
+        return bof 
+
     def output(self,ref,x):
         i = self.bounds_index_of_point(x)
         if i == -1:
@@ -102,9 +128,6 @@ class IsoRing:
     """ 
     def register_attempt_(self,p):
         assert matrix_methods.is_vector(p) 
-
-
-
         ops = self.sec.optima_points() 
         if len(p) != ops.shape[1]:
             print("attempt in wrong dim {}, want {}".format(len(p),\
