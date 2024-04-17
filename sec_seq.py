@@ -119,8 +119,6 @@ class OptimaBloomFuncSecRep:
         self.dpm.process_index_pair(px1,px2)
         return
 
-    ##def finalize_dcount(self,iso_index:int,pred_opt2pr_map:defaultdict):
-        ##q = self.obfsr.iso_appear(iso_index)
     def finalize_dcount(self,pred_opt2pr_map:defaultdict):
         # get the dimension of predecessor
         ##print("SZ IS: ",self.sz)
