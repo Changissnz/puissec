@@ -1,5 +1,6 @@
 from obj_func import * 
 from sec_seq import * 
+from cvec import * 
 
 class BoundedObjFunc:
 
@@ -65,10 +66,15 @@ class BoundedObjFunc:
 
 class IsoRing:
 
-    def __init__(self,sec:Sec,ofunc:BoundedObjFunc,bounds):
+    def __init__(self,sec:Sec,ofunc:BoundedObjFunc,bounds,\
+        cvecl=None):
         assert type(sec) == Sec
         assert type(ofunc) == BoundedObjFunc
         assert matrix_methods.is_proper_bounds_vector(bounds)
+        if type(cvecl) != type(None):
+            for c in cvecl: assert type(c) == CVec
+            assert len(cvecl) == len(sec.opm)
+
         self.sec = sec
         self.sec_cache = [self.sec] 
 
@@ -78,6 +84,21 @@ class IsoRing:
         self.bstat = True
         # index of repr in `sec_cache`
         self.repi = 0
+        # sequence of <CVec> instances, each 
+        # i'th <CVec> corresponds to the i'th
+        # 
+        self.cvecl = cvecl
+        self.declare_cvecl()
+
+    def declare_cvecl(self):
+        if type(self.cvecl) != type(None):
+            return
+
+        self.cvecl = [] 
+        for i in range(0,len(self.sec.opm)):
+            cvseq = default_cvec_iselector_seq()
+            cv = CVec(cvis=cvseq)
+            self.cvecl.append(cv)
 
     def operating_sec(self): 
         if self.bstat:
@@ -121,6 +142,12 @@ class IsoRing:
 
         # calculate feedback for attempt
         q = self.register_attempt_(p)
+        assert len(q) == len(self.cvecl)
+
+        # log the feedback into each of the CVecs 
+        self.cvecl[0].append(q[0],p)
+        for i in range(1,len(self.cvecl)): 
+            self.cvecl[i].append(q[i],None)
 
         # get the actual stat
         stat = matrix_methods.equal_iterables(p,self.sec.seq)
@@ -141,4 +168,5 @@ class IsoRing:
         # get scores for each of the optima 
         q = list(map(lambda x: self.ofunc(x,p),ops))
         return np.array(q) 
+
 

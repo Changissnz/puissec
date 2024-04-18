@@ -7,6 +7,15 @@ python3 -m tests.test_cvec
 """
 ###
 
+def cmp_seq_with_cvec(cvec,seq):
+    input_samples = [0 for _ in range(len(seq))]
+
+    cvec.input_samples = input_samples
+    cvec.v = seq 
+
+    bvec = cvec.cmp()
+    return bvec 
+
 class CVecISelectorClass(unittest.TestCase):
 
     def test__CVecISelector__output__case1(self):
@@ -28,6 +37,31 @@ class CVecISelectorClass(unittest.TestCase):
             outp = cvis.output(c)
             assert ansd[c] == outp 
         return 
+
+class CVecClass(unittest.TestCase):
+
+    def test__CVec__cmp__case1(self):
+        ciseq = default_cvec_iselector_seq()
+        cvec = CVec(cvis=ciseq)
+
+        x = [6,5,4,3,2,1,0.5,0.25,0.125]
+        bvec = cmp_seq_with_cvec(cvec,x) 
+        assert np.all(bvec == np.array([ True,  True,  True,  True,  True,  True,  True])) 
+
+        x = [5,5]
+        bvec = cmp_seq_with_cvec(cvec,x) 
+        assert np.all(bvec == np.array([False, False, False, False, False, False, False]))
+
+        x = [5,4]
+        bvec = cmp_seq_with_cvec(cvec,x) 
+        assert np.all(bvec == np.array([ True, False,  True, False, False, False, False]))
+
+        x = [-1,-2,-1,-2,0,0,1,1,-1,-2,-2,-3]
+        bvec = cmp_seq_with_cvec(cvec,x) 
+        assert np.all(bvec == np.array([False,  True, False, False, False, False, False]))
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
