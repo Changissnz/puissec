@@ -7,7 +7,7 @@ from hype import *
 a <RChainHead> instance derived from a 
 <IsoRing>. 
 """
-def IsoRing_to_base_RChainHead(ir:IsoRing):#cvec:CVec,bof:BoundedObjFunc):
+def IsoRing_to_base_RChainHead(ir:IsoRing):
     assert type(ir) == IsoRing
 
     def outputf1(p):
@@ -16,11 +16,13 @@ def IsoRing_to_base_RChainHead(ir:IsoRing):#cvec:CVec,bof:BoundedObjFunc):
         if stat:
             return None
         m = ir.cvec_feedback()
-        return m 
+        return m
 
     def outputf2(m):
         ## NOTE 
         # USE W/ CAUTION HERE 
+        if type(m) == type(None):
+            return False
         return metric_2dboolmat_to_bool(m)
 
     rch = relevance_functions.RChainHead()
@@ -32,7 +34,9 @@ def IsoRing_to_base_RChainHead(ir:IsoRing):#cvec:CVec,bof:BoundedObjFunc):
     rch.add_node_at(argseq2)
     return rch
 
+"""
 
+"""
 def default_base_RSSI(ir:IsoRing,hs:HypStruct,ssih):
     assert type(ir) == IsoRing
     assert type(hs) == HypStruct
@@ -47,3 +51,11 @@ def default_base_RSSI(ir:IsoRing,hs:HypStruct,ssih):
             resplattingMode)
 
     return rss
+
+class Crackling:
+
+    def __init__(self): 
+        self.rss = None
+
+    def declare_new_rssi(self,ir,hs,ssih):
+        self.rss = default_base_RSSI(ir,lhs,ssih)

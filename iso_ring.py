@@ -90,6 +90,9 @@ class IsoRing:
         self.cvecl = cvecl
         self.declare_cvecl()
 
+        # cracked stat 
+        self.cstat = False 
+
     def declare_cvecl(self):
         if type(self.cvecl) != type(None):
             return
@@ -151,6 +154,7 @@ class IsoRing:
 
         # get the actual stat
         stat = matrix_methods.equal_iterables(p,self.sec.seq)
+        self.cstat = stat 
         return q,stat
 
     """
