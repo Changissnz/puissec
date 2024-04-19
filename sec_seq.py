@@ -27,8 +27,8 @@ def generate_pointgen_stdrand(bounds,num_points,rnd_struct):
     return np.array(ps)
 
 def default_AltBaseFunc_for_IsoRing():
-    q = generate_efunc_type_q(1,1,1,1)
-    q2 = generate_efunc_type_q(0.5,1.0,0.5,1.0)
+    q = generate_efunc_type_q(1,1)#,1,1)
+    q2 = generate_efunc_type_q(0.5,1.0)#,0.5,1.0)
     mfs = deepcopy(DEFAULT_PAIRWISE_VEC_FUNCS)
     mfs = mfs + [q,q2] 
     return AltBaseFunc(mfs,random)
@@ -175,6 +175,11 @@ class Sec:
         s += str(self.cdm)
 
         return s + "\n"
+
+    @staticmethod
+    def generate(seq,singleton_range,num_optima,rnd_struct):
+        return -1 
+
 
     def optima_points(self):
         ks = sorted(list(self.opm.keys()))

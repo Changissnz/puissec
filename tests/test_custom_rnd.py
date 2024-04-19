@@ -101,8 +101,8 @@ class AltBaseFuncClass(unittest.TestCase):
         xx = [[0,0],[1,1]]
         #xx = [[1,2],[1,3]]
 
-        q = generate_efunc_type_q(5,10,idn_fx,sqrt_fx)
-        q2 = generate_efunc_type_q(15,1.4,idn_fx,sqrt_fx)
+        q = generate_efunc_type_q(5,10)#,idn_fx,sqrt_fx)
+        q2 = generate_efunc_type_q(15,1.4)#,idn_fx,sqrt_fx)
         base_pairs = [DEFAULT_PAIRWISE_VEC_FUNCS[0],\
                 DEFAULT_PAIRWISE_VEC_FUNCS[1],\
                 DEFAULT_PAIRWISE_VEC_FUNCS[3],\

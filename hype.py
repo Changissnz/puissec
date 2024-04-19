@@ -28,7 +28,7 @@ class HypStruct:
         self.suspected_subbounds = suspected_subbounds
 
         # the probability/weight of each sub-bound
-        assert type(sb_pr) == type(None) or 
+        assert type(sb_pr) == type(None) or \
             matrix_methods.is_vector(sb_pr)
 
         if type(sb_pr) == type(None):

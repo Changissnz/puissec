@@ -11,7 +11,7 @@ e1 and e2 are input variables to output
 function `F`. 
 """
 def generate_efunc_type_q(c1:float,\
-    c2:float,f,g):
+    c2:float):#,f,g):
 
     base = lambda e1: 1 + c1 * math.e ** e1
     undrbase = lambda e2: 1 + c2 * math.e ** e2

@@ -400,3 +400,7 @@ def generate_point_for_bvecseq(superbound,\
     
     adder = r_diff * rvec
     return np.round(ref_point + adder,5)
+
+def generate_pr_dist_for_seq(seq_size,max_indices,actual=1.0):
+
+    return -1
