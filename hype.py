@@ -1,3 +1,17 @@
+from morebs2 import matrix_methods 
+
+def any_intersecting_bounds(bounds_seq):
+    for i in range(0,len(bounds_seq) - 1):
+        for j in range(i+1,len(bounds_seq)):
+            b1 = bounds_seq[i] 
+            b2 = bounds_seq[i+1]
+            q = matrix.intersection_of_bounds(b1,b2)
+            if type(q) != type(None):
+                return True
+    return False 
+
+
+
 """
 The Hypothesis structure.
 
@@ -8,17 +22,30 @@ P(s in S) --> is s relevant?
 """
 class HypStruct:
 
-    def __init__(self,suspected_subbounds):
+    def __init__(self,suspected_subbounds,sb_pr=None):
+        assert len(suspected_subbounds) > 0 
+        assert not any_intersecting_bounds(suspected_subbounds)
         self.suspected_subbounds = suspected_subbounds
-        # every i'th element is vector of scores 
-        # corresponding to the i'th element in 
-        # the sequence `suspected_subbounds`
-        self.subbound_scorevec = [None for i in range(len(self.suspected_subbounds))]
+
+        # the probability/weight of each sub-bound
+        assert type(sb_pr) == type(None) or 
+            matrix_methods.is_vector(sb_pr)
+
+        if type(sb_pr) == type(None):
+            sb_pr = np.ones((len(suspected_subbounds),),dtype=float)
+            sb_pr = sb_pr * 1.0 / len(suspected_subbounds)
+        assert len(sb_pr) == len(suspected_subbounds)
+        self.sb_pr = sb_pr
         return
 
-    def mark_subbound(self,i):
-        return -1
+    def mark_subbound(self,i,v=0.0):
+        assert i >= 0 and i < len(self.suspected_subbounds)
+        assert type(v) == float 
+        self.sb_pr[i] = v
+        return
 
-    def log_score(self):
-        return -1
+    def most_probable_subbound(self):
+        q = list(enumerate(self.sb_pr))
+        qi = max(q,key=lambda x:x[1])
+        return self.suspected_subbounds[qi[0]]
 

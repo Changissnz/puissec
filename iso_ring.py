@@ -167,6 +167,10 @@ class IsoRing:
         
         # get scores for each of the optima 
         q = list(map(lambda x: self.ofunc(x,p),ops))
-        return np.array(q) 
+        return np.array(q)
 
-
+    def cvec_feedback(self):
+        x = []
+        for c in self.cvecl:
+            x.append(c.cmp())
+        return np.array(x,dtype=bool)
