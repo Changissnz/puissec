@@ -1,5 +1,11 @@
 from dfs_struct import * 
+from sec_seq import * 
 
+"""
+serves as a descriptor for a methodology that 
+<SecNetFrameGen> uses to generate the `frame` 
+of a <SecNet>, meaning its nodes and edges. 
+"""
 class SecNetGenScheme:
 
     def __init__(self,description,rnd_seed,additional_args=None):
@@ -430,3 +436,4 @@ class SecNetFrameGen:
         self.node_components.pop(q[1]) 
         self.node_components.append(cx) 
         return
+

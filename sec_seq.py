@@ -1,37 +1,4 @@
-from ep_corrmap import * 
-from bloominhurst import *
-
-default_rnd_boolean_index_splitter = lambda x: True if random.randrange(0,2) else False 
-
-def generate_default_szmult_mod(m,drange=[2,11]):
-    assert len(drange) == 2 and drange[0] <= drange[1]
-
-    def f(x):
-        q = int(round(x * m) % (drange[1] - drange[0]))
-        return q + drange[0] 
-    return f 
-
-"""
-used to generate points by Python standard
-`random` library. 
-"""
-def generate_pointgen_stdrand(bounds,num_points,rnd_struct):
-
-    assert matrix_methods.is_proper_bounds_vector(bounds)
-    
-    ps = []
-    for i in range(num_points):
-        rx = rnd_struct.random(bounds.shape[0])
-        p = matrix_methods.point_on_bounds_by_ratio_vector(bounds,rx)
-        ps.append(p)
-    return np.array(ps)
-
-def default_AltBaseFunc_for_IsoRing():
-    q = generate_efunc_type_q(1,1)#,1,1)
-    q2 = generate_efunc_type_q(0.5,1.0)#,0.5,1.0)
-    mfs = deepcopy(DEFAULT_PAIRWISE_VEC_FUNCS)
-    mfs = mfs + [q,q2] 
-    return AltBaseFunc(mfs,random)
+from sec_mapr import * 
 
 ############################################
 
@@ -78,6 +45,7 @@ class OptimaBloomFuncSecRep:
         ##print("SZ IS: {}".format(self.sz))
         return self.sz
 
+    # NOTE: wrong. 
     def iso_appear(self,i):
         assert i in self.bpoints
         return deepcopy(self.bpoints[i])
@@ -176,11 +144,33 @@ class Sec:
 
         return s + "\n"
 
+    """
+    bare instances do not have any dep. or co-dep. 
+    """
     @staticmethod
-    def generate(seq,singleton_range,num_optima,rnd_struct):
-        return -1 
+    def generate_bare_instance(singleton_range,dimension,num_optima,\
+        optima_countermeasure,rnd_struct=np.random):
+        # select the optima points 
+        bds = np.array([deepcopy(singleton_range) for _ in range(dimension)])
+        ps = generate_pointgen_stdrand(bds,num_optima,rnd_struct)
+        print(ps)
+        
+        # select a random optima
+        qi = random.randrange(0,len(ps))
+        seq = deepcopy(ps[qi])
 
+        # declare a Pr map for the optima
+        opm = generate_pr_dist_for_seq(ps,qi,optima_countermeasure,\
+            rnd_struct)
+        dep_map = defaultdict(float)
+        codep_map = deepcopy(dep_map)
+        return Sec(seq,singleton_range,\
+            opm,dep_map,codep_map,obfsr=None)
 
+    """
+    return: 
+    - np.array,rows ordered by alphanumeric order. 
+    """
     def optima_points(self):
         ks = sorted(list(self.opm.keys()))
         optima_points = [matrix_methods.string_to_vector(v,float) for v in \
@@ -260,7 +250,6 @@ class Sec:
                 continue
         return
 
-    # TODO: bug here. 
     def lone_pr_vec_for_bloom(self):
         
         x = self.optima_points_to_index_pr_map()
@@ -328,7 +317,6 @@ class Sec:
         s.obfsr.tstat = False 
         return s,sz0,s.obfsr.sz
         
-
 class SecSeq:
 
     def __init__(self,sequence,reference_map=None): 

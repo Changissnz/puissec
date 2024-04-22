@@ -156,5 +156,64 @@ class PRCatGenFunctionsClass(unittest.TestCase):
             assert np.all(b2[:,0] - b1[:,1])
         return
 
+    def test__generate_pr_dist_for_seq(self):
+        random.seed(37)
+        np.random.seed(11)
+
+        # declare the optima 
+        bounds = np.ones((4,2)) * np.array([0,1.]) 
+        optima = generate_pointgen_stdrand(bounds,5,np.random)
+        best_index = 2
+
+        # set counter-measure
+        cm = (0.,0.) 
+        cm2 = (0.,1.) 
+        cm3 = (0.5,1.0)
+        prdist = generate_pr_dist_for_seq(optima,best_index,cm)
+
+        prdist_ans = defaultdict(float,\
+            {'0.18027,0.01948,0.46322,0.72493': 0.0,\
+            '0.4202,0.48543,0.01278,0.48737': 0.0,\
+            '0.94181,0.8508,0.72996,0.10874': 1.0,\
+            '0.8939,0.85715,0.16509,0.63233': 0.0,\
+            '0.02048,0.11674,0.31637,0.15791': 0.0})
+
+        assert prdist == prdist_ans
+
+        prdist2 = generate_pr_dist_for_seq(optima,best_index,cm2)
+        assert prdist == prdist2 
+
+        prdist3 = generate_pr_dist_for_seq(optima,best_index,cm3)
+
+        prdist3_ans = defaultdict(float,\
+            {'0.18027,0.01948,0.46322,0.72493': 0.061262321286630006,\
+            '0.4202,0.48543,0.01278,0.48737': 0.003774196443119382,\
+            '0.94181,0.8508,0.72996,0.10874': 0.5,\
+            '0.8939,0.85715,0.16509,0.63233': 0.3030111046915374,\
+            '0.02048,0.11674,0.31637,0.15791': 0.13195237757871314})
+        assert prdist3 == prdist3_ans 
+
+
+
+
+    def test__variance_vec__pr__case1(self):
+        random.seed(29)
+        np.random.seed(29)
+
+        eq_value = 0.25
+        size = 3
+        variance = 1.0
+        vpr = variance_vec__pr(eq_value,size,variance)
+        vpr2 = variance_vec__pr(eq_value,size,variance)
+
+        vpr_ans = np.array([0.09230145, 0.27780682, 0.37989173])
+        vpr2_ans = np.array([0.64787779,0., 0.10212221])
+
+        assert matrix_methods.equal_iterables(vpr,vpr_ans)
+        assert matrix_methods.equal_iterables(vpr2,vpr2_ans)
+
+        assert abs(np.sum(vpr) - 0.75) < 10 ** -5
+        assert abs(np.sum(vpr2) - 0.75) < 10 ** -5
+
 if __name__ == '__main__':
     unittest.main()

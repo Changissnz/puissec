@@ -6,9 +6,30 @@ from imod import *
 """
 Contains basic functions for calculating 
 exact-correlation and partial-correlation
-probabilities. 
+probabilities, among other generator methods
+for points and bounds.
 """
 
+"""
+used to generate points by Python standard
+`random` library. 
+"""
+def generate_pointgen_stdrand(bounds,num_points,rnd_struct):
+
+    assert matrix_methods.is_proper_bounds_vector(bounds)
+    
+    ps = []
+    for i in range(num_points):
+        rx = rnd_struct.random(bounds.shape[0])
+        p = matrix_methods.point_on_bounds_by_ratio_vector(bounds,rx)
+        ps.append(p)
+    return np.round(np.array(ps),5)
+
+"""
+generates a 2-d matrix of shape `dim`,
+each value one drawn from Python std. 
+random. 
+"""
 def generate_2d_match_pr(dim):
     assert len(dim) == 2
     assert min(dim) > 0
@@ -30,6 +51,13 @@ def generate_2d_match_pr(dim):
         pr_map[sind] = random.random() 
     return pr_map
 
+"""
+generates a map
+key := index of d2
+value := dict,
+    key := index of d1
+    value := strength of connection, in [0.,1.]
+"""
 def generate_pr_dist_D1_to_D2(d1_sz,d2_sz):
     prdist = defaultdict(None)
     for i in range(d2_sz):
@@ -49,6 +77,12 @@ def replace_map_key(m,f):
         m_[f(k)] = v 
     return m_ 
 
+"""
+splits a map using Python std. random 
+and an input argument `ratio` into 
+2 disjoint maps m1,m2 such that 
+m1 + m2 = m. 
+"""
 def split_map(m,ratio=0.5):
     m_ = defaultdict(None)
     m2_ = defaultdict(None)
@@ -67,6 +101,10 @@ def default_dotkey_func():
     f = lambda s1,s2: matrix_methods.vector_to_string(s1 + s2,int)
     return f
 
+"""
+converts a map with frequency values to one with 
+ratio values (summation of 1.0)
+"""
 def map_freq2pr(m):
     assert type(m) in {defaultdict,dict,Counter}
     s = sum(list(m.values()))
@@ -75,7 +113,11 @@ def map_freq2pr(m):
         for (k,v) in m.items()])
     return m_ 
 
-
+"""
+return: 
+- dict, representation of matrix values with 
+        shape |d1| x |d2|. 
+"""
 def map_dot_product(d1,d2,x2x2_func=np.multiply,\
     dotkey_func=default_dotkey_func()):
     assert type(d1) in {defaultdict,dict,Counter}
@@ -382,6 +424,9 @@ def generate_bounds_vector_sequence(superbound,\
         num_bounds -= 1
     return bseq 
 
+"""
+helper method for `generate_bounds_vector_sequence`
+"""
 def generate_point_for_bvecseq(superbound,\
     superbound_diff,ref_point,ratio_range):
     assert len(ratio_range) == 2 
@@ -401,6 +446,117 @@ def generate_point_for_bvecseq(superbound,\
     adder = r_diff * rvec
     return np.round(ref_point + adder,5)
 
-def generate_pr_dist_for_seq(seq_size,max_indices,actual=1.0):
+############################# some probability distributions 
 
-    return -1
+"""
+generates a map with 
+    
+    key=stringized optimum --> value=pr. value
+
+using knowledge of the `best_index` in the 
+`optima` and the `countermeasure` w/ 
+[0] 
+[1] 
+
+---------------------------------------------
+EX: 
+
+<0,1,2,3>
+<0.25,0.25,0.5,0>
+best: 2
+
+<0,1,2,3>
+<0.5,0.4,0.1,0.>
+best: 2
+
+<0,1,2,3>
+<0.25,0.25,0.25,0.25>
+
+"""
+def generate_pr_dist_for_seq(optima,best_index,countermeasure,\
+    rnd_struct=random):
+    assert len(countermeasure) == 2
+    assert min(countermeasure) >= 0.0 and max(countermeasure) <= 1.0
+
+    d = defaultdict(float) 
+    if optima.shape[0] == 1:
+        assert best_index == 0
+        so = matrix_methods.vector_to_string(np.round(optima[0],5),float)
+        d[so] = 1.0
+
+    eq_value = np.round(countermeasure[0] / (optima.shape[0] - 1),5)
+    vpr = variance_vec__pr(eq_value,optima.shape[0] - 1,countermeasure[1],\
+            rnd_struct=random)
+    
+    j = 0
+    for (i,x) in enumerate(optima):
+        so = matrix_methods.vector_to_string(np.round(optima[i],5),float)
+        if i == best_index:
+            d[so] = 1.0 - countermeasure[0] 
+        else: 
+            d[so] = vpr[j] 
+            j += 1 
+    return d 
+
+"""
+for a vector V = {eq_value} * size, 
+calculates a vector V2 with values that 
+vary from the uniform `eq_value` based 
+on `variance`, a value in [0,1.].
+
+For each value v in V, choose a positive 
+float delta,d, in the range specified by 
+variance. Set the new value 
+        v' = min(v + d,1.0).
+Choose an arbitrary subset S of values 
+in V - {v}. Add -(1/|S| * d) to each 
+element of S. These changes are reflected
+onto V to eventually produce V'.
+
+See the function `varmod_index_of_vec__pr`
+for more details.
+"""
+def variance_vec__pr(eq_value,size,variance,\
+    rnd_struct=random):
+    assert size > 0 
+
+    #assert abs(1 - eq_value * size) < 10 ** -4
+    q = np.ones((size,)) * float(eq_value)
+    if size == 1: return q 
+
+    s = eq_value * size 
+    s = s - (1.0/size * s)  
+    s = variance * s 
+    delta_range = [0.0,s]
+    for i in range(size):
+        q = varmod_index_of_vec__pr(q,i,delta_range,rnd_struct)
+    return q
+
+def varmod_index_of_vec__pr(v,i,available_range,rnd_struct):
+    s = rnd_struct.uniform(available_range[0],available_range[1])
+    q = [j for j in range(len(v)) if j != i]
+    # apply positive delta 
+    v_ = v[i] + s
+
+    diff = v_ - 1.0
+    if diff >= 0.0:
+        v_ = 1.0
+        s = s - diff
+    v[i] = v_ 
+
+    # distribute negative delta 
+    while s > 0.0:
+        denum = rnd_struct.randrange(1,6)
+        s_ = s * 1.0/denum
+
+        # 
+        qi = rnd_struct.choice(q)
+        x = v[qi]
+        
+        xdiff = x - s_
+        if xdiff < 0.0:
+            s_ = s_ + xdiff
+        x = x - s_ 
+        v[qi] = x 
+        s = s - s_ 
+    return v 
