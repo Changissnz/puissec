@@ -10,7 +10,12 @@ default_rnd_boolean_index_splitter = lambda x: True if random.randrange(0,2) els
 ##################### belonging to <Sec> 
 
 """
-parses a key for a (co?)-dependency map
+parses a key for a (co?)-dependency map.
+
+return:
+- index of optima for reference
+- index of other <Sec>
+- index of optima for other <Sec> 
 """
 def parse_dconn(s):
     assert type(s) == str

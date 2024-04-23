@@ -437,3 +437,329 @@ class SecNetFrameGen:
         self.node_components.append(cx) 
         return
 
+
+# TODO: test this. 
+"""
+generates the connections for Pr. dependencies 
+of each <Sec> instance in `sec_seq` in the 
+order of the <Sec>'s index. 
+
+For each <Sec> S, its (co?)-dependency map has elements
+of the form 
+```
+key: 
+    "index of the local optimum of S",
+    "index of other <Sec> S2"."index of local optimum of S2"
+value:
+    f in [0.,1.]
+```
+
+For example, for two secrets <S1,S2> with 5 and 6 local 
+optima,respectively: 
+```
+4,1.3
+```
+is the key for the fifth local optimum of S1 with the 
+ fourth local optimum of 2nd secret S2. 
+
+The dependency maps generated are reflexive. 
+"""
+class SecNetDepGen:
+
+    def __init__(self,sec_seq,rnd_struct,\
+        min_components:int,max_nconn_ratio:float,
+        dlength_range):
+        assert type(sec_seq) == list
+        for s in sec_seq: assert type(s) == Sec 
+        assert type(min_components) == int and min_components > 0
+        assert len(sec_seq) >= min_components
+        assert max_nconn_ratio >= 0.0 and max_nconn_ratio <= 1.0
+
+        assert len(dlength_range) == 2
+        assert dlength_range[0] < dlength_range[1]
+        assert type(dlength_range[0]) == type(dlength_range[1])
+        assert type(dlength_range[0]) == int
+        assert dlength_range[1] <= len(sec_seq) 
+
+        self.sec_seq = sec_seq 
+        self.clear_sec_pr_maps()
+
+        self.rnd_struct = rnd_struct 
+        self.min_components = min_components
+        self.max_nconn_ratio = max_nconn_ratio
+        self.dlength_range = dlength_range 
+        # each element is a set representing a 
+        # co-dependent component
+        self.cd_comp_sets = []
+        # index of <Sec> -> indices of other <Sec> 
+        #               dependent on it.
+        self.dep_map = defaultdict(list)
+
+        for i in range(len(sec_seq)):
+            self.cd_comp_sets.append(set([i])) 
+            self.dep_map[i] = [] 
+        
+        # every element is of the form
+        #   key= node idn.
+        #   value= dict
+        #       key=connection b/t node optimum and other
+        #       value=strength of the connection
+        self.dep = defaultdict(defaultdict)
+        self.codep = defaultdict(defaultdict)
+        return
+
+    def clear_sec_pr_maps(self):
+        for s in self.sec_seq: 
+            s.dm.clear()
+            s.cdm.clear()
+        return 
+
+    ###################### make conn. method. 
+    def make_conn(self,options = [1,2,3]):
+        assert set(options).issubset({1,2,3})
+        print("OPT: ",len(options))
+        if len(options) == 0:
+            return False
+
+        # choose a random element in options
+        i = self.rnd_struct.randrange(0,len(options))
+        o = options.pop(i)
+
+        stat = True
+
+        print("choosing choice: ",o)
+        # dependency conn.
+        if o == 1:
+            stat = self.make_dep_conn()
+        # co-dep. conn. (b/t two components)
+        elif o == 2: 
+            stat = self.make_codep_C2C_conn()
+        # co-dep. conn. (in one component) 
+        else:  
+            stat = self.make_codep_CInC_conn()
+        print("stat: ",stat)
+
+        if type(stat) != type(None):
+            return True
+        return self.make_conn(options)
+        
+    def make_dep_conn(self):
+        # get list of candidates
+        l = self.available_for_dependency()
+        if len(l) == 0: return None
+
+        # choose a pair of non-connected nodes
+        q = self.rnd_struct.randrange(0,len(l))
+        l = list(l)
+        x = l[q]
+
+        # choose a local optima from each of the elements
+        i1 = self.rnd_struct.randrange(0,len(self.sec_seq[x[0]].opm))
+        i2 = self.rnd_struct.randrange(0,len(self.sec_seq[x[1]].opm))
+
+        prv = round(self.rnd_struct.uniform(0.,1.),5)
+        self.add_dependency(x[0],x[1],i1,i2,prv)
+        return True
+
+    def make_codep_C2C_conn(self):
+        stat = self.available_C2C_conn()
+        if not stat: return None
+        cind = [i for i in range(len(self.cd_comp_sets))]
+        # choose a (node,component)
+        ci1 = self.rnd_struct.randrange(0,len(cind)) 
+        ci1 = cind.pop(ci1) 
+        x = list(self.cd_comp_sets[ci1])
+        ci1_ = self.rnd_struct.randrange(0,len(x))
+        n1 = x[ci1_]
+
+        # choose another (node,component)
+        ci2 = self.rnd_struct.randrange(0,len(cind))
+        ci2 = cind.pop(ci2) 
+        x = list(self.cd_comp_sets[ci2])
+        ci2_ = self.rnd_struct.randrange(0,len(x))
+        n2 = x[ci2_]
+
+        # make a co-dep b/t n1 and n2 
+        prv = round(self.rnd_struct.uniform(0.,1.),5)
+        self.add_codep(n1,n2,prv)
+        return True 
+
+    def make_codep_CInC_conn(self):
+        q = self.available_CInC_conn()
+        x = len([q_ for q_ in q if len(q_) > 1])
+        if x == 0: return None
+
+        n1,n2 = None,None
+        for (i,q_) in enumerate(q):
+            if len(q_) < 2: continue
+
+            q2 = list(q_) 
+
+            ix = self.rnd_struct.randrange(0,len(q2))
+            n1 = q2.pop(ix) 
+    
+            ix = self.rnd_struct.randrange(0,len(q2))
+            n2 = q2.pop(ix) 
+            break
+
+        if type(n1) == type(None) or type(n2) == type(None):
+            return None
+
+        prv = round(self.rnd_struct.uniform(0.,1.),5)
+        self.add_codep(n1,n2,prv)
+        return True 
+
+    def add_codep(self,n1:int,n2:int,prv:float): 
+        # choose two local optima, one 
+        # from each of n1,n2
+        ps1 = self.sec_seq[n1].optima_points().shape
+        ps2 = self.sec_seq[n2].optima_points().shape
+
+        i1 = self.rnd_struct.randrange(0,ps1[0]) 
+        i2 = self.rnd_struct.randrange(0,ps2[0]) 
+
+        s1 = str(i1) + "," + str(n2) + "." + str(i2)
+        s2 = str(i2) + "," + str(n1) + "." + str(i1)
+        self.codep[n1][s1] = prv
+        self.codep[n2][s2] = prv 
+
+    ################ for co-dependency
+
+    def available_C2C_conn(self):
+        l = len(self.cd_comp_sets)
+        return l > self.min_components
+
+    def available_CInC_conn(self):
+        # first, get each node's codep conn.
+        # measure 
+        ms = []
+        for i in range(len(self.sec_seq)):
+            ms.append(self.codep_conn_of_node(i))
+
+        # get the open Sec instances
+        ms_ = [i for (i,m_) in enumerate(ms) if m_ < \
+            self.max_nconn_ratio]
+
+        # group the open Sec instances based 
+        # on component
+        qs = [set() for i in range(len(self.cd_comp_sets))]
+        for si in ms_: 
+            j = self.component_of_node(si)
+            assert j != -1
+            qs[j] = qs[j] | {si} 
+        return qs 
+
+    def codep_conn_of_node(self,n):
+        q = self.codep[n]
+
+        j = self.component_of_node(n) 
+        if j == -1: return 0.0
+
+        q2 = self.cd_comp_sets[j] - {n}
+        sm = sum([len(self.sec_seq[q_].opm) for q_ in q2])
+        sm = sm * len(self.sec_seq[n].opm)
+
+        if sm == 0.0: return 0.
+        return round(len(q)/ sm,5)
+
+    def component_of_node(self,n):
+        j = -1
+        for (i,c) in enumerate(self.cd_comp_sets):
+            if n in c:
+                j = i
+                break 
+        return j 
+        
+    #################################################
+
+    def add_dependency(self,ref,dependent,i1,i2,prv):
+        print("adding dependency")
+        print("{}-->{}".format(ref,dependent))
+
+        #assert ref not in self.dep_map[dependent]
+
+        q = [dependent] 
+        q = q + self.dep_map[dependent]
+        self.dep_map[ref].extend(q)
+
+        if dependent not in self.dep: 
+            self.dep[dependent] = defaultdict(float)
+        
+        k = str(i2) + "," + str(ref) + "." + str(i1) 
+        self.dep[dependent][k] = prv
+        return
+
+    """
+    return:
+    - set, each is a tuple (master node,dependent node)
+    """
+    def available_for_dependency(self):
+        l = set()
+
+        for i in range(len(self.sec_seq)):
+            sx = self.available_for_dependency_on_node(i)
+            qx = set([(i,sx_) for sx_ in sx])
+            l = l | qx
+        return l
+
+    """
+    for a node n2 to be able to depend on 
+    `n`, node `n` cannot be dependent on n2
+    and also cannot have any codependencies 
+    with n2. 
+    """
+    def available_for_dependency_on_node(self,n):
+        q = set([i for i in range(len(self.sec_seq))])
+        
+        # not dependent on
+        q = q - {n} 
+        ns = self.connected_nodes(n)
+        q = q - ns
+
+        # no codependencies
+        j = self.component_of_node(n)
+        q = q - self.cd_comp_sets[j] 
+        return q 
+
+    def write_conn_to_Sec(self):
+        for (i,s) in enumerate(self.sec_seq):
+            s.dm = self.dep[i]
+            s.cdm = self.codep[i]
+        return
+
+    #################################
+
+    """
+    calculates the codependent nodes of 
+    `n` if `is_dep`=False, otherwise calculates
+    the nodes that n depends on.
+    """
+    def connected_nodes(self,n,is_dep:bool=True): 
+        dx = self.dep if is_dep else self.codep 
+        q = dx[n]
+        s = set()
+
+        print("Q")
+        print(q)
+        for k,v in q.items():
+            k_ = parse_dconn(k)
+            s = s | {k_[1]} 
+        return s 
+
+
+## NOTE: 
+## the method <Sec.generate_next_Sec> needs to be 
+## reviewed for the correctness of the (c&d)-maps. 
+## Every version of a Sec will have (c&d)-maps with 
+## keys that have identical suffixes. 
+
+## NOTE: 
+## have to start coding 
+"""
+expected-actual maps 
+"""
+## which can then be used to demonstrate the
+## effectiveness of "misdirectional probabilities"
+
+
+### TODO: dep. and co-dep cannot intersect! 
