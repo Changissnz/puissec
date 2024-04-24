@@ -187,16 +187,6 @@ p := l / |pr_i|.
 <opt2freq_map>
 """
 def partial_correlation_pr(opt2freq_map,pred_opt2pr_map):
-    ##
-    """
-    print("PARTIAL")
-    print("[0]")
-    print(opt2freq_map)
-    print("[1]")
-    print(pred_opt2pr_map)
-    """
-    ##
-
     pm = partial_correlation_map(opt2freq_map,pred_opt2pr_map)
     return partial_correlation_pr_v2(pm)
     
@@ -238,7 +228,6 @@ pred_opt2pr_map := predecessor map; pair-set index -> bond measure.
 - return: 
 defaultdict, index pair of D2 -> bond strength 
 """
-#def exact_correlation_dep_Pr(opt2freq_map,pred_corrmap,pred_opt2pr_map):
 def exact_correlation_dep_Pr(d2_rsz,pred_corrmap,pred_opt2pr_map):
     # make the index gen. 
     bis = aprng_gauge.BatchIncrStruct(d2_rsz,is_perm=False,\
@@ -455,8 +444,8 @@ generates a map with
 
 using knowledge of the `best_index` in the 
 `optima` and the `countermeasure` w/ 
-[0] 
-[1] 
+[0] f in [0.,1.]
+[1] g in [0.,1.]
 
 ---------------------------------------------
 EX: 
@@ -483,6 +472,7 @@ def generate_pr_dist_for_seq(optima,best_index,countermeasure,\
         assert best_index == 0
         so = matrix_methods.vector_to_string(np.round(optima[0],5),float)
         d[so] = 1.0
+        return d 
 
     eq_value = np.round(countermeasure[0] / (optima.shape[0] - 1),5)
     vpr = variance_vec__pr(eq_value,optima.shape[0] - 1,countermeasure[1],\

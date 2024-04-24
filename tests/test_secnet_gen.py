@@ -1,6 +1,27 @@
 from secnet_gen import * 
 import unittest
 
+def Sec_list_sample_1():
+
+    singleton_range = [0.,10.] 
+    dimension = 5
+    num_optima = 2
+    countermeasure = (0.6,0.5) 
+
+    sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
+
+    sec2 = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
+
+    sec3 = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
+
+    sec4 = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
+
+    return [sec,sec2,sec3,sec4]
+
 class SecNetGenSchemeClass(unittest.TestCase):
 
     # NOTE: weak assertion in testing
@@ -65,6 +86,48 @@ class SecNetGenSchemeClass(unittest.TestCase):
         d = defaultdict(int,{3: 1, 4: 1, 0: 1, 33: 1, 1: 0, 2: 2, 5: 2,\
             200: 2, 10: 2, 12: 2, 112: 2, 24: 2, 56: 2})
         assert v == d 
+
+class SecNetDepGenClass(unittest.TestCase):
+
+    def test__SecNetDepGen__make_conn__case1(self):
+
+        secs = Sec_list_sample_1()
+        sndg = SecNetDepGen(secs,random,2,0.75,[1,4])
+        stat = True
+        i = 0 
+        while stat and i < 100: 
+            stat = sndg.make_conn([2,3])
+            i += 1 
+            '''
+            print("stat: ",stat)
+            print("dep map")
+            print(sndg.dep_map)
+            print("---------------------")
+            '''
+
+        #print(i)
+        assert i <= 25
+
+    def test__SecNetDepGen__make_conn__case2(self):
+        secs = Sec_list_sample_1()
+        sndg = SecNetDepGen(secs,random,2,0.75,[1,4])
+
+        stat = True
+        i = 0 
+        #for i in range(10):
+        #    print("ITER: ",i)
+        while stat and i < 100: 
+            stat = sndg.make_conn([1])
+            i += 1 
+            '''
+            print("stat: ",stat)
+            print("dep map")
+            print(sndg.dep_map)
+            print("---------------------")
+            '''
+        #print(i)
+        assert i <= 5
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,6 +4,7 @@ import random
 from collections import defaultdict,Counter 
 import math 
 import morebs2 
+import pickle
 
 DEFAULT_SINGLETON_RANGE = [-0.0,1.0]
 
@@ -39,3 +40,9 @@ sqrt_fx = lambda x: math.sqrt(x)
 
 # DEFAULT_BLACKBOX_FUNCTIONS 
 blackbox_df1 = lambda x: (x + random.random()) % 1.0
+
+def pickle_open_with_typecheck(fp,t): 
+    fobj = open(fp,"rb")
+    obj = pickle.load(fobj)
+    assert type(obj) == t
+    return obj 
