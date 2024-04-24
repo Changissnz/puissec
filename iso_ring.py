@@ -93,6 +93,18 @@ class IsoRing:
         # cracked stat 
         self.cstat = False 
 
+    def explode_contents(self,optima_size_limit=1000):
+        s = len(self.sec_cache[-1].opm)
+
+        while s < optima_size_limit:
+            sc = self.sec_cache.pop(-1)
+            sc.process_one_bloomiso()
+            s2 = sc.generate_next_Sec()
+            s = len(s2.opm)
+            self.sec_cache.append(sc)
+            self.sec_cache.append(s2)
+        return
+
     def declare_cvecl(self):
         if type(self.cvecl) != type(None):
             return

@@ -47,7 +47,8 @@ def Sec_sample_2():
         q = next(bis) 
         stat = not type(q) == type(None) 
         if not stat: continue 
-        vs = matrix_methods.vector_to_string(q,int)
+        vs = str(q[0]) + "," + "2." + str(q[1])
+
         is_in_dep = 1 if random.random() >= 0.5 else 0 
 
         if is_in_dep:

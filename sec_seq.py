@@ -2,6 +2,10 @@ from sec_mapr import *
 
 ############################################
 
+"""
+class helps with transforming optima points 
+of a Sec from one dimension to another. 
+"""
 class OptimaBloomFuncSecRep:
 
     def __init__(self,obf,sz_map,immutable_dim:int,\
@@ -81,6 +85,10 @@ class OptimaBloomFuncSecRep:
         ##
         return d
 
+    """
+    records derivative indices used to generate 
+    `next_val` into `dpm`. 
+    """
     def assign_next_value_to_pred(self,next_val):
         px1 = self.obf.prev_i1
         px2 = self.obf.prev_i2
@@ -90,10 +98,10 @@ class OptimaBloomFuncSecRep:
     def finalize_dcount(self,pred_opt2pr_map:defaultdict):
         # get the dimension of predecessor
         ##print("SZ IS: ",self.sz)
-        pr_vec,dep_map = self.dpm.fin_count(self.corr_type,\
+        pr_vec,exact_corr,dep_map = self.dpm.fin_count(self.corr_type,\
             self.sz,pred_opt2pr_map)
         self.set_dpm()
-        return pr_vec,dep_map 
+        return pr_vec,exact_corr,dep_map 
 
     def sample_size_at_i(self,i):
         if i not in self.bpoints: return 0
@@ -257,10 +265,12 @@ class Sec:
         
         #####
 
+    def next_Sec_cdpr_maps(self):
+        return -1 
+
     def generate_next_Sec(self):
         assert not self.obfsr.fstat
-        assert self.obfsr.tstat 
-        
+        assert self.obfsr.tstat         
         q = self.lone_pr_vec_for_bloom()
 
         # get the optima points for the `sz`
@@ -269,38 +279,25 @@ class Sec:
         assert bps.shape[0] == len(q[0])
 
         optima_pr_map = defaultdict(float)
+        sm = sum(q[0])
+        sm = 1.0 if sm == 0.0 else sm 
         for i,q_ in enumerate(q[0]):
             vs = matrix_methods.vector_to_string(bps[i],float)
-            optima_pr_map[vs] = np.round(q_,5)
+            optima_pr_map[vs] = np.round(q_ / sm,5)
 
-        # get the dep. maps
-        #   split the dependency map w/ co-dep map
-        dep_map,codep_map = {},{}
-        for (k,v) in q[1].items():
-            stat = default_rnd_boolean_index_splitter(v)
-            if stat: 
-                dep_map[k] = v
-            else: 
-                codep_map[k] = v
-        dep_map,codep_map = defaultdict(float,dep_map),\
-            defaultdict(float,codep_map)
+        # get the dep.,codep. map
+        dep_map = exact_correlation_DMap_key_delta(self.dm,deepcopy(q[1]))
+        codep_map = exact_correlation_DMap_key_delta(self.cdm,q[1])
 
-        # get the new <seq> vector 
-            # Pr. of old ans. 
-        vsm = matrix_methods.vector_to_string(self.seq,float)
-        pr = self.opm[vsm]
-
-        qopm = [(k,v) for k,v in optima_pr_map.items()] 
-        qopm = sorted(qopm,key=lambda x: x[0])
-        nu_pt = min(qopm,key=lambda x: abs(x[1] - pr)) 
-        nu_pt = nu_pt[0]
-        nu_pt = matrix_methods.string_to_vector(nu_pt,float)
-        #nu_pt = np.round(nu_pt,5)
+        # get the new seq, which has the highest
+        # Pr. in optima_pr_map
+        qx = max([(k,v) for (k,v) in optima_pr_map.items()],key=lambda x:x[1])
+        nu_pt = matrix_methods.string_to_vector(qx[0],float)
 
         s = Sec(nu_pt,deepcopy(self.singleton_range),\
             optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)
         sz0 = s.obfsr.sz
-        ##
+
         """
         print("-- RESETTING OSEEDS")
         print("\t-- ORIGINAL")

@@ -41,7 +41,7 @@ class DerivatorPrMap:
     pred_opt2pr_map := 2-d index of D1 -> probability 
 
     - return: 
-    [0] vector, lone Pr.
+    [0] vector, lone Pr, length is number of samples (|`cnt`|)
     [1] defaultdict(float), key is 
     """
     def fin_count(self,corr_type:str,\
@@ -81,7 +81,7 @@ class DerivatorPrMap:
             prq = exact_correlation_dep_Pr(\
                 d2_rsz,exact_corr,pred_opt2pr_map)
 
-        return pr_vec,prq 
+        return pr_vec,exact_corr,prq 
 
     def output_Pr(self,cnt,cf,pred_opt2pr_map:defaultdict):
         return cf(cnt,pred_opt2pr_map)

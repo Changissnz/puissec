@@ -10,6 +10,29 @@ probabilities, among other generator methods
 for points and bounds.
 """
 
+
+"""
+parses a key for a (co?)-dependency map.
+
+return:
+- index of optima for reference
+- index of other <Sec>
+- index of optima for other <Sec> 
+"""
+def parse_dconn(s):
+    assert type(s) == str
+
+    q = s.split(",") 
+    assert len(q) == 2
+
+    index_ref = int(q[0])
+
+    seq_index = q[1].split(".") 
+    opt_index = int(seq_index[1])
+    seq_index = int(seq_index[0])
+    return index_ref,seq_index,opt_index
+
+
 """
 used to generate points by Python standard
 `random` library. 
@@ -340,6 +363,35 @@ def partial_correlation_dep_Pr(d2_rsz,pred_exact_corrmap,\
         key = matrix_methods.vector_to_string(pr_index,int)
         pr_map[key] = pfc 
     return pr_map 
+
+"""
+
+converts dm 
+
+dm := map, dep. or codep. map. 
+    key is D1 optima,DX index.DX optima
+pred_exact_corrmap := index of D2 -> index of D1
+"""
+def exact_correlation_DMap_key_delta(dm,pred_exact_corrmap):
+
+    def d2_equivalent_of_d1(v):
+
+        q = []
+        for (k,v_) in pred_exact_corrmap.items():
+            if v_ == v: 
+                q.append(k) 
+
+        q_ = random.choice(q)
+        return q_ 
+
+    dx = defaultdict(float)
+
+    for (k,v) in dm.items():
+        q = parse_dconn(k)
+        x = d2_equivalent_of_d1(q[0])
+        s = str(x) + "," + str(q[1]) + "." + str(q[2])
+        dx[s] = v 
+    return dx 
 
 ##################################################
 ########### bounds generator

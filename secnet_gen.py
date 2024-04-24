@@ -437,8 +437,6 @@ class SecNetFrameGen:
         self.node_components.append(cx) 
         return
 
-
-# TODO: test this. 
 """
 generates the connections for Pr. dependencies 
 of each <Sec> instance in `sec_seq` in the 
@@ -521,6 +519,20 @@ class SecNetDepGen:
         self.write_conn_to_Sec()
         return
 
+    def fstat(self):
+
+        # d-length satisfaction
+        dstat = max([len(v) for v in self.dep_map.values()])
+        dstat = dstat >= self.dlength_range[0] and dstat <= self.dlength_range[1] 
+
+        # number of components 
+        cstat = self.available_C2C_conn()
+
+        # max_nconn_ratio
+        r = max([self.codep_conn_of_node(i) for i in range(len(self.sq))])
+        rstat = r <= self.max_nconn_ratio
+        return dstat,cstat,rstat 
+
     ###################### make conn. method. 
     def make_conn(self,options = [1,2,3]):
         assert set(options).issubset({1,2,3})
@@ -570,31 +582,8 @@ class SecNetDepGen:
 
         stat = self.available_C2C_conn()
         if not stat: return None
+
         cind = [i for i in range(len(self.cd_comp_sets))]
-        
-        ###############
-        """
-        # choose a (node,component)
-        ci1 = self.rnd_struct.randrange(0,len(cind)) 
-        ci1 = cind.pop(ci1) 
-        x = list(self.cd_comp_sets[ci1])
-        ci1_ = self.rnd_struct.randrange(0,len(x))
-        n1 = x[ci1_]
-
-        # choose another (node,component)
-        ci2 = self.rnd_struct.randrange(0,len(cind))
-        ci2 = cind.pop(ci2) 
-        x = list(self.cd_comp_sets[ci2])
-        ci2_ = self.rnd_struct.randrange(0,len(x))
-        n2 = x[ci2_]
-
-        # make a co-dep b/t n1 and n2 
-        prv = round(self.rnd_struct.uniform(0.,1.),5)
-        self.add_codep(n1,n2,prv)
-        return True 
-        """
-        ####################
-
         # choose a (node,component)
         ci1 = self.rnd_struct.randrange(0,len(cind)) 
         ci1 = cind.pop(ci1) 
