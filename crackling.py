@@ -7,7 +7,7 @@ from hype import *
 a <RChainHead> instance derived from a 
 <IsoRing>. 
 """
-def IsoRing_to_base_RChainHead(ir:IsoRing):
+def IsoRing_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
     assert type(ir) == IsoRing
 
     def outputf1(p):
@@ -15,23 +15,14 @@ def IsoRing_to_base_RChainHead(ir:IsoRing):
 
         if stat:
             return None
-        m = ir.cvec_feedback()
-        return m
 
-    def outputf2(m):
-        ## NOTE 
-        # USE W/ CAUTION HERE 
-        if type(m) == type(None):
-            return False
-        return metric_2dboolmat_to_bool(m)
+        d = cracklng.register_response(p,q)
+        return d
 
     rch = relevance_functions.RChainHead()
 
     argseq1 = ['nr',outputf1]
     rch.add_node_at(argseq1)
-
-    argseq2 = ['nr',outputf2]
-    rch.add_node_at(argseq2)
     return rch
 
 """
@@ -54,8 +45,34 @@ def default_base_RSSI(ir:IsoRing,hs:HypStruct,ssih):
 
 class Crackling:
 
-    def __init__(self): 
+    def __init__(self,target_indices=None):
+        self.hs = None 
         self.rss = None
+        self.set_cvec() 
 
-    def declare_new_rssi(self,ir,hs,ssih):
-        self.rss = default_base_RSSI(ir,lhs,ssih)
+    def load_HypStruct(self,hs):
+        assert type(hs) == HypStruct
+        self.hs = hs 
+
+    def load_crackf(self):
+        return -1 
+
+    def set_cvec(self):
+        ciseq = default_cvec_iselector_seq()
+        cvec = CVec(cvis=ciseq)
+        self.cvec = cvec 
+
+    """
+    only want 
+    """
+    def register_response(self,p,q): 
+        assert type(self.hs) != type(None)
+
+        x = q[self.hs.target_index] 
+        self.cvec.append(q,p)
+        
+        qx1 = self.cvec.cmp(measures.zero_div)
+        qx2 = self.cvec.cmp(np.less_equal) 
+
+        m = np.array([qx1,qx2])
+        return metric_2dboolmat_to_bool(m,vx=0.65)

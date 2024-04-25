@@ -84,11 +84,6 @@ class IsoRing:
         self.bstat = True
         # index of repr in `sec_cache`
         self.repi = 0
-        # sequence of <CVec> instances, each 
-        # i'th <CVec> corresponds to the i'th
-        # 
-        self.cvecl = cvecl
-        ##self.declare_cvecl()
 
         # cracked stat 
         self.cstat = False 
@@ -109,6 +104,23 @@ class IsoRing:
             self.sec_cache.append(s2)
             if type(ts2) == type(None):
                 break
-
         return
 
+    def register_attempt(self,p):
+        q = self.register_attempt_(p)
+        stat = matrix_methods.equal_iterables(p,self.sec.seq)
+        self.cstat = stat
+        return q,stat 
+
+
+    def register_attempt_(self,p):
+        assert matrix_methods.is_vector(p) 
+        ops = self.sec.optima_points() 
+        if len(p) != ops.shape[1]:
+            print("attempt in wrong dim {}, want {}".format(len(p),\
+                ops.shape[1]))
+            return None 
+        
+        # get scores for each of the optima 
+        q = list(map(lambda x: self.ofunc(x,p),ops))
+        return np.array(q)
