@@ -95,8 +95,8 @@ class IsoRing:
 
     def explode_contents(self,optima_size_limit=1000):
         s = len(self.sec_cache[-1].opm)
-        print("starting length for {}: {}".format\
-            (len(self.sec_cache[-1].seq),s))
+        ##print("starting length for {}: {}".format\
+        ##    (len(self.sec_cache[-1].seq),s))
         while s < optima_size_limit:
             sc = self.sec_cache.pop(-1)
             sc.process_one_bloomiso()
@@ -107,97 +107,8 @@ class IsoRing:
             s = len(s2.opm)
             self.sec_cache.append(sc)
             self.sec_cache.append(s2)
-
             if type(ts2) == type(None):
                 break
 
         return
 
-
-    '''
-    def declare_cvecl(self):
-        if type(self.cvecl) != type(None):
-            return
-
-        self.cvecl = [] 
-        for i in range(0,len(self.sec.opm)):
-            cvseq = default_cvec_iselector_seq()
-            cv = CVec(cvis=cvseq)
-            self.cvecl.append(cv)
-
-    def operating_sec(self): 
-        if self.bstat:
-            return self.sec_cache[-1]
-        return self.sec_cache[self.repi] 
-
-    def run_Sec_till_fstat(self,guesser_func):
-        sec = self.operating_sec()
-        stat = sec.obfsr.fstat
-
-        while stat:
-            # get the length of output 
-            p = guesser_func(sec.obfsr.sz)
-            q,s = self.register_attempt(p)
-            print("guess is")
-            print(q)
-            print(s)
-            print()
-
-            sec = self.operating_sec()
-            stat = sec.obfsr.fstat 
-
-        print("done")
-
-    def register_attempt(self,p):
-        sq = self.sec_cache[-1]
-        stat1 = sq.obfsr.fstat
-        stat2 = sq.obfsr.tstat 
-
-        # case: generate an element for next repr. 
-        if not stat2: 
-            x1,x2 = next(sq) 
-
-            if type(x1) == type(None):
-                print("recursing on register")
-                return self.register_attempt(p)
-        #       declare another <Sec> instance
-        else:
-            sec2,previous_sz,current_sz = sq.generate_next_Sec()
-            self.sec_cache.append(sec2) 
-
-        # calculate feedback for attempt
-        q = self.register_attempt_(p)
-        assert len(q) == len(self.cvecl)
-
-        # log the feedback into each of the CVecs 
-        self.cvecl[0].append(q[0],p)
-        for i in range(1,len(self.cvecl)): 
-            self.cvecl[i].append(q[i],None)
-
-        # get the actual stat
-        stat = matrix_methods.equal_iterables(p,self.sec.seq)
-        self.cstat = stat 
-        return q,stat
-
-    """
-    return: 
-    - vector of distance calculations, finished status 
-    """ 
-    def register_attempt_(self,p):
-        assert matrix_methods.is_vector(p) 
-        ops = self.sec.optima_points() 
-        if len(p) != ops.shape[1]:
-            print("attempt in wrong dim {}, want {}".format(len(p),\
-                ops.shape[1]))
-            return None 
-        
-        # get scores for each of the optima 
-        q = list(map(lambda x: self.ofunc(x,p),ops))
-        return np.array(q)
-
-    def cvec_feedback(self):
-        x = []
-        for c in self.cvecl:
-            x.append(c.cmp())
-        return np.array(x,dtype=bool)
-    '''

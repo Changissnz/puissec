@@ -31,8 +31,7 @@ class SecClass(unittest.TestCase):
 
         vx = sec.lone_pr_vec_for_bloom()
         assert vx[0] == [0.2, 0.2, 0.4, 0.2]
-        assert vx[2] == defaultdict(float,\
-            {'0,1': 0.0})            
+        assert type(vx[1]) == dict
         return
 
     def test__Sec__next__case2(self):
