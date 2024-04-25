@@ -380,6 +380,7 @@ def exact_correlation_DMap_key_delta(dm,pred_exact_corrmap):
         for (k,v_) in pred_exact_corrmap.items():
             if v_ == v: 
                 q.append(k) 
+        if len(q) == 0: return None
 
         q_ = random.choice(q)
         return q_ 
@@ -389,6 +390,8 @@ def exact_correlation_DMap_key_delta(dm,pred_exact_corrmap):
     for (k,v) in dm.items():
         q = parse_dconn(k)
         x = d2_equivalent_of_d1(q[0])
+        if type(x) == type(None): continue 
+
         s = str(x) + "," + str(q[1]) + "." + str(q[2])
         dx[s] = v 
     return dx 

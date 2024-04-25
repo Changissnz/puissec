@@ -36,14 +36,17 @@ class OptimaBloomFuncSecRep:
         self.dpm = DerivatorPrMap() 
 
     def set_sz(self,attempts=10):
+        self.tdim.append(self.sz)
         # get dim of OptimaBloomFunc
         self.sz = self.obf.oseeds.shape[1]
-        self.tdim.append(self.sz) 
+        ##self.tdim.append(self.sz) 
 
         self.sz = self.sz_map(self.sz)
         if self.sz in self.tdim:
+            print("VIOLA")
             if attempts > 0:
                 return self.set_sz(attempts - 1)
+            self.sz = None 
             return None 
 
         ##print("SZ IS: {}".format(self.sz))
@@ -98,10 +101,10 @@ class OptimaBloomFuncSecRep:
     def finalize_dcount(self,pred_opt2pr_map:defaultdict):
         # get the dimension of predecessor
         ##print("SZ IS: ",self.sz)
-        pr_vec,exact_corr,dep_map = self.dpm.fin_count(self.corr_type,\
+        pr_vec,exact_corr = self.dpm.fin_count(self.corr_type,\
             self.sz,pred_opt2pr_map)
         self.set_dpm()
-        return pr_vec,exact_corr,dep_map 
+        return pr_vec,exact_corr#,dep_map 
 
     def sample_size_at_i(self,i):
         if i not in self.bpoints: return 0

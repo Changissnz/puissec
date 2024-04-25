@@ -7,14 +7,7 @@ python3 -m tests.test_cvec
 """
 ###
 
-def cmp_seq_with_cvec(cvec,seq):
-    input_samples = [0 for _ in range(len(seq))]
 
-    cvec.input_samples = input_samples
-    cvec.v = seq 
-
-    bvec = cvec.cmp()
-    return bvec 
 
 class CVecISelectorClass(unittest.TestCase):
 

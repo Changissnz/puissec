@@ -48,11 +48,12 @@ def std_float_matrix_to_bool_matrix(m,f):
             assert type(x[i,j]) == np.bool_, "got {}".format(type(x[i,j]))
     return x 
 
+# NOTE: unused.
 def bool_matrix_to_bool(bm,f=metric_2dboolmat_to_bool):
 
     q = f(bm)
     assert type(q) == bool 
-    return b 
+    return q 
 
 class CVecISelector:
 
@@ -246,7 +247,7 @@ class CVec:
     """
     - description: 
     compares two index-sequences using the function 
-    `output_type` (either divide or geq). 
+    `output_type` (either division or leq). 
 
     - return:
     |iseq1| x |iseq2| matrix, each (i,j)'th value is 
@@ -287,3 +288,12 @@ class CVec:
 
         return output
 
+def cmp_seq_with_cvec(cvec,seq):
+    assert type(cvec) == CVec
+    input_samples = [0 for _ in range(len(seq))]
+
+    cvec.input_samples = input_samples
+    cvec.v = seq 
+
+    bvec = cvec.cmp()
+    return bvec 

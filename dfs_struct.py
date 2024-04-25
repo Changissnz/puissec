@@ -49,7 +49,6 @@ class NodePath:
     def cost(self,cost_func=sum):
         return cost_func(self.pweights) 
 
-# make a search type: thorough vs path filter
 """
 search_head_type := 1 for thorough, 2 for filtered;
     1 produces all possible paths, 2 produces less paths 

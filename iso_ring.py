@@ -1,5 +1,5 @@
 from obj_func import * 
-from sec_seq import * 
+from secnet_gen import * 
 from cvec import * 
 
 class BoundedObjFunc:
@@ -88,23 +88,33 @@ class IsoRing:
         # i'th <CVec> corresponds to the i'th
         # 
         self.cvecl = cvecl
-        self.declare_cvecl()
+        ##self.declare_cvecl()
 
         # cracked stat 
         self.cstat = False 
 
     def explode_contents(self,optima_size_limit=1000):
         s = len(self.sec_cache[-1].opm)
-
+        print("starting length for {}: {}".format\
+            (len(self.sec_cache[-1].seq),s))
         while s < optima_size_limit:
             sc = self.sec_cache.pop(-1)
             sc.process_one_bloomiso()
             s2 = sc.generate_next_Sec()
+            ts2 = s2[2]
+            ##print("transition: {}->{}".format(s2[1],s2[2]))
+            s2 = s2[0]
             s = len(s2.opm)
             self.sec_cache.append(sc)
             self.sec_cache.append(s2)
+
+            if type(ts2) == type(None):
+                break
+
         return
 
+
+    '''
     def declare_cvecl(self):
         if type(self.cvecl) != type(None):
             return
@@ -190,3 +200,4 @@ class IsoRing:
         for c in self.cvecl:
             x.append(c.cmp())
         return np.array(x,dtype=bool)
+    '''
