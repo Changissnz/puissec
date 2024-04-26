@@ -16,7 +16,8 @@ class CBridge:
         return
 
     def load_crackf(self,h=5):
-        self.rssi = default_base_RSSI(self.isoring,self.hs,h)
+        self.rssi = default_base_RSSI(self.isoring,self.crackling,\
+            self.hs,h)
 
     def __next__(self):
         p = next(self.rssi)
