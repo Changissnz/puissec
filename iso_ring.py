@@ -4,6 +4,15 @@ from cvec import *
 
 class BoundedObjFunc:
 
+    """
+    takes a sequence of proper bounds `bounds_seq` w/
+    each bound corresponding to a different i'th element
+    in `corr_obj`. 
+
+    Main method is `output(reference point, current point)`.
+    If `current point` is not in any bounds of `bounds_seq`,
+    output function is `default_objf`.
+    """
     def __init__(self,bounds_seq,corr_objf,default_objf):
 
         for c in corr_objf: assert type(c) == ObjFunc
@@ -109,13 +118,19 @@ class IsoRing:
     def register_attempt(self,p):
         q = self.register_attempt_(p)
         stat = matrix_methods.equal_iterables(p,self.sec.seq)
+        outstat = []
+        ops = self.rep().optima_points()
+        for q in ops:
+            stat2 = matrix_methods.equal_iterables(p,q) 
+            outstat.append(stat2)
+        outstat = np.any(np.array(outstat) == True) 
         self.cstat = stat
-        return q,stat 
+        return q,outstat 
 
 
     def register_attempt_(self,p):
         assert matrix_methods.is_vector(p) 
-        ops = self.sec.optima_points() 
+        ops = self.rep().optima_points()
         if len(p) != ops.shape[1]:
             print("attempt in wrong dim {}, want {}".format(len(p),\
                 ops.shape[1]))
@@ -124,3 +139,43 @@ class IsoRing:
         # get scores for each of the optima 
         q = list(map(lambda x: self.ofunc(x,p),ops))
         return np.array(q)
+
+    def set_isorep(self,i):
+        assert len(self.sec_cache) > i and i > -1
+        self.repi = i 
+        return
+
+    def rep(self):
+        return deepcopy(self.sec_cache[self.repi])
+
+### an example of an <IsoRing> instantiation
+def IsoRing_sample_1():
+    random.seed(12)
+    np.random.seed(12)
+
+    singleton_range = [0.,1.] 
+    dimension = 5
+    num_optima = 2
+    countermeasure = (0.6,0.5) 
+    secs = []
+
+    for i in range(5): 
+            sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
+            secs.append(sec)
+
+    sndg = SecNetDepGen(secs,random,2,0.75,[1,4])
+
+    sndg.assign_conn()
+
+    superbound = np.ones((5,2)) * np.array([0.,1.])
+    spacing_ratio_range = [0.,0.2]
+    outlier_pr_ratio = 0.4#1.0
+    num_bounds = 8
+    sb = deepcopy(superbound)
+
+    obf = BoundedObjFunc.generate_BoundedObjFunc(\
+            superbound,spacing_ratio_range,\
+            outlier_pr_ratio,num_bounds,3) 
+
+    return IsoRing(sndg.sq[0],obf,sb)

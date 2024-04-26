@@ -8,13 +8,11 @@ class Crackling:
         self.hs = None 
         self.rss = None
         self.set_cvec() 
+        self.astat = False 
 
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
         self.hs = hs 
-
-    def load_crackf(self):
-        return -1 
 
     def set_cvec(self):
         ciseq = default_cvec_iselector_seq()
@@ -24,9 +22,9 @@ class Crackling:
     """
     only want 
     """
-    def register_response(self,p,q): 
+    def register_response(self,p,q,astat:bool): 
         assert type(self.hs) != type(None)
-
+        self.astat = astat 
         x = q[self.hs.target_index] 
         self.cvec.append(q,p)
         
@@ -51,7 +49,8 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
         if stat:
             return None
 
-        d = cracklng.register_response(p,q)
+        d = cracklng.register_response(p,q,stat)
+
         return d
 
     rch = relevance_functions.RChainHead()

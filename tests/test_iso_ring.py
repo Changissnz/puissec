@@ -7,37 +7,6 @@ python3 -m unittest tests.test_iso_ring
 """
 #
 
-def IsoRing_sample_1():
-    random.seed(12)
-    np.random.seed(12)
-
-    singleton_range = [0.,1.] 
-    dimension = 5
-    num_optima = 2
-    countermeasure = (0.6,0.5) 
-    secs = []
-
-    for i in range(5): 
-            sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
-            countermeasure,rnd_struct=np.random)
-            secs.append(sec)
-
-    sndg = SecNetDepGen(secs,random,2,0.75,[1,4])
-
-    sndg.assign_conn()
-
-    superbound = np.ones((5,2)) * np.array([0.,1.])
-    spacing_ratio_range = [0.,0.2]
-    outlier_pr_ratio = 0.4#1.0
-    num_bounds = 8
-    sb = deepcopy(superbound)
-
-    obf = BoundedObjFunc.generate_BoundedObjFunc(\
-            superbound,spacing_ratio_range,\
-            outlier_pr_ratio,num_bounds,3) 
-
-    return IsoRing(sndg.sq[0],obf,sb)
-
 class BoundedObjFuncClass(unittest.TestCase):
 
     def test__BoundedObjFunc__output(self):

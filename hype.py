@@ -22,11 +22,13 @@ P(s in S) --> is s relevant?
 """
 class HypStruct:
 
-    def __init__(self,targeted_index:int,suspected_subbounds,sb_pr=None):
+    def __init__(self,seq_idn:int,targeted_index:int,suspected_subbounds,sb_pr=None):
+        assert type(seq_idn) == int and seq_idn >= 0         
         assert type(target_index) == int and target_index >= 0 
         assert len(suspected_subbounds) > 0 
         assert not any_intersecting_bounds(suspected_subbounds)
         
+        self.seq_idn = seq_idn
         self.target_index = targeted_index
         self.suspected_subbounds = suspected_subbounds
 
