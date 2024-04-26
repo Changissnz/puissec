@@ -12,7 +12,7 @@ class CBridge:
         self.hs = hs 
         self.rssi = None 
 
-        self.load_crackf()
+        self.load_crackf(ssih)
         return
 
     def load_crackf(self,h=5):
