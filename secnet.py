@@ -12,8 +12,9 @@ class SecNet:
         node_loc_assignment= None,
         entry_points=3,
         rnd_struct=random):
-        assert len(irc) > 0
-        for i in irc: assert type(i) == IsoRing
+        assert len(irc) > 0 and type(irc) == SecSeq
+        
+        #for i in irc: assert type(i) == IsoRing
         assert len(sec_nodeset) >= len(irc) 
 
         self.irc = irc 

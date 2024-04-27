@@ -331,3 +331,6 @@ class SecSeq:
         self.sequence = sequence
         self.reference_map = reference_map
         return
+
+    def __len__(self):
+        return len(self.sequence) 
