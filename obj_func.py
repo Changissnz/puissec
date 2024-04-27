@@ -1,13 +1,15 @@
 from morebs2 import matrix_methods,modular_labeller
 from defaults import *
 
-
-## TODO: test these functions 
-"""
-
-"""
 class ObjFunc:
+    
+    """
+    a class with main method `output` that operates on 
+    2 vectors, a reference and another point.
 
+    The `obj_type` is one of {"e.d.","s.m.","r.n."}.
+    The rnd_seed is either an integer or None. 
+    """
     def __init__(self,obj_type,rnd_seed=None):
         # e.d. := Euclidean distance
         # s.m. := scalar modular 
@@ -27,6 +29,11 @@ class ObjFunc:
     @staticmethod
     def generate(self):
         return -1 
+
+    def __str__(self):
+        s = "OFUNC\n\t- {}\n\t- {}".format(self.obj_type,self.rnd_seed)
+        return s 
+
 
     def instantiate(self):
         if self.obj_type == "e.d.":

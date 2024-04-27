@@ -399,10 +399,9 @@ def exact_correlation_DMap_key_delta(dm,pred_exact_corrmap):
 ##################################################
 ########### bounds generator
 
-"""
-*CAUTION*
-- not deterministic when setting seed values for 
-  random and np.random.
+""" 
+*NOTE* 
+a deterministic function if np.random seed is set 
 
 - arguments: 
 superbound := bounds vector, the bound that all 
@@ -482,10 +481,9 @@ def generate_point_for_bvecseq(superbound,\
     r_diff = superbound[:,1] - ref_point
     assert np.min(r_diff) >= 0.0 
 
-
     # calculate a ratio vecor
     rvec = numerical_generator.generate_uniform_sequence_in_bounds\
-        (superbound.shape[0], np.array([ratio_range]))
+        (superbound.shape[0], np.array([ratio_range]),rnd_struct=np.random)
     
     adder = r_diff * rvec
     return np.round(ref_point + adder,5)

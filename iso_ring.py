@@ -25,6 +25,18 @@ class BoundedObjFunc:
         self.corr_objf = corr_objf
         self.dobjf = default_objf
 
+    def __str__(self): 
+        s = ""
+
+        for (i,b) in enumerate(self.bounds_seq):
+            s += "bounds\n"
+            s += str(b)
+            s += "\n"
+            s += str(self.corr_objf[i])
+            s += "\n"
+        s += "--------------"
+        return s  
+
     @staticmethod
     def generate_BoundedObjFunc(superbound,\
         spacing_ratio_range,outlier_pr_ratio,\
@@ -160,9 +172,9 @@ def IsoRing_sample_1():
     secs = []
 
     for i in range(5): 
-            sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
-            countermeasure,rnd_struct=np.random)
-            secs.append(sec)
+        sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+        countermeasure,rnd_struct=np.random)
+        secs.append(sec)
 
     sndg = SecNetDepGen(secs,random,2,0.75,[1,4])
 
