@@ -165,8 +165,7 @@ class IsoRing:
     def rep(self):
         return deepcopy(self.sec_cache[self.repi])
 
-### an example of an <IsoRing> instantiation
-def IsoRing_sample_1():
+def Sec_list_sample1(): 
     random.seed(12)
     np.random.seed(12)
 
@@ -180,10 +179,31 @@ def IsoRing_sample_1():
         sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
         countermeasure,rnd_struct=np.random)
         secs.append(sec)
+    return secs 
 
+def Sec_list_sample2(): 
+    random.seed(14)
+    np.random.seed(19)
+
+    singleton_range = [0.,1.] 
+    dimension = 5
+    num_optima = 12
+    countermeasure = (0.7,0.5) 
+    secs = []
+
+    for i in range(num_optima): 
+        sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+        countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+    return secs 
+
+
+### an example of an <IsoRing> instantiation
+def IsoRing_sample_1():
+    secs = Sec_list_sample1()
     sndg = SecNetDepGen(secs,random,2,0.75,[1,4])
-
     sndg.assign_conn()
+    sq = sndg.sq
 
     superbound = np.ones((5,2)) * np.array([0.,1.])
     spacing_ratio_range = [0.,0.2]
@@ -195,4 +215,4 @@ def IsoRing_sample_1():
             superbound,spacing_ratio_range,\
             outlier_pr_ratio,num_bounds,3) 
 
-    return IsoRing(sndg.sq[0],obf,sb)
+    return IsoRing(sq[0],obf,sb)

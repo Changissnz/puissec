@@ -512,10 +512,13 @@ class SecNetDepGen:
             s.cdm.clear()
         return 
 
-    def assign_conn(self):
+    def assign_conn(self,size_limt=float('inf')):
         stat = True
+        i = 0
         while stat: 
             stat = self.make_conn([1,2,3])
+            stat = stat and i < size_limt
+            i += 1
         self.write_conn_to_Sec()
         return
 
@@ -553,6 +556,7 @@ class SecNetDepGen:
         # co-dep. conn. (in one component) 
         else:  
             stat = self.make_codep_CInC_conn()
+        ##print("stat for {}:{}".format(o,stat))
         if type(stat) != type(None):
             return True
         return self.make_conn(options)

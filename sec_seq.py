@@ -164,7 +164,7 @@ class Sec:
         # select the optima points 
         bds = np.array([deepcopy(singleton_range) for _ in range(dimension)])
         ps = generate_pointgen_stdrand(bds,num_optima,rnd_struct)
-        print(ps)
+        ##print(ps)
         
         # select a random optima
         qi = random.randrange(0,len(ps))

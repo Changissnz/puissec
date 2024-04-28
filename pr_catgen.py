@@ -149,7 +149,7 @@ def map_dot_product(d1,d2,x2x2_func=np.multiply,\
     dx = defaultdict(float)
     for (k,v) in d1.items():
         for (k2,v2) in d2.items():
-            print("K: ", k,"\tK2: ", k2)
+            ##print("K: ", k,"\tK2: ", k2)
             k3 = dotkey_func([k],[k2]) 
             dx[k3] = x2x2_func(v,v2)
     return dx 
