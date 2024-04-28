@@ -183,7 +183,7 @@ class CVec:
         return
 
     def append(self,v,sample):
-        assert type(v) in {int,float}
+        assert type(v) in {int,float,np.float64,np.int32},"got {}".format(type(v))
         if len(self.input_samples) > 0:
             assert type(sample) == type(self.input_samples[-1]) 
 
@@ -203,18 +203,17 @@ class CVec:
     def cmp(self,output_type=measures.zero_div):
         bvec = [] 
         for i in range(len(self.cvis)):
-            print("comparator {}".format(i))
+            ##print("comparator {}".format(i))
             m = self.cmp_by_selector(i,output_type)
-            print("M")
-            print(m)
+            ##print("M")
+            ##print(m)
             if type(m) == type(None):
                 bvec.append(False) 
                 continue 
 
             b = self.process_cmpmat(m)
             bvec.append(b)
-
-            print("--------------")
+            ##print("--------------")
         return np.array(bvec)
 
     """
@@ -225,21 +224,15 @@ class CVec:
         assert str(m.dtype) in {'bool','int32','float64'},"got type {}".format(m.dtype)
 
         if m.dtype != 'bool':
-            print("convert to boolmat")
+            ##print("convert to boolmat")
             m = std_float_matrix_to_bool_matrix(m,metric_div)
-        print("operating on: {}".format(m))
-        print()
+        ##print("operating on: {}".format(m))
+        ##print()
         return metric_2dboolmat_to_bool(m)
 
     def cmp_by_selector(self,selector_index:int,output_type): 
         cvis = self.cvis[selector_index]
         prev,ref = cvis.output(len(self.v))
-        '''
-        print("PREV")
-        print(prev)
-        print("REF")
-        print(ref)
-        '''
         if type(prev) == type(None) or type(ref) == type(None):
             return None 
         return self.cmp_indexseqs(prev,ref,output_type)
@@ -258,30 +251,15 @@ class CVec:
 
         sv1 = self.subvec(iseq1)
         sv2 = self.subvec(iseq2) 
-
-        
-        print("comparing subvecs")
-        print("[0] ",sv1)
-        print("[1] ",sv2)
-        
-
         output = np.zeros((len(iseq1),len(iseq2)))
 
         for i in range(len(iseq1)): 
-            for j in range(len(iseq2)):
-                print("output on indices: {},{}".format(iseq1[i],iseq2[j]))
-                
-                #q = output_type(sv2[j],sv1[i])
+            for j in range(len(iseq2)):                
                 if output_type == np.less_equal:
-                    #q = output_type(sv1[i],sv2[j])
                     q = output_type(sv2[j],sv1[i])
-
                 else: 
-                    #q = output_type(sv1[i],sv2[j],1.1)
                     q = output_type(sv2[j],sv1[i],1.1)
-
-                #q = output_type(iseq1[i],iseq2[j]) 
-                print("--| ",q)
+                ##print("--| ",q)
                 output[i][j] = q
                 
                 ###

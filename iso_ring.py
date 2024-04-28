@@ -128,6 +128,7 @@ class IsoRing:
         return
 
     def register_attempt(self,p):
+        ##print("-- RA")
         q = self.register_attempt_(p)
         stat = matrix_methods.equal_iterables(p,self.sec.seq)
         outstat = []
@@ -135,6 +136,8 @@ class IsoRing:
         for q in ops:
             stat2 = matrix_methods.equal_iterables(p,q) 
             outstat.append(stat2)
+        ##print("got outstat")
+        ##print(outstat)
         outstat = np.any(np.array(outstat) == True) 
         self.cstat = stat
         return q,outstat 
@@ -142,14 +145,16 @@ class IsoRing:
 
     def register_attempt_(self,p):
         assert matrix_methods.is_vector(p) 
-        ops = self.rep().optima_points()
+        r = self.rep()
+        ops = r.optima_points()
         if len(p) != ops.shape[1]:
             print("attempt in wrong dim {}, want {}".format(len(p),\
                 ops.shape[1]))
             return None 
         
         # get scores for each of the optima 
-        q = list(map(lambda x: self.ofunc(x,p),ops))
+        q = list(map(lambda x: self.ofunc.output(x,p),ops))
+        ##print("-- reg: ",q)
         return np.array(q)
 
     def set_isorep(self,i):

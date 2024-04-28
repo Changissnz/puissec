@@ -26,7 +26,7 @@ class Crackling:
         assert type(self.hs) != type(None)
         self.astat = astat 
         x = q[self.hs.target_index] 
-        self.cvec.append(q,p)
+        self.cvec.append(x,p)
         
         qx1 = self.cvec.cmp(measures.zero_div)
         qx2 = self.cvec.cmp(np.less_equal) 
@@ -44,13 +44,18 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
     assert type(ir) == IsoRing
 
     def outputf1(p):
+        ##print("IR registers attempt")
+        ##print(p)
         q,stat = ir.register_attempt(p)
+        ##print("-- register")
+        ##print(q)
+        ##print(stat)
 
         if stat:
             return None
-
+        ##print("cracking resp: ")
         d = cracklng.register_response(p,q,stat)
-
+        ##print("\t",d)
         return d
 
     rch = relevance_functions.RChainHead()
@@ -66,7 +71,9 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih):
     assert type(ir) == IsoRing
     assert type(hs) == HypStruct
 
+    ##print("\t-- converting to RCH")
     rch = IsoRing_and_Crackling_to_base_RChainHead(ir,cracklng)
+    ##print("\t-- CONVERTED")
     resplattingMode = ("relevance zoom",rch)
 
     mpsb = hs.most_probable_subbound()
@@ -74,5 +81,5 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih):
     rss = rssi.ResplattingSearchSpaceIterator(mpsb,\
         start_point,SSIHop=ssih,resplattingMode = \
             resplattingMode)
-
+    ##print("DECLARED RSS")
     return rss
