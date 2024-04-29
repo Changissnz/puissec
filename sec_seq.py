@@ -1,4 +1,4 @@
-from sec_mapr import * 
+from srefmap import * 
 
 ############################################
 
@@ -143,6 +143,8 @@ class Sec:
 
         self.dimso = None 
 
+        self.idn_tag = None 
+
     def __str__(self):
         s = "** sequence\n"
         s += matrix_methods.vector_to_string(self.seq,float)
@@ -177,6 +179,14 @@ class Sec:
         codep_map = deepcopy(dep_map)
         return Sec(seq,singleton_range,\
             opm,dep_map,codep_map,obfsr=None)
+
+    def seq_index(self):
+        ops = self.optima_points()
+
+        for (i,o) in enumerate(ops): 
+            stat = matrix_methods.equal_iterables(o,self.seq)
+            if stat: return i 
+        return -1
 
     """
     return: 
@@ -268,9 +278,6 @@ class Sec:
         
         #####
 
-    def next_Sec_cdpr_maps(self):
-        return -1 
-
     def generate_next_Sec(self):
         assert not self.obfsr.fstat
         assert self.obfsr.tstat         
@@ -317,40 +324,50 @@ class Sec:
         s.obfsr.tstat = False 
         return s,sz0,s.obfsr.sz
 
-class SolnRef:
-
-    """
-
-    d := dict, sec idn -> (weight for whole answer,)
-    """
-    def __init__(self,d):
-        self.d = d
-        return -1 
-
-    @staticmethod
-    def generate(sequence):
-        assert len(sequence) > 0
-        for s in sequence: 
-            assert type(s) == IsoRing
-
-
 class SecSeq:
 
-    def __init__(self,sequence,reference_map=None): 
+    def __init__(self,sequence):#,reference_map=None): 
 
-        for s in sequence: assert type(s) == Sec
-        assert len(reference_map) == len(sequence)
-        assert type(reference_map) == defaultdict
+        for (i,s) in enumerate(sequence): 
+            assert type(s) == Sec
+            s.idn_tag = i 
+        
+        #assert len(reference_map) == len(sequence)
+        #assert type(reference_map) == defaultdict
 
-        lm = list(reference_map.values())
-        minny,maxxy = min(lm),max(lm)
-        assert minny >= 0 and maxxy < len(sequence)
+        #lm = list(reference_map.values())
+        #minny,maxxy = min(lm),max(lm)
+        #assert minny >= 0 and maxxy < len(sequence)
         self.sequence = sequence
-        self.reference_map = reference_map
+        #self.reference_map = reference_map
         return
 
     def __len__(self):
         return len(self.sequence) 
+
+    def sec_instances_to_supermap(self,map_type):
+        assert map_type in {'l','d','c'}
+
+        def selectm(i):
+            if map_type == 'l':
+                return deepcopy(self.sequence[i].opm)
+            if map_type == 'd':
+                return deepcopy(self.sequence[i].dm)
+            return deepcopy(self.sequence[i].cdm)
+
+        dx = defaultdict(defaultdict)
+        for i in range(len(self.sequence)):
+            dx[i] = selectm(i)
+        return dx 
+
+    def soln_map(self):
+        d = {}
+        for s in self.sequence:
+            d[s.idn_tag] = s.seq_index()
+        return d 
+
+
+
 
 
 

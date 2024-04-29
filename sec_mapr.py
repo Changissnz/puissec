@@ -28,6 +28,7 @@ def metrics_on_node_in_depmap(dm,n):
         other_sec = other_sec | {px[2]}
     return count,other_sec 
 
+# TODO: test this
 """
 sec2dm := dict, sec. idn -> dependency idn -> Pr
 """
@@ -61,6 +62,7 @@ def connected_subsets_of_codepmap(sec2dm):
         dun |= {s2} 
     return s_ 
 
+# TODO: test this
 """
 sec2dm := dict, sec. idn -> dependency idn -> Pr
 sec_id := 
