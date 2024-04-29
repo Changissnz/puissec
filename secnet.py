@@ -74,7 +74,7 @@ class SecNet:
 
     """
     generates an instance of a <SecNet> using 
-    a sequence of <IsoRings> (that may or may not 
+    a sequence of <IsoRing>s (that may or may not 
     have dep./codep.) along with other variables 
     pertaining to the graph to be generated.
     """

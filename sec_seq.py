@@ -316,7 +316,24 @@ class Sec:
         s.obfsr.set_sz()
         s.obfsr.tstat = False 
         return s,sz0,s.obfsr.sz
-        
+
+class SolnRef:
+
+    """
+
+    d := dict, sec idn -> (weight for whole answer,)
+    """
+    def __init__(self,d):
+        self.d = d
+        return -1 
+
+    @staticmethod
+    def generate(sequence):
+        assert len(sequence) > 0
+        for s in sequence: 
+            assert type(s) == IsoRing
+
+
 class SecSeq:
 
     def __init__(self,sequence,reference_map=None): 
@@ -334,3 +351,7 @@ class SecSeq:
 
     def __len__(self):
         return len(self.sequence) 
+
+
+
+    

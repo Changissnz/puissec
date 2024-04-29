@@ -10,8 +10,6 @@ def any_intersecting_bounds(bounds_seq):
                 return True
     return False 
 
-
-
 """
 The Hypothesis structure.
 

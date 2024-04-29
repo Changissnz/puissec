@@ -165,6 +165,10 @@ class IsoRing:
     def rep(self):
         return deepcopy(self.sec_cache[self.repi])
 
+    def pr_of_optima_index(self,oi):
+
+        return -1 
+
 def Sec_list_sample1(): 
     random.seed(12)
     np.random.seed(12)
