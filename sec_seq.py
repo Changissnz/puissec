@@ -326,20 +326,11 @@ class Sec:
 
 class SecSeq:
 
-    def __init__(self,sequence):#,reference_map=None): 
-
+    def __init__(self,sequence):
         for (i,s) in enumerate(sequence): 
             assert type(s) == Sec
             s.idn_tag = i 
-        
-        #assert len(reference_map) == len(sequence)
-        #assert type(reference_map) == defaultdict
-
-        #lm = list(reference_map.values())
-        #minny,maxxy = min(lm),max(lm)
-        #assert minny >= 0 and maxxy < len(sequence)
         self.sequence = sequence
-        #self.reference_map = reference_map
         return
 
     def __len__(self):
@@ -365,10 +356,3 @@ class SecSeq:
         for s in self.sequence:
             d[s.idn_tag] = s.seq_index()
         return d 
-
-
-
-
-
-
-    

@@ -28,8 +28,11 @@ def metrics_on_node_in_depmap(dm,n):
         other_sec = other_sec | {px[2]}
     return count,other_sec 
 
-# TODO: test this
 """
+calculates the connected subsets of <Sec>
+instances based on non-null co-dependency 
+values using `sec2dm`.
+
 sec2dm := dict, sec. idn -> dependency idn -> Pr
 """
 def connected_subsets_of_codepmap(sec2dm):
@@ -62,7 +65,6 @@ def connected_subsets_of_codepmap(sec2dm):
         dun |= {s2} 
     return s_ 
 
-# TODO: test this
 """
 sec2dm := dict, sec. idn -> dependency idn -> Pr
 sec_id := 
@@ -93,6 +95,45 @@ def depchain_for_Sec(sec2dm,sec_id):
         q.extend(list(qls)) 
 
     return chain 
+
+####################### range-of-interpretation
+####################### formulations
+
+# TODO: test this 
+'''
+(co?)-dependent weighted Pr for node
+
+n := int, identifier for node 
+ndec := int, identifier for decision on `n`. 
+opm := dict, int of optimum -> float, Pr value. 
+dm := dict, (co?)-dependency map pertaining to `n`. 
+decision_chain := list, (sec index, index of selected optimum)
+
+'''
+def dep_weighted_Pr_for_node_dec(n,ndec,opm,dm,decision_chain): 
+    # gather the relevant probability values
+    parsed_dc = []
+    prvs = []
+    for d in decision_chain:
+        key = str(ndec) + ","\
+            + d[0] + "." d[1]
+        prvs.append(dm[key])
+    assert ndec in opm
+
+    # add weighted additions to Pr(ndec) 
+    v = opm[ndec]
+    v2 = v
+
+    for x in prvs: 
+        v2 = v2 + (v * x) 
+
+    # normalize the value 
+    qk = set(opm.keys()) - {ndec}
+    s = 0.0
+    for qk_ in qk:
+        s += opm[qk_]
+    s += v2
+    return measures.zero_div(v2,s,0.0)
 
 ####################### generator functions
 ####################### for <Sec> vars 
