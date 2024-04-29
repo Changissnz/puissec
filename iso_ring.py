@@ -220,3 +220,10 @@ def IsoRing_sample_1():
             outlier_pr_ratio,num_bounds,3) 
 
     return IsoRing(sq[0],obf,sb)
+
+def SecSeq_sample_1(num_components=1):
+    s = Sec_list_sample2()
+    sndg = SecNetDepGen(s,random,num_components,0.8,[1,4])
+    sndg.assign_conn(1500)
+    ss = SecSeq(sndg.sq)
+    return ss 

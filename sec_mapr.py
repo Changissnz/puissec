@@ -88,7 +88,8 @@ def depchain_for_Sec(sec2dm,sec_id):
         for q_ in qls: 
             if in_chain(q_):
                 return None 
-        chain.append(qls)
+        if len(qls) > 0: 
+            chain.append(qls)
         q.extend(list(qls)) 
 
     return chain 
