@@ -439,8 +439,8 @@ class SecNetFrameGen:
 
 """
 generates the connections for Pr. dependencies 
-of each <Sec> instance in `sec_seq` in the 
-order of the <Sec>'s index. 
+of each <Sec> instance in `sec_seq`. See the 
+class method `make_conn` for more information.
 
 For each <Sec> S, its (co?)-dependency map has elements
 of the form 

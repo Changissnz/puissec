@@ -133,7 +133,11 @@ def dep_weighted_Pr_for_node_dec(n,ndec,opm,dm,decision_chain):
     for qk_ in qk:
         s += opm[qk_]
     s += v2
-    return measures.zero_div(v2,s,0.0)
+
+    opm_ = defaultdict(float) 
+    for (k,v) in opm.items():
+        opm_[k] = measures.zero_div(v,s,0.0)
+    return opm_
 
 ####################### generator functions
 ####################### for <Sec> vars 

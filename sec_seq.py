@@ -356,3 +356,8 @@ class SecSeq:
         for s in self.sequence:
             d[s.idn_tag] = s.seq_index()
         return d 
+
+    def construct_SRefMap(self):
+        dmsm = self.sec_instances_to_supermap('d')
+
+        return -1 
