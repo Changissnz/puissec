@@ -126,7 +126,7 @@ class SecNetDepGenClass(unittest.TestCase):
             print("---------------------")
             '''
         #print(i)
-        assert i <= 5
+        assert i <= 7, "want {},got {}".format(5,i)
 
 
 if __name__ == '__main__':

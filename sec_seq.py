@@ -333,6 +333,11 @@ class SecSeq:
         self.sequence = sequence
         return
 
+    def __getitem__(self,i):
+        assert i <= len(self.sequence)
+        assert i >= 0 
+        return self.sequence[i] 
+
     def __len__(self):
         return len(self.sequence) 
 

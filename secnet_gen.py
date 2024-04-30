@@ -466,7 +466,7 @@ class SecNetDepGen:
 
     def __init__(self,sec_seq,rnd_struct,\
         min_components:int,max_nconn_ratio:float,
-        dlength_range):
+        dlength_range,depconn_ratio=None):
         assert type(sec_seq) == list
         for s in sec_seq: assert type(s) == Sec 
         assert type(min_components) == int and min_components > 0
@@ -478,6 +478,7 @@ class SecNetDepGen:
         assert type(dlength_range[0]) == type(dlength_range[1])
         assert type(dlength_range[0]) == int
         assert dlength_range[1] <= len(sec_seq) 
+        assert type(depconn_ratio) in {type(None),int}
 
         self.sq = sec_seq 
         self.clear_sec_pr_maps()
@@ -486,6 +487,7 @@ class SecNetDepGen:
         self.min_components = min_components
         self.max_nconn_ratio = max_nconn_ratio
         self.dlength_range = dlength_range 
+        self.depconn_ratio = depconn_ratio
         # each element is a set representing a 
         # co-dependent component
         self.cd_comp_sets = []
@@ -518,7 +520,6 @@ class SecNetDepGen:
         while stat: 
             stat = self.make_conn([1,2,3])
             stat = stat and i < size_limt
-            #print("conn ",i)
             i += 1
         self.write_conn_to_Sec()
         return
@@ -575,13 +576,56 @@ class SecNetDepGen:
         l = list(l)
         x = l[q]
 
+        self.dep_conn_process(x) 
+        return True
+
+    def dep_conn_process(self,pn):
+        c = None
+        if type(self.depconn_ratio) == type(None):
+            c = 1
+        else: 
+            assert self.depconn_ratio >= 0.0 and self.depconn_ratio <= 1.0
+
+            x = len(self.sq[pn[0]].opm) * len(self.sq[pn[1]].opm)
+            c = int(math.ceil(self.depconn_ratio * x)) 
+        
+        for i in range(c):
+            self.one_dep_conn(pn)
+
+    def one_dep_conn(self,pn):
+        # get the available optima indices for each
+        # of the nodes w.r.t. each other
+
+        q1 = filter_optimum_conn_in_depmap(self.dep[pn[0]],pn[0])
+        q2 = filter_optimum_conn_in_depmap(self.dep[pn[1]],pn[1])
+        q11 = filter_optimum_conn_in_depmap(self.codep[pn[0]],pn[0])
+        q21 = filter_optimum_conn_in_depmap(self.codep[pn[1]],pn[1])
+
+        q1.extend(q11)
+        q2.extend(q21) 
+
+        q1_ = [x for x in q1 if x[0] == pn[1]]
+        q2_ = [x for x in q2 if x[0] == pn[0]]
+
+            # occupied
+        q1 = set([q_[1] for q_ in q1_])
+        q2 = set([q_[1] for q_ in q2_])
+
+        l1 = list(range(0,len(self.sq[pn[0]].opm))) 
+        l2 = list(range(0,len(self.sq[pn[1]].opm))) 
+        l1_ = sorted(list(set(l1) - q1)) 
+        l2_ = sorted(list(set(l2) - q2)) 
+
         # choose a local optima from each of the elements
-        i1 = self.rnd_struct.randrange(0,len(self.sq[x[0]].opm))
-        i2 = self.rnd_struct.randrange(0,len(self.sq[x[1]].opm))
+        '''
+        i1 = self.rnd_struct.randrange(0,len(self.sq[pn[0]].opm))
+        i2 = self.rnd_struct.randrange(0,len(self.sq[pn[1]].opm))
+        '''
+        i1 = l1_[self.rnd_struct.randrange(0,len(l1_))]
+        i2 = l2_[self.rnd_struct.randrange(0,len(l2_))]
 
         prv = round(self.rnd_struct.uniform(0.,1.),5)
-        self.add_dependency(x[0],x[1],i1,i2,prv)
-        return True
+        self.add_dependency(pn[0],pn[1],i1,i2,prv)
 
     def make_codep_C2C_conn(self,attempts=10):
         if attempts <= 0: 
@@ -656,6 +700,12 @@ class SecNetDepGen:
             x1 = self.cd_comp_sets.pop(q[0])
             x2 = self.cd_comp_sets.pop(q[1])
             self.cd_comp_sets.append(x1 | x2) 
+
+    def available_optimapair_for_nodepair(self,n1,n2,map_type='c'):
+        assert map_type in {'c','d'}
+
+
+        return -1 
 
     ################ for co-dependency
 
@@ -782,6 +832,8 @@ class SecNetDepGen:
             if len(sx) > 0: continue
             qsx.append(q_)
         qsx = set(qsx)
+
+        ##print("available for dep on node {}:{}".format(n,qsx))
         return qsx
 
     ## ?? 

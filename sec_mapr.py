@@ -22,7 +22,6 @@ def metrics_on_node_in_depmap(dm,n):
     other_sec = set()
     for (k,v) in dm.items():
         px = parse_dconn(k)
-        print("parsed results: ",px)
         if px[1] != n: continue
         count += 1
         other_sec = other_sec | {px[2]}
@@ -101,7 +100,8 @@ def extdec_dmap_set(dm,o,extf):
     d = defaultdict(set)
     while len(oconn) > 0:
         q = sort_next()
-        if type(q) == type(None): continue \
+        if type(q) == type(None): 
+            continue
         d[q[0]] = q[1] 
 
     return d
