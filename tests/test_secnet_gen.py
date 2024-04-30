@@ -1,6 +1,12 @@
 from secnet_gen import * 
 import unittest
 
+### lone file test 
+"""
+python3 -m tests.test_secnet_gen
+"""
+###
+
 def Sec_list_sample_1():
 
     singleton_range = [0.,10.] 
@@ -128,6 +134,18 @@ class SecNetDepGenClass(unittest.TestCase):
         #print(i)
         assert i <= 7, "want {},got {}".format(5,i)
 
+    def test__SecNetDepGen__make_conn__case3(self):
+
+        s = Sec_list_sample2(num_secs=4)
+        sndg = SecNetDepGen(s,random,4,0.0,[1,4],depconn_ratio=0.5)
+        sndg.assign_conn(500)
+        ss = SecSeq(sndg.sq)
+
+        ans = {0:(0,0),1:(28,0),2:(34,0),3:(32,0)}
+        for s in ss.sequence:
+                q = ans[s.idn_tag] 
+                assert q[0] == len(s.dm)
+                assert q[1] == len(s.cdm) 
 
 if __name__ == '__main__':
     unittest.main()

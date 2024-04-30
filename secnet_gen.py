@@ -857,3 +857,37 @@ class SecNetDepGen:
             s = s | {k_[1]} 
         return s 
 
+
+
+def Sec_list_sample1(): 
+    random.seed(12)
+    np.random.seed(12)
+
+    singleton_range = [0.,1.] 
+    dimension = 5
+    num_optima = 2
+    countermeasure = (0.6,0.5) 
+    secs = []
+
+    for i in range(5): 
+        sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+        countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+    return secs 
+
+def Sec_list_sample2(num_secs=12): 
+    random.seed(14)
+    np.random.seed(19)
+
+    singleton_range = [0.,1.] 
+    dimension = 5
+    num_optima = 12
+    countermeasure = (0.7,0.5) 
+    secs = []
+
+    for i in range(num_secs): 
+        sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+        countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+        ##print("sec {}".format(i))
+    return secs 
