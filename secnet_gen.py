@@ -478,7 +478,7 @@ class SecNetDepGen:
         assert type(dlength_range[0]) == type(dlength_range[1])
         assert type(dlength_range[0]) == int
         assert dlength_range[1] <= len(sec_seq) 
-        assert type(depconn_ratio) in {type(None),int}
+        assert type(depconn_ratio) in {type(None),float}
 
         self.sq = sec_seq 
         self.clear_sec_pr_maps()
@@ -589,41 +589,26 @@ class SecNetDepGen:
             x = len(self.sq[pn[0]].opm) * len(self.sq[pn[1]].opm)
             c = int(math.ceil(self.depconn_ratio * x)) 
         
+        ##print("making {} dep.".format(c))
         for i in range(c):
+            ##print("-- {}".format(i))
             self.one_dep_conn(pn)
 
+    """
+    adds an optimum-to-optimum dependency connection 
+    so that pn[1] depends on pn[0].
+    """
     def one_dep_conn(self,pn):
         # get the available optima indices for each
         # of the nodes w.r.t. each other
-
-        q1 = filter_optimum_conn_in_depmap(self.dep[pn[0]],pn[0])
-        q2 = filter_optimum_conn_in_depmap(self.dep[pn[1]],pn[1])
-        q11 = filter_optimum_conn_in_depmap(self.codep[pn[0]],pn[0])
-        q21 = filter_optimum_conn_in_depmap(self.codep[pn[1]],pn[1])
-
-        q1.extend(q11)
-        q2.extend(q21) 
-
-        q1_ = [x for x in q1 if x[0] == pn[1]]
-        q2_ = [x for x in q2 if x[0] == pn[0]]
-
-            # occupied
-        q1 = set([q_[1] for q_ in q1_])
-        q2 = set([q_[1] for q_ in q2_])
-
-        l1 = list(range(0,len(self.sq[pn[0]].opm))) 
-        l2 = list(range(0,len(self.sq[pn[1]].opm))) 
-        l1_ = sorted(list(set(l1) - q1)) 
-        l2_ = sorted(list(set(l2) - q2)) 
+        dmx = self.dep[pn[1]]
+        sz0 = len(self.sq[pn[1]].opm)
+        sz1 = len(self.sq[pn[0]].opm)
+        l1_,l2_ = available_for_dep(dmx,pn[0],sz0,sz1)
 
         # choose a local optima from each of the elements
-        '''
-        i1 = self.rnd_struct.randrange(0,len(self.sq[pn[0]].opm))
-        i2 = self.rnd_struct.randrange(0,len(self.sq[pn[1]].opm))
-        '''
         i1 = l1_[self.rnd_struct.randrange(0,len(l1_))]
         i2 = l2_[self.rnd_struct.randrange(0,len(l2_))]
-
         prv = round(self.rnd_struct.uniform(0.,1.),5)
         self.add_dependency(pn[0],pn[1],i1,i2,prv)
 
@@ -763,17 +748,19 @@ class SecNetDepGen:
     """
     def add_dependency(self,ref,dependent,i1,i2,prv):
         ##print("adding dependency")
-        ##print("{}-->{}".format(ref,dependent))
+        ##print("{}.{}-->{}.{}".format(ref,i1,dependent,i2))
 
         assert ref not in self.dep_map[dependent]
-
         qx = deepcopy(self.dep_map[ref]) 
+        ##print(qx) 
         q = [dependent] 
         q = q + self.dep_map[dependent]
         q1 = deepcopy(q) 
         self.dep_map[ref].extend(q)
+        self.dep_map[ref] = list(set(self.dep_map[ref]))
         for q_ in qx:
             self.dep_map[q_].extend(q1)
+            self.dep_map[q_] = list(set(self.dep_map[q_]))
 
         if dependent not in self.dep: 
             self.dep[dependent] = defaultdict(float)

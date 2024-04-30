@@ -14,18 +14,45 @@ return:
 - number of connections, 
 - set, of its optima indices 
 """
-def metrics_on_node_in_depmap(dm,n):
+def metrics_on_node_in_depmap(dm,n,full_output=False):
     assert type(dm) == defaultdict
 
     count = 0
-    # sec index -> set of its optima indices 
+    # optima indices
     other_sec = set()
+    this_sec = set()
     for (k,v) in dm.items():
         px = parse_dconn(k)
         if px[1] != n: continue
         count += 1
         other_sec = other_sec | {px[2]}
-    return count,other_sec 
+
+        if full_output:
+            this_sec = this_sec | {px[0]}
+
+    if not full_output:
+        return count,other_sec
+    return count,other_sec,this_sec 
+
+"""
+dm := dict, dep. map for dependent node.
+nondep_node := int, identifier for node depended on.
+os1 := int, number of optima for dependent 
+os2 := int, number of optima for non-dependent
+
+return:
+- available optima for dependent node
+- available optima for non-dependent node 
+"""
+def available_for_dep(dm,nondep_node,os1,os2):
+    # number of connections, 
+    # local optima for nondep_node, 
+    # local optima for dep node 
+    count,other_sec,this_sec = metrics_on_node_in_depmap(dm,nondep_node,True)
+    
+    q1 = sorted(list(set(range(os1)) - this_sec))
+    q2 = sorted(list(set(range(os2)) - other_sec))
+    return q1,q2
 
 """
 dm := dict, dep. map for a <Sec> instance. 
