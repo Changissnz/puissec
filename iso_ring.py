@@ -185,7 +185,7 @@ def Sec_list_sample1():
         secs.append(sec)
     return secs 
 
-def Sec_list_sample2(): 
+def Sec_list_sample2(num_secs=12): 
     random.seed(14)
     np.random.seed(19)
 
@@ -195,10 +195,11 @@ def Sec_list_sample2():
     countermeasure = (0.7,0.5) 
     secs = []
 
-    for i in range(num_optima): 
+    for i in range(num_secs): 
         sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
         countermeasure,rnd_struct=np.random)
         secs.append(sec)
+        ##print("sec {}".format(i))
     return secs 
 
 
@@ -227,3 +228,21 @@ def SecSeq_sample_1(num_components=1):
     sndg.assign_conn(1500)
     ss = SecSeq(sndg.sq)
     return ss 
+
+def SecSeq_sample_2():
+    s = Sec_list_sample2(num_secs=80)
+    sndg = SecNetDepGen(s,random,4,0.5,[1,4])
+    print("assigning conn")
+    sndg.assign_conn(5000)
+
+    # make 100 random dependent conn
+    stat = True
+    i = 0  
+    while stat and i < 1000: 
+        stat = sndg.make_dep_conn()
+        i += 1 
+
+    ss = SecSeq(sndg.sq)
+    return ss 
+
+

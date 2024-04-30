@@ -518,6 +518,7 @@ class SecNetDepGen:
         while stat: 
             stat = self.make_conn([1,2,3])
             stat = stat and i < size_limt
+            #print("conn ",i)
             i += 1
         self.write_conn_to_Sec()
         return
@@ -565,7 +566,9 @@ class SecNetDepGen:
         # get list of candidates
         l = self.available_for_dependency()
         ##print("# available for dep.: ",l)
-        if len(l) == 0: return None
+        if len(l) == 0: 
+            ##print("NADA")
+            return None
 
         # choose a pair of non-connected nodes
         q = self.rnd_struct.randrange(0,len(l))

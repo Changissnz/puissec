@@ -29,11 +29,92 @@ def metrics_on_node_in_depmap(dm,n):
     return count,other_sec 
 
 """
+dm := dict, dep. map for a <Sec> instance. 
+
+return: 
+- list, elements are 
+    (other <Sec> idn,index of other <Sec>, bond strength).
+"""
+def filter_optimum_conn_in_depmap(dm,o): 
+    q = []
+    for (k,v) in dm.items():
+        k_ = parse_dconn(k) 
+        if k_[0] != o: continue
+        s = (k_[1],k_[2],v)
+        q.append(s) 
+    return q 
+
+"""
+return: 
+- number of conn.,cumulative bond strength
+"""
+def metrics_on_optimum_in_depmap(dm,o):
+    fo = filter_optimum_conn_in_depmap(dm,o)
+    n = len(fo) 
+    bs = sum(list(fo.values()))
+    return n,bs
+
+# TODO: test. 
+"""
+extremum decision on DMap at optimum `o`. 
+
+return:
+- dict, sec idn -> Set(decision with extreme Pr. value)
+"""
+def extdec_dmap_set(dm,o,extf):
+    assert extf in {min,max}
+
+    oconn = filter_optimum_conn_in_depmap(dm,o)
+
+    # get the max
+    def sort_next():
+        if len(oconn) == 0: 
+            return
+        x = oconn.pop(0)
+        max0 = x[2] 
+        max_set = set([x[1]])
+        ref_sec = x[0] 
+        i = 0 
+        while i < len(oconn):
+            x2 = oconn[0]
+
+            # case: not relevant
+            if x2[0] != ref_sec:
+                i += 1
+                continue
+
+            x2 = oconn.pop(0)
+            q = [max0,x2[2]]
+            
+            # case: equals
+            if abs(q[0] - q[1]) < 10 ** -4:
+                max_set = max_set | {x2[1]} 
+                continue
+
+            # case: extremum
+            mx = extf(q)
+            if x2[2] == mx:
+                max_set = set([x2[1]])
+                max0 = x2[2]
+        return ref_sec,max_set 
+
+    d = defaultdict(set)
+    while len(oconn) > 0:
+        q = sort_next()
+        if type(q) == type(None): continue \
+        d[q[0]] = q[1] 
+
+    return d
+
+"""
 calculates the connected subsets of <Sec>
 instances based on non-null co-dependency 
 values using `sec2dm`.
 
 sec2dm := dict, sec. idn -> dependency idn -> Pr
+
+return: 
+- list, each element a Set(codependent) 
 """
 def connected_subsets_of_codepmap(sec2dm):
     s = set(sec2dm.keys())
@@ -67,7 +148,10 @@ def connected_subsets_of_codepmap(sec2dm):
 
 """
 sec2dm := dict, sec. idn -> dependency idn -> Pr
-sec_id := 
+sec_id := int, identifier for <Sec>
+
+return:
+- list, each element a Set(dependency)
 """
 def depchain_for_Sec(sec2dm,sec_id):
 
@@ -116,7 +200,7 @@ def dep_weighted_Pr_for_node_dec(n,ndec,opm,dm,decision_chain):
     prvs = []
     for d in decision_chain:
         key = str(ndec) + ","\
-            + d[0] + "." d[1]
+            + d[0] + "." + d[1]
         prvs.append(dm[key])
     assert ndec in opm
 
