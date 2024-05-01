@@ -341,6 +341,25 @@ class SecSeq:
     def __len__(self):
         return len(self.sequence) 
 
+    def load_srm(self):
+        lsm = self.sec_instances_to_supermap()
+        SRefMap()
+        return -1 
+
+    '''
+    calculates the possible-decision chain 
+    extremum (min,max) for `node` with `dec`. 
+    '''
+    def greedy_lone_pd_chain_ext(self,node,dec,is_dm=True):
+        q = None 
+        if is_dm:
+            q = deepcopy(self.sequence[node].dm)
+        else: 
+            q = deepcopy(self.sequence[node].cdm)
+        minny = extdec_dmap_set(q,dec,min)
+        maxxy = extdec_dmap_set(q,dec,max)
+        return minny,maxxy 
+
     def sec_instances_to_supermap(self,map_type):
         assert map_type in {'l','d','c'}
 
@@ -362,7 +381,7 @@ class SecSeq:
             d[s.idn_tag] = s.seq_index()
         return d 
 
+    # TODO: 
     def construct_SRefMap(self):
         dmsm = self.sec_instances_to_supermap('d')
-
         return -1 

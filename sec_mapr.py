@@ -59,7 +59,7 @@ dm := dict, dep. map for a <Sec> instance.
 
 return: 
 - list, elements are 
-    (other <Sec> idn,index of other <Sec>, bond strength).
+    (other <Sec> idn,index of other <Sec> optimum, bond strength).
 """
 def filter_optimum_conn_in_depmap(dm,o): 
     q = []
@@ -82,7 +82,9 @@ def metrics_on_optimum_in_depmap(dm,o):
 
 # TODO: test. 
 """
-extremum decision on DMap at optimum `o`. 
+possible-decision chain by extremum 
+function `extf` for optimum `o` in 
+(co?)-dep. map `dm`.
 
 return:
 - dict, sec idn -> Set(decision with extreme Pr. value)
@@ -132,6 +134,18 @@ def extdec_dmap_set(dm,o,extf):
         d[q[0]] = q[1] 
 
     return d
+
+def is_in_pd_chain(pdc,dc,fullkey_req=False):
+
+    if fullkey_req:
+        stat = set(dc.keys()) == set(pdc.keys()) 
+        if not stat: 
+            return False 
+
+    for k,v in dc.items():
+        if v not pdc[k]:
+            return False
+    return True 
 
 """
 calculates the connected subsets of <Sec>

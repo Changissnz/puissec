@@ -8,7 +8,11 @@ from sec_mapr import *
 
 class SRefMap: 
 
-    def __init__(self,secseq_map):
+    def __init__(self,opmn,dms,cdms):
+        self.opmn = opmn 
+        self.dms = dms
+        self.cdms = cdms 
+
         self.ssm = secseq_map
         # vertex label -> vector value
         self.v = {}
@@ -37,3 +41,4 @@ class SRefMap:
     """
     def pr_of_selection(self,d):
         return -1
+
