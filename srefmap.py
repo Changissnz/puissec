@@ -8,6 +8,10 @@ from sec_mapr import *
 
 class SRefMap: 
 
+    PRISM_VERTEX_LABELS = {'greedy-lone',\
+            'greedy-d','greedy-c','greedy-dc',\
+            'actual','conn-derived'}
+
     def __init__(self,opmn,dms,cdms):
         self.opmn = opmn 
         self.dms = dms
@@ -20,36 +24,39 @@ class SRefMap:
 
     def load_prism_vertices(self,d):
         for (k,v) in d.items():
-            assert k in {'greedy-lone',\
-            'greedy-d','greedy-c','greedy-dc',\
-            'actual','conn-derived'}
+            assert k in self.PRISM_VERTEX_LABELS
             self.v[k] = v
         return
 
     def preprocess(self):
         return -1 
 
-    def sec_to_pd_ext_map(self,s):
-# def greedy_lone_pd_chain_ext(node,dec,is_dm=True)
-        assert s in self.opmn
-        sec2pdchain = {}
-
-        for k in self.opmn[s].items():
-            greedy_lone_pd_chain_ext(s,k)
-
-        return -1
-
     def pd_ext_for_sec(self,s): 
         assert s in self.opmn
         return -1 
 
-    # get the Pr. range of a node
-    def pr_range_of_node_dec(self,node_idn,dec_idn,
-        opmi,dm,decision_chain):
-        prmap = dep_weighted_Pr_for_node_dec(node_idn,\
-            dec_idn,opmi,dm,decision_chain)
-        return 
+    # TODO: test. 
+    """
+    return:
+    - dict, identifier of optima in <Sec> `s` -> 
+            (min. possible-decision map,max. possible-decision map)
+    """
+    def sec_to_pd_ext_map(self,s):
+        assert s in self.opmn
+        opt2pdchain = {}
 
+        for k in self.opmn[s].items():
+            opt2pdchain[k] = self.greedy_lone_pd_chain_ext(s,k,no_intersecting_keys=True)
+        return opt2pdchain
+
+    ##################### greedy solutions using 
+    ##################### extremum functions 
+
+    """
+    return: 
+    - dict, dependent|codependent node of `node` -> 
+            set of local opt. indices by ext. func. 
+    """
     def greedy_lone_pd_chain_ext(self,node,dec,no_intersecting_keys=True):
 
         dm1 = self.greedy_lone_pd_chain_ext_(node,dec,True)
@@ -78,9 +85,20 @@ class SRefMap:
         maxxy = extdec_dmap_set(q,dec,max)
         return minny,maxxy 
 
+    #################### probability calculations for 
+    #################### decision-chains. 
+
+    # get the Pr. range of a node
+    def pr_range_of_node_dec(self,node_idn,dec_idn,
+        opmi,dm,decision_chain):
+        prmap = dep_weighted_Pr_for_node_dec(node_idn,\
+            dec_idn,opmi,dm,decision_chain)
+        return 
+
     """
     d := dict, sec idn -> local optima index
     """
-    def pr_of_selection(self,d):
+    def pr_of_nodedec_(self,d,pr_type):
         return -1
+
 

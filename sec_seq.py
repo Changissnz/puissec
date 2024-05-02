@@ -351,7 +351,7 @@ class SecSeq:
 
         def selectm(i):
             if map_type == 'l':
-                return deepcopy(self.sequence[i].opm)
+                return self.sequence[i].optima_points_to_index_pr_map()
             if map_type == 'd':
                 return deepcopy(self.sequence[i].dm)
             return deepcopy(self.sequence[i].cdm)

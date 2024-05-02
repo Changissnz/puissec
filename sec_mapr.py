@@ -143,7 +143,7 @@ def is_in_pd_chain(pdc,dc,fullkey_req=False):
             return False 
 
     for k,v in dc.items():
-        if v not pdc[k]:
+        if v not in pdc[k]:
             return False
     return True 
 

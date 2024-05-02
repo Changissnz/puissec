@@ -880,6 +880,7 @@ def Sec_list_sample2(num_secs=12):
     np.random.seed(19)
 
     singleton_range = [0.,1.] 
+    num_optima = 12 
     dimension = 5
     countermeasure = (0.7,0.5) 
     secs = []
