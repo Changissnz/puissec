@@ -881,7 +881,6 @@ def Sec_list_sample2(num_secs=12):
 
     singleton_range = [0.,1.] 
     dimension = 5
-    num_optima = 12
     countermeasure = (0.7,0.5) 
     secs = []
 

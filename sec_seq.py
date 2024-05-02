@@ -346,20 +346,6 @@ class SecSeq:
         SRefMap()
         return -1 
 
-    '''
-    calculates the possible-decision chain 
-    extremum (min,max) for `node` with `dec`. 
-    '''
-    def greedy_lone_pd_chain_ext(self,node,dec,is_dm=True):
-        q = None 
-        if is_dm:
-            q = deepcopy(self.sequence[node].dm)
-        else: 
-            q = deepcopy(self.sequence[node].cdm)
-        minny = extdec_dmap_set(q,dec,min)
-        maxxy = extdec_dmap_set(q,dec,max)
-        return minny,maxxy 
-
     def sec_instances_to_supermap(self,map_type):
         assert map_type in {'l','d','c'}
 
