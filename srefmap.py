@@ -20,6 +20,10 @@ class SRefMap:
         self.ssm = secseq_map
         # vertex label -> vector value
         self.v = {}
+        # node idn -> index of opt. -> 
+        # identifier of optima in <Sec> `s` -> 
+        # (min. possible-decision map,max. possible-decision map)
+        self.preproc_map = None
         return 
 
     def load_prism_vertices(self,d):
@@ -28,12 +32,24 @@ class SRefMap:
             self.v[k] = v
         return
 
-    def preprocess(self):
-        return -1 
+    ############# pre-process function and calculating
+    ############# possible-decision maps 
 
-    def pd_ext_for_sec(self,s): 
-        assert s in self.opmn
-        return -1 
+    def preprocess(self):
+        self.preproc_on_seclist()
+        return
+
+    """
+    preprocess function on all <Sec> identifiers; 
+    creates a map with min&max possible-decision 
+    maps for every (<Sec> idn.,optima idn.) pair. 
+    """
+    def preproc_on_seclist(self):
+        self.preproc_map = defaultdict(defaultdict)
+        for k in self.opmn.keys():
+            q = self.sec_to_pd_ext_map(k)
+            self.preproc_map[k] = q 
+        return 
 
     # TODO: test. 
     """
@@ -88,6 +104,15 @@ class SRefMap:
     #################### probability calculations for 
     #################### decision-chains. 
 
+    '''
+    frequency-counter process. 
+    '''
+    def fc_proc(self): 
+        return -1
+
+    def fc_proc_on_node(self,i): 
+        return -1 
+
     # get the Pr. range of a node
     def pr_range_of_node_dec(self,node_idn,dec_idn,
         opmi,dm,decision_chain):
@@ -95,10 +120,10 @@ class SRefMap:
             dec_idn,opmi,dm,decision_chain)
         return 
 
+
     """
     d := dict, sec idn -> local optima index
     """
     def pr_of_nodedec_(self,d,pr_type):
         return -1
-
 

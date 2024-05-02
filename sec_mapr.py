@@ -135,6 +135,15 @@ def extdec_dmap_set(dm,o,extf):
 
     return d
 
+"""
+pdc := dict, sec idn. -> set(<opt.>)
+dc := dict, sec idn. -> (set(<opt.>)|opt idn.)
+fullkey_req := bool, set to True, method asserts
+            both `pdc.
+            
+return:
+- is dc a subset of pdc? 
+"""
 def is_in_pd_chain(pdc,dc,fullkey_req=False):
 
     if fullkey_req:
@@ -143,7 +152,14 @@ def is_in_pd_chain(pdc,dc,fullkey_req=False):
             return False 
 
     for k,v in dc.items():
-        if v not in pdc[k]:
+        assert type(v) in {int,np.int32,set}
+        v_ = None
+        if type(v) != set:
+            v_ = {v}
+        else:
+            v_ = v 
+
+        if not v_.issubset(pdc[k]):
             return False
     return True 
 
