@@ -20,7 +20,7 @@ class SRefMap:
         self.ssm = secseq_map
         # vertex label -> vector value
         self.v = {}
-        # node idn -> index of opt. -> 
+        # node idn ->
         # identifier of optima in <Sec> `s` -> 
         # (min. possible-decision map,max. possible-decision map)
         self.preproc_map = None
@@ -104,15 +104,6 @@ class SRefMap:
     #################### probability calculations for 
     #################### decision-chains. 
 
-    '''
-    frequency-counter process. 
-    '''
-    def fc_proc(self): 
-        return -1
-
-    def fc_proc_on_node(self,i): 
-        return -1 
-
     # get the Pr. range of a node
     def pr_range_of_node_dec(self,node_idn,dec_idn,
         opmi,dm,decision_chain):
@@ -126,4 +117,3 @@ class SRefMap:
     """
     def pr_of_nodedec_(self,d,pr_type):
         return -1
-

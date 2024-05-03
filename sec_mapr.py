@@ -140,7 +140,7 @@ pdc := dict, sec idn. -> set(<opt.>)
 dc := dict, sec idn. -> (set(<opt.>)|opt idn.)
 fullkey_req := bool, set to True, method asserts
             both `pdc.
-            
+
 return:
 - is dc a subset of pdc? 
 """
@@ -279,6 +279,28 @@ def dep_weighted_Pr_for_node_dec(n,ndec,opm,dm,decision_chain):
     for (k,v) in opm.items():
         opm_[k] = measures.zero_div(v,s,0.0)
     return opm_
+
+
+"""
+used in frequency-counting for <SRefMap>; updates 
+`dcnt` w/ `pd`. 
+
+arguments:
+- dcnt := defaultdict, sec. idn. -> Counter(opt.index -> frequency)
+- pd := dict, possible-decision map
+
+return: 
+- defaultdict, sec. idn. -> Counter(opt.index -> frequency)
+"""
+def update_SRefMap_counter(dcnt:defaultdict,pd): 
+    assert type(dcnt) == defaultdict
+    assert type(pd) in {defaultdict,dict} 
+
+    for (k,v) in pd.items():
+        x = dcnt[k]
+        for v_ in v:
+            x[v_] += 1 
+    return dcnt
 
 ####################### generator functions
 ####################### for <Sec> vars 
