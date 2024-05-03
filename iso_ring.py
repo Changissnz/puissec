@@ -196,19 +196,21 @@ def SecSeq_sample_1(num_components=1):
     ss = SecSeq(sndg.sq)
     return ss 
 
-def SecSeq_sample_2():
-    s = Sec_list_sample2(num_secs=80)
+def SecSeq_sample_2(num_secs=80):
+    s = Sec_list_sample2(num_secs=num_secs)
     sndg = SecNetDepGen(s,random,4,0.5,[1,4])
     print("assigning conn")
     sndg.assign_conn(5000)
 
     # make 100 random dependent conn
+    """
     stat = True
     i = 0  
     while stat and i < 1000: 
         stat = sndg.make_dep_conn()
         i += 1 
-
+    """
+    
     ss = SecSeq(sndg.sq)
     return ss 
 

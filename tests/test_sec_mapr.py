@@ -51,5 +51,23 @@ class SecMaprFunctionsClass(unittest.TestCase):
         cs = connected_subsets_of_codepmap(sm)
         assert len(cs) == 5
 
+class PDMapIterClass(unittest.TestCase):
+
+    def test__PDMapIter__next__case1(self):
+        pdec = defaultdict(set,{8:{2,3,4},1:{0,1},2:{1,2,3},0:{4,3}})
+
+        ans1 = defaultdict(None, {0: 3, 1: 0, 2: 1, 8: 2})
+        ans6 = defaultdict(None, {0: 3, 1: 0, 2: 2, 8: 4})
+        ans36 = defaultdict(None, {0: 4, 1: 1, 2: 3, 8: 4})
+        ansd = {1:ans1,6:ans6,36:ans36}
+
+        pmi = PDMapIter(pdec)
+        while not pmi.reached_end():
+                q = next(pmi)
+                if pmi.sz in ansd: 
+                        ans = ansd[pmi.sz]
+                        assert ans == q 
+        assert pmi.sz == 36 
+
 if __name__ == '__main__':
     unittest.main()

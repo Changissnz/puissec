@@ -24,6 +24,8 @@ class SRefMap:
         # identifier of optima in <Sec> `s` -> 
         # (min. possible-decision map,max. possible-decision map)
         self.preproc_map = None
+
+        self.preprocess() 
         return 
 
     def load_prism_vertices(self,d):
@@ -117,3 +119,40 @@ class SRefMap:
     """
     def pr_of_nodedec_(self,d,pr_type):
         return -1
+
+
+    '''
+    frequency-counter process. 
+
+    return: 
+    - dict,possible-decision map
+    '''
+    def fc_proc(self): 
+        # identifier of optima in <Sec> `s` -> 
+        return -1
+
+    '''
+    return:
+    - 
+    '''
+    def extfc_proc_on_node(self,i): 
+        assert type(self.preproc_map) != type(None) 
+        dcnt = defaultdict(Counter)
+        q = self.preproc_map[i]
+        ##update_SRefMap_counter(dcnt:defaultdict,pd)
+        return -1 
+
+    '''
+    calculates either the min or max 
+    of a `node` w/ `dec`
+    '''
+    def prmap_for_nodedec(self,n,dec,fi=0):
+        assert n in self.preproc_map
+        assert f in {0,1}
+
+        dcnt = defaultdict(Counter)
+
+        q = self.preproc_map[n]
+        assert dec in q
+
+        ##update_SRefMap_counter(dcnt,)

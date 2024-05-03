@@ -1,6 +1,6 @@
 from ep_corrmap import * 
 from bloominhurst import *
-
+from morebs2 import search_space_iterator
 
 default_rnd_boolean_index_splitter = lambda x: True if random.randrange(0,2) else False 
 
@@ -301,6 +301,67 @@ def update_SRefMap_counter(dcnt:defaultdict,pd):
         for v_ in v:
             x[v_] += 1 
     return dcnt
+
+# TODO: test this.
+"""
+iterator for possible-decision maps, a 
+dictionary structure w/ 
+
+    key := sec idn.
+    value := set of opt. indices 
+"""
+class PDMapIter: 
+
+    def __init__(self,pd):
+        assert type(pd) in {dict,defaultdict}
+        for v in pd.values(): assert type(v) in {list,set}
+        
+        self.pd = defaultdict(list)
+        for k,v in pd.items(): 
+            self.pd[k] = list(v) 
+
+        self.set_iter()
+        self.sz = 0 
+        return 
+
+    def set_iter(self):
+
+        ls = sorted(list(self.pd.keys())) 
+        u = [] 
+        for ls_ in ls:
+            lx = len(self.pd[ls_])
+            u.append((ls_,lx)) 
+        u = np.array(u)
+        v = deepcopy(u[:,1])
+        bounds = np.zeros((len(u),2))
+        bounds[:,1] = v 
+        start_point = np.zeros((len(v),))
+        column_order = [i for i in range(len(v))][::-1]
+        ssihop = deepcopy(v)
+        cycleOn = False
+        self.ssi_ref = u 
+        self.ssi = search_space_iterator.SearchSpaceIterator(bounds,\
+            start_point,column_order,SSIHop=ssihop,cycleOn=cycleOn)
+
+    def reached_end(self):
+        return self.ssi.reached_end()
+
+    def __next__(self): 
+
+        if self.reached_end():
+            return None 
+
+        # fetch the index 
+        i = next(self.ssi) 
+
+        # fetch the element 
+        pdx = defaultdict(None)
+
+        for (j,s) in enumerate(self.ssi_ref):
+            pdx[s[0]] = self.pd[int(s[0])][int(i[j])]
+        self.sz += 1 
+        # 
+        return pdx 
 
 ####################### generator functions
 ####################### for <Sec> vars 

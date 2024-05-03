@@ -486,6 +486,7 @@ class SecNetDepGen:
         self.rnd_struct = rnd_struct 
         self.min_components = min_components
         self.max_nconn_ratio = max_nconn_ratio
+        # TODO: barely used, delete? 
         self.dlength_range = dlength_range 
         self.depconn_ratio = depconn_ratio
         # each element is a set representing a 
@@ -566,7 +567,7 @@ class SecNetDepGen:
     def make_dep_conn(self):
         # get list of candidates
         l = self.available_for_dependency()
-        ##print("# available for dep.: ",l)
+        ##print("# available for dep.: ",len(l))
         if len(l) == 0: 
             ##print("NADA")
             return None
@@ -790,7 +791,7 @@ class SecNetDepGen:
     """
     def available_for_dependency_on_node(self,n):
         q = set([i for i in range(len(self.sq))])
-
+        ##print("L: ",len(q))
         already = self.dep_map[n]
 
         # get those that n depends on
@@ -799,15 +800,18 @@ class SecNetDepGen:
             if k == n: continue
             if n in v: qs.append(k)
         qs = set(qs) 
+        ##print("L: ",len(qs))
 
         # no dependencies or duplicates. 
         q = q - {n}
         q = q - set(already)
         q = q - qs
+        ##print("L: ",len(q))
 
         # no codependencies
         j = self.component_of_node(n)
         q = q - self.cd_comp_sets[j] 
+        ##print("L: ",len(q))
 
         # iterate through candidates and 
         # see which ones cannot due to 
@@ -819,7 +823,8 @@ class SecNetDepGen:
             if len(sx) > 0: continue
             qsx.append(q_)
         qsx = set(qsx)
-
+        
+        ##print("L: ",len(qsx))
         ##print("available for dep on node {}:{}".format(n,qsx))
         return qsx
 
