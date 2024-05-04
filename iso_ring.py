@@ -202,6 +202,7 @@ def SecSeq_sample_2(num_secs=80):
     print("assigning conn")
     sndg.assign_conn(5000)
 
+    # TODO: delesha
     # make 100 random dependent conn
     """
     stat = True
@@ -214,4 +215,32 @@ def SecSeq_sample_2(num_secs=80):
     ss = SecSeq(sndg.sq)
     return ss 
 
+def duplicate_Sec_list(sec_list,indices_to_dup,\
+    dup_iterations):
 
+    if dup_iterations <= 0: return sec_list 
+
+    for i in indices_to_dup:
+        s = deepcopy(sec_list[i]) 
+        s.idn_tag = len(sec_list)
+        sec_list.append(s) 
+    
+    return duplicate_Sec_list(sec_list,\
+        indices_to_dup,dup_iterations-1)
+
+def SecSeq_sample_3():
+    s = Sec_list_sample2(num_secs=40) 
+    i = [i_ for i_ in range(40)] 
+    s = duplicate_Sec_list(s,i,10)
+
+    random.seed(22)
+    np.random.seed(222)
+    sndg = SecNetDepGen(s,random,4,0.5,[1,4])
+    print("assigning conn")
+    while stat and i < 5000: 
+        print("dconn {}".format(i))
+        stat = sndg.make_dep_conn()
+        i += 1 
+    sndg.write_conn_to_Sec() 
+    ss = SecSeq(sndg.sq) 
+    return ss

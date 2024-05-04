@@ -302,7 +302,6 @@ def update_SRefMap_counter(dcnt:defaultdict,pd):
             x[v_] += 1 
     return dcnt
 
-# TODO: test this.
 """
 iterator for possible-decision maps, a 
 dictionary structure w/ 
