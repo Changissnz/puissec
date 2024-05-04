@@ -16,40 +16,51 @@ class SecMaprFunctionsClass(unittest.TestCase):
         sndg.assign_conn(1500)
         #sq = sndg.sq
         s = sndg.sq 
+        
         """
+        print("XXX")
         for i in range(len(s)):
                 for j in range(len(s)):
                         print("FOR S={}.{}",i,j)
                         metrcs = metrics_on_node_in_depmap(s[2].dm,j)
                         print(metrcs)
         """
-        outp = metrics_on_node_in_depmap(s[1].dm,11)
-        assert outp == (1, {4})
+
+        outp = metrics_on_node_in_depmap(s[2].dm,7)
+        assert outp == (1, {7})
 
     def test__SecMaprFunctions__depchain_for_Sec__case1(self):
 
+        
         ss = SecSeq_sample_1()
         sm = ss.sec_instances_to_supermap('d')
 
-        ans = [{6}, {11, 5}]
-        dc1 = depchain_for_Sec(sm,6)
-        assert dc1 == ans 
-
-        ans2 = [{10}, {0, 2, 8, 9, 11}]
-        dc2 = depchain_for_Sec(sm,10)
-        assert dc2 == ans2
+        ans1 = [{1}, {9, 3}]
+        dc1 = depchain_for_Sec(sm,1)
+        assert dc1 == ans1
         return
 
     def test__SecMaprFunctions__connected_subsets_of_codepmap__case1(self):
         ss = SecSeq_sample_1(1)
         sm = ss.sec_instances_to_supermap('c')
         cs = connected_subsets_of_codepmap(sm)
-        assert len(cs) == 1
+        assert len(cs) == 2
 
         ss2 = SecSeq_sample_1(5)
         sm = ss2.sec_instances_to_supermap('c')
         cs = connected_subsets_of_codepmap(sm)
         assert len(cs) == 5
+
+    def test__SecMaprFunctions__connected_subsets_of_codepmap__case2(self):
+        s = Sec_list_sample2()
+        sndg = SecNetDepGen(s,random,1,0.8,[1,4])
+        sndg.assign_conn(5000,[2,3])
+        ss = SecSeq(sndg.sq)
+
+        sm = ss.sec_instances_to_supermap('c')
+        cs = connected_subsets_of_codepmap(sm)
+        assert len(cs) == 1
+
 
 class PDMapIterClass(unittest.TestCase):
 

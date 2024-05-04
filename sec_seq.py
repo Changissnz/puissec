@@ -145,6 +145,21 @@ class Sec:
 
         self.idn_tag = None 
 
+    def deepcopy(self,new_idn_tag="NULL",\
+        transfer_obfsr=False):
+        s = deepcopy(self.seq)
+        sr = deepcopy(self.singleton_range)
+        opm_ = deepcopy(self.opm) 
+        dm_ = deepcopy(self.dm)
+        cdm_ = deepcopy(self.cdm) 
+        obfsr = None 
+        if transfer_obfsr: 
+            obfsr = self.obfsr
+            self.obfsr = None
+        sc = Sec(s,sr,opm_,dm_,cdm_,obfsr)
+        sc.idn_tag = new_idn_tag
+        return sc 
+
     def __str__(self):
         s = "** sequence\n"
         s += matrix_methods.vector_to_string(self.seq,float)

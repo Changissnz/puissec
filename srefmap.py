@@ -38,7 +38,7 @@ def generate_filterf_ext_instance(extf):
 """
 the default binop. 
 """
-def absdiff(x1,x2);
+def absdiff(x1,x2):
     return abs(x1 - x2) 
 
 def filterf_ext_with_binary_op_accum_(prmap_seq,extf,binop): 
@@ -210,7 +210,7 @@ class SRefMap:
     def extfc_proc_on_node(self,n,ft,filterf): 
         assert type(self.preproc_map) != type(None) 
         assert ft in self.PRISM_VERTEX_LABELS 
-        asseret ft != "actual" 
+        assert ft != "actual" 
 
         q = self.preproc_map[n]
 

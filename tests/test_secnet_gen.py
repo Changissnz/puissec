@@ -141,11 +141,11 @@ class SecNetDepGenClass(unittest.TestCase):
         sndg.assign_conn(500)
         ss = SecSeq(sndg.sq)
 
-        ans = {0:(0,0),1:(28,0),2:(34,0),3:(32,0)}
+        ans = {0:(31,0),1:(64,0),2:(0,0),3:(32,0)}
         for s in ss.sequence:
-                q = ans[s.idn_tag] 
-                assert q[0] == len(s.dm)
-                assert q[1] == len(s.cdm) 
+            q = ans[s.idn_tag] 
+            assert q[0] == len(s.dm)
+            assert q[1] == len(s.cdm) 
 
 if __name__ == '__main__':
     unittest.main()

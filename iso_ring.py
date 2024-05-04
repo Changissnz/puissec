@@ -192,14 +192,14 @@ def IsoRing_sample_1():
 def SecSeq_sample_1(num_components=1):
     s = Sec_list_sample2()
     sndg = SecNetDepGen(s,random,num_components,0.8,[1,4])
-    sndg.assign_conn(1500)
+    sndg.assign_conn(2500)
     ss = SecSeq(sndg.sq)
     return ss 
 
 def SecSeq_sample_2(num_secs=80):
     s = Sec_list_sample2(num_secs=num_secs)
     sndg = SecNetDepGen(s,random,4,0.5,[1,4])
-    print("assigning conn")
+    ##print("assigning conn")
     sndg.assign_conn(5000)
 
     # TODO: delesha
@@ -217,12 +217,13 @@ def SecSeq_sample_2(num_secs=80):
 
 def duplicate_Sec_list(sec_list,indices_to_dup,\
     dup_iterations):
+    ##print("duplications remaining: {}".format(dup_iterations))
 
     if dup_iterations <= 0: return sec_list 
 
     for i in indices_to_dup:
-        s = deepcopy(sec_list[i]) 
-        s.idn_tag = len(sec_list)
+        l = len(sec_list)
+        s = sec_list[i].deepcopy(new_idn_tag=l)
         sec_list.append(s) 
     
     return duplicate_Sec_list(sec_list,\
@@ -235,12 +236,14 @@ def SecSeq_sample_3():
 
     random.seed(22)
     np.random.seed(222)
-    sndg = SecNetDepGen(s,random,4,0.5,[1,4])
-    print("assigning conn")
-    while stat and i < 5000: 
-        print("dconn {}".format(i))
+    sndg = SecNetDepGen(s,random,4,0.5,[1,4],\
+        conn_candidate_size=5000) 
+    ##print("assigning conn")
+    stat,i = True,0
+    while stat and i < 500:  
+        ##print("dconn {}".format(i))
         stat = sndg.make_dep_conn()
         i += 1 
     sndg.write_conn_to_Sec() 
     ss = SecSeq(sndg.sq) 
-    return ss
+    return ss,sndg

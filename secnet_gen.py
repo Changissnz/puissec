@@ -466,7 +466,8 @@ class SecNetDepGen:
 
     def __init__(self,sec_seq,rnd_struct,\
         min_components:int,max_nconn_ratio:float,
-        dlength_range,depconn_ratio=None):
+        dlength_range,depconn_ratio=None,\
+        conn_candidate_size=float('inf')):
         assert type(sec_seq) == list
         for s in sec_seq: assert type(s) == Sec 
         assert type(min_components) == int and min_components > 0
@@ -489,6 +490,10 @@ class SecNetDepGen:
         # TODO: barely used, delete? 
         self.dlength_range = dlength_range 
         self.depconn_ratio = depconn_ratio
+        # used to narrow the selection space 
+        # for quicker processing of depconn. 
+        self.conn_candidate_size = conn_candidate_size
+
         # each element is a set representing a 
         # co-dependent component
         self.cd_comp_sets = []
@@ -515,11 +520,12 @@ class SecNetDepGen:
             s.cdm.clear()
         return 
 
-    def assign_conn(self,size_limt=float('inf')):
+    def assign_conn(self,size_limt=float('inf'),\
+        l=[1,2,3]):
         stat = True
         i = 0
         while stat: 
-            stat = self.make_conn([1,2,3])
+            stat = self.make_conn(deepcopy(l))
             stat = stat and i < size_limt
             i += 1
         self.write_conn_to_Sec()
@@ -566,7 +572,7 @@ class SecNetDepGen:
         
     def make_dep_conn(self):
         # get list of candidates
-        l = self.available_for_dependency()
+        l = self.available_for_dependency(self.conn_candidate_size)
         ##print("# available for dep.: ",len(l))
         if len(l) == 0: 
             ##print("NADA")
@@ -774,13 +780,17 @@ class SecNetDepGen:
     return:
     - set, each is a tuple (master node,dependent node)
     """
-    def available_for_dependency(self):
+    def available_for_dependency(self,sz_limit=float('inf')):
         l = set()
 
         for i in range(len(self.sq)):
             sx = self.available_for_dependency_on_node(i)
             qx = set([(i,sx_) for sx_ in sx])
-            l = l | qx
+            for qx_ in qx: 
+                l = l | {qx_} 
+                if len(l) >= sz_limit: 
+                    break 
+
         return l
 
     """
@@ -789,7 +799,7 @@ class SecNetDepGen:
     and also cannot have any codependencies 
     with n2. 
     """
-    def available_for_dependency_on_node(self,n):
+    def available_for_dependency_on_node(self,n,verbose=False):
         q = set([i for i in range(len(self.sq))])
         ##print("L: ",len(q))
         already = self.dep_map[n]
@@ -800,6 +810,11 @@ class SecNetDepGen:
             if k == n: continue
             if n in v: qs.append(k)
         qs = set(qs) 
+
+        if verbose:
+            print("N={} depends on \n\t{}".format(n,qs))
+            print("A-set: {}".format(already))
+
         ##print("L: ",len(qs))
 
         # no dependencies or duplicates. 
@@ -819,8 +834,11 @@ class SecNetDepGen:
         qsx = []
         for q_ in q: 
             qr = self.dep_map[q_]
-            sx = set(qr).union(qs) 
-            if len(sx) > 0: continue
+            sx = set(qr).intersection(qs) 
+            if len(sx) > 0: 
+                if verbose: 
+                    print("intersection w/ {}: {}".format(qs,qr))
+                continue
             qsx.append(q_)
         qsx = set(qsx)
         
