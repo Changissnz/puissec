@@ -73,8 +73,7 @@ class SRefMap:
         self.opmn = opmn 
         self.dms = dms
         self.cdms = cdms 
-
-        self.ssm = secseq_map
+        
         # vertex label -> vector value
         self.v = {}
         # node idn ->

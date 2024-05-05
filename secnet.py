@@ -33,8 +33,11 @@ class IsoRingedChain:
         bof = BoundedObjFunc.generate_BoundedObjFunc(\
             deepcopy(bound),spacing_ratio_range,\
             outlier_pr_ratio,num_bounds,rs_seed)
-        return IsoRing(sec,ofunc=bof,\
+        return IsoRing(sec,bof,\
             bound,cvecl=None)
+
+    def __len__(self): 
+        return len(self.irl)
 
     def load_IsoRings(self,singleton_bound=DEFAULT_SINGLETON_RANGE,\
         rnd_struct=random,rs_seed=8): 
@@ -73,6 +76,7 @@ class SecNet:
         
         assert len(irc) > 0 and type(irc) == SecSeq
         assert len(sec_nodeset) >= len(irc) 
+        self.ss = irc
         self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
         self.rnd_struct = rnd_struct 
 
@@ -95,9 +99,9 @@ class SecNet:
         return
 
     def load_srm(self):
-        opmn = self.sec_instances_to_supermap("l")
-        dms = self.sec_instances_to_supermap("d")
-        cdms = self.sec_instances_to_supermap("c")
+        opmn = self.ss.sec_instances_to_supermap("l")
+        dms = self.ss.sec_instances_to_supermap("d")
+        cdms = self.ss.sec_instances_to_supermap("c")
         return SRefMap(opmn,dms,cdms)
 
     """
@@ -146,8 +150,8 @@ class SecNet:
     @staticmethod
     def generate(irc,sec_node_count,\
         nsec_node_count,num_entry,rnd_struct,*sngs_args):
-        assert node_count >= len(irc) 
-        q = node_count + nsec_node_count
+        q = sec_node_count + nsec_node_count
+        assert q >= len(irc) 
         assert num_entry <= q and num_entry > 0 
 
         q_ = [i for i in range(q)] 
