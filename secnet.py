@@ -168,3 +168,14 @@ class SecNet:
             node_loc_assignment,entry_points=num_entry,\
             rnd_struct=rnd_struct)
         return sn 
+
+def SecNet_sample1():
+    ss = SecSeq_sample_1(1)
+    sec_node_count = 12
+    nsec_node_count = 23
+    num_entry = 4
+    rnd_struct = random
+    sn = SecNet.generate(ss,sec_node_count,\
+            nsec_node_count,num_entry,\
+            rnd_struct,"spine frame",772) 
+    return sn 
