@@ -1,6 +1,63 @@
 from collections import defaultdict 
 from bridge import * 
 
+class IsoRingedChain:
+
+    def __init__(self,ss:SecSeq,bound,\
+        rnd_struct,rs_seed:int):
+        self.ss = ss 
+        self.irl = []
+        self.load_IsoRings(bound,rnd_struct,rs_seed)  
+
+    """
+    default args. are 
+        - spacing_ratio_range := 
+        - outlier_pr_ratio := ()
+        - num_bounds := min(100,|sec.opm| * 2)
+        - rnd_seed := 113 
+
+    Each <IsoRing> uses the same default <CVec> generator 
+    scheme. 
+    """
+    @staticmethod
+    def default_Sec2IsoRing(sec:Sec,bound,rnd_struct,rs_seed):
+        if type(rs_seed) != type(None): 
+            rnd_struct.seed(rs_seed)
+        
+        # generate the BOF
+        spacing_ratio_range = rnd_struct.uniform(0.1,0.8)
+        spacing_ratio_range = [spacing_ratio_range,rnd_struct.uniform(spacing_ratio_range,0.8)]
+        outlier_pr_ratio = rnd_struct.uniform(0.4,0.6) 
+
+        num_bounds = min([100,2 * len(sec.opm)])
+        bof = BoundedObjFunc.generate_BoundedObjFunc(\
+            deepcopy(bound),spacing_ratio_range,\
+            outlier_pr_ratio,num_bounds,rs_seed)
+        return IsoRing(sec,ofunc=bof,\
+            bound,cvecl=None)
+
+    def load_IsoRings(self,singleton_bound=DEFAULT_SINGLETON_RANGE,\
+        rnd_struct=random,rs_seed=8): 
+
+        self.irl = [] 
+        if type(rs_seed) != type(None):
+            rnd_struct.seed(rs_seed)
+
+        for s in self.ss.sequence:
+
+            # get the dim. of s
+            q = s.dim() 
+            bound_ = np.ones((q,2)) * singleton_bound
+
+            sd = rnd_struct.randrange(0,500)
+            ir = IsoRingedChain.default_Sec2IsoRing(s,\
+                bound_,rnd_struct,sd) 
+            self.irl.append(ir) 
+        self.ss = None 
+    
+    def pickle_thyself(self):
+        return -1
+
 """
 A graph structure that serves as an 
 environment for activity programmed 
@@ -9,15 +66,15 @@ in other structs.
 class SecNet:
 
     def __init__(self,irc,G,sec_nodeset,\
-        node_loc_assignment= None,
-        entry_points=3,
-        rnd_struct=random):
-        assert len(irc) > 0 and type(irc) == SecSeq
+        node_loc_assignment= None,entry_points=3,\
+        bound=DEFAULT_SINGLETON_RANGE,\
+        rnd_struct=random,rnd_seed=9):
         
-        #for i in irc: assert type(i) == IsoRing
+        assert len(irc) > 0 and type(irc) == SecSeq
         assert len(sec_nodeset) >= len(irc) 
+        self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
+        self.rnd_struct = rnd_struct 
 
-        self.irc = irc 
         self.d = G 
         self.sec_nodeset = sec_nodeset
         # sec index -> node location 

@@ -145,6 +145,9 @@ class Sec:
 
         self.idn_tag = None 
 
+    def dim(self): 
+        return len(self.seq) 
+
     def deepcopy(self,new_idn_tag="NULL",\
         transfer_obfsr=False):
         s = deepcopy(self.seq)
@@ -348,6 +351,16 @@ class SecSeq:
         self.sequence = sequence
         return
 
+    def pickle_thyself(self):
+
+        sequence = [s.deepcopy()]
+
+        return -1 
+
+    @staticmethod 
+    def unpickle_thyself(fp):
+        return -1 
+        
     def __getitem__(self,i):
         assert i <= len(self.sequence)
         assert i >= 0 

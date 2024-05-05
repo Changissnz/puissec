@@ -217,7 +217,7 @@ def SecSeq_sample_2(num_secs=80):
 
 def duplicate_Sec_list(sec_list,indices_to_dup,\
     dup_iterations):
-    ##print("duplications remaining: {}".format(dup_iterations))
+    print("duplications remaining: {}".format(dup_iterations))
 
     if dup_iterations <= 0: return sec_list 
 
@@ -238,10 +238,10 @@ def SecSeq_sample_3():
     np.random.seed(222)
     sndg = SecNetDepGen(s,random,4,0.5,[1,4],\
         conn_candidate_size=5000) 
-    ##print("assigning conn")
+    print("assigning conn")
     stat,i = True,0
     while stat and i < 500:  
-        ##print("dconn {}".format(i))
+        print("dconn {}".format(i))
         stat = sndg.make_dep_conn()
         i += 1 
     sndg.write_conn_to_Sec() 
