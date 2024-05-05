@@ -58,6 +58,7 @@ class IsoRingedChain:
     def pickle_thyself(self):
         return -1
 
+# TODO: test this. 
 """
 A graph structure that serves as an 
 environment for activity programmed 
@@ -138,7 +139,7 @@ class SecNet:
 
     """
     generates an instance of a <SecNet> using 
-    a sequence of <IsoRing>s (that may or may not 
+    a <SecSeq> instance (that may or may not 
     have dep./codep.) along with other variables 
     pertaining to the graph to be generated.
     """
