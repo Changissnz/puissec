@@ -693,12 +693,6 @@ class SecNetDepGen:
             x2 = self.cd_comp_sets.pop(q[1])
             self.cd_comp_sets.append(x1 | x2) 
 
-    def available_optimapair_for_nodepair(self,n1,n2,map_type='c'):
-        assert map_type in {'c','d'}
-
-
-        return -1 
-
     ################ for co-dependency
 
     def available_C2C_conn(self):
@@ -879,8 +873,6 @@ class SecNetDepGen:
             k_ = parse_dconn(k)
             s = s | {k_[1]} 
         return s 
-
-
 
 def Sec_list_sample1(): 
     random.seed(12)

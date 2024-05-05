@@ -33,7 +33,14 @@ class SecNet:
             assert len(self.node_loc_assignment) == len(set(self.node_loc_assignment.values()))
 
         self.rnd_struct = rnd_struct
+        self.srm = self.load_srm()
         return
+
+    def load_srm(self):
+        opmn = self.sec_instances_to_supermap("l")
+        dms = self.sec_instances_to_supermap("d")
+        cdms = self.sec_instances_to_supermap("c")
+        return SRefMap(opmn,dms,cdms)
 
     """
     uses `rnd_struct` to assign each element 

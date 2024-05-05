@@ -356,11 +356,6 @@ class SecSeq:
     def __len__(self):
         return len(self.sequence) 
 
-    def load_srm(self):
-        lsm = self.sec_instances_to_supermap()
-        SRefMap()
-        return -1 
-
     def sec_instances_to_supermap(self,map_type):
         assert map_type in {'l','d','c'}
 
