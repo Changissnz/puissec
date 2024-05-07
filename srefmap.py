@@ -69,11 +69,13 @@ class SRefMap:
             'greedy-d','greedy-c','greedy-dc',\
             'actual'}
 
-    def __init__(self,opmn,dms,cdms):
+    def __init__(self,opmn,dms,cdms,ndmaptype='cd'):
+        assert ndmaptype in {'c','d','cd'}
         self.opmn = opmn 
         self.dms = dms
         self.cdms = cdms 
-        
+        self.ndmt = ndmaptype
+
         # vertex label -> vector value
         self.v = {}
         # node idn ->
@@ -98,6 +100,11 @@ class SRefMap:
         self.preproc_on_seclist()
         return
 
+    def reprocess(self,ndmt):
+        assert ndmt in {'c','d','cd'}
+        self.ndmt = ndmt
+        self.preprocess()  
+
     """
     preprocess function on all <Sec> identifiers; 
     creates a map with min&max possible-decision 
@@ -121,7 +128,7 @@ class SRefMap:
         opt2pdchain = {}
 
         for k in self.opmn[s].keys():
-            opt2pdchain[k] = self.greedy_lone_pd_chain_ext(s,k,no_intersecting_keys=True)
+            opt2pdchain[k] = self.greedy_pd_chain_ext(s,k,self.ndmt)
         return opt2pdchain
 
     ##################### greedy solutions using 
@@ -132,17 +139,17 @@ class SRefMap:
     - dict, dependent|codependent node of `node` -> 
             set of local opt. indices by ext. func. 
     """
-    def greedy_lone_pd_chain_ext(self,node,dec,no_intersecting_keys=True):
+    def greedy_pd_chain_ext(self,node,dec,map_types):
+        assert map_types in {'c','d','cd'}
 
-        dm1 = self.greedy_lone_pd_chain_ext_(node,dec,True)
-        dm2 = self.greedy_lone_pd_chain_ext_(node,dec,False)
-
-        if no_intersecting_keys:
-            k1 = set(dm1[0].keys())
-            k2 = set(dm1[1].keys())
-            ## TODO: 
-            ##assert len(k1.intersection(k2)) == 0
+        if map_types == 'c': 
+            return self.greedy_pd_chain_ext_(node,dec,False)
         
+        if map_types == 'd': 
+            return self.greedy_pd_chain_ext_(node,dec,True)
+
+        dm1 = self.greedy_pd_chain_ext_(node,dec,True)
+        dm2 = self.greedy_pd_chain_ext_(node,dec,False)
         dm1[0].update(dm2[0])
         dm1[1].update(dm2[1])
         return dm1 
@@ -151,7 +158,7 @@ class SRefMap:
     calculates the possible-decision chain 
     extremum (min,max) for `node` with `dec`. 
     '''
-    def greedy_lone_pd_chain_ext_(self,node,dec,is_dm=True):
+    def greedy_pd_chain_ext_(self,node,dec,is_dm=True):
         q = None 
         if is_dm:
             q = deepcopy(self.dms[node])
@@ -171,12 +178,6 @@ class SRefMap:
             dec_idn,opmi,dm,decision_chain)
         return 
 
-    """
-    d := dict, sec idn -> local optima index
-    """
-    def pr_of_nodedec_(self,d,pr_type):
-        return -1
-
     # TODO: test.
     '''
     frequency-counter process that implements
@@ -186,14 +187,14 @@ class SRefMap:
     return: 
     - dict, sec idn -> index of selected opt.
     '''
-    def fc_proc__best_nodedec_map(self,vl,indices=[0,1]): 
+    def fc_proc__best_nodedec_map(self,indices=[0,1]): 
         ## TODO: re-write 
         # identifier of optima in <Sec> `s` -> 
         self.dcnt = defaultdict(Counter)
         ks = list(self.opmn.keys())
 
         for ks_ in ks:
-            self.extfc_proc_on_node(ks_,vl,indices)
+            self.extfc_proc_on_node(ks_,indices)
 
         d = {}
         for k,v in self.dcnt.items():
@@ -209,10 +210,8 @@ class SRefMap:
     return:
     - 
     '''
-    def extfc_proc_on_node(self,n,ft,indices): 
+    def extfc_proc_on_node(self,n,indices): 
         assert type(self.preproc_map) != type(None) 
-        assert ft in self.PRISM_VERTEX_LABELS 
-        assert ft != "actual" 
         assert set(indices).issubset({0,1}) 
 
         q = self.preproc_map[n]
@@ -225,11 +224,11 @@ class SRefMap:
     calculates the optima map for node `n` based on 
     its decision `dec` using function `F`, in which 
     `fi` is an index in {0,1} specifying which 
-    possible-decision map to use. 
+    possible-decision map to use (MIN|MAX). 
     '''
-    def prmap_for_nodedec(self,F,n,dec,fi=0):
-        assert n in self.preproc_map
+    def prmap_for_nodedec(self,n,dec,fi,pr_type):
         assert fi in {0,1}
+        F = self.prfunc_by_type(pr_type)
         return F(n,dec,fi)
 
     # TODO: test.
