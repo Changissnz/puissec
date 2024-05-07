@@ -145,9 +145,6 @@ class SRefMap:
         
         dm1[0].update(dm2[0])
         dm1[1].update(dm2[1])
-
-        ##print("RETURNING: ",type(dm1[0]))
-        ##print("RETURNING2: ",type(dm1[1]))
         return dm1 
         
     '''
@@ -162,16 +159,6 @@ class SRefMap:
             q = deepcopy(self.cdms[node])
         minny = extdec_dmap_set(q,dec,min)
         maxxy = extdec_dmap_set(q,dec,max)
-
-        ###
-        """
-        print("MINNY")
-        print(minny)
-        print("MAXXY")
-        print(maxxy)
-        """
-        ###
-
         return minny,maxxy 
 
     #################### probability calculations for 
@@ -225,36 +212,14 @@ class SRefMap:
     def extfc_proc_on_node(self,n,ft,indices): 
         assert type(self.preproc_map) != type(None) 
         assert ft in self.PRISM_VERTEX_LABELS 
-        assert ft != "actual"
-        print("INDICES: ",indices)
-        ins = set(indices)
-        assert ins.issubset({0,1}) 
+        assert ft != "actual" 
+        assert set(indices).issubset({0,1}) 
 
         q = self.preproc_map[n]
         for v in q.values(): 
             for i in indices: 
                 self.dcnt = update_SRefMap_counter(self.dcnt,v[i])
         return 
-
-        ##########
-        """
-        F = self.prfunc_by_type(ft)
-        l = len(self.opmn[n])
-        prmaps = []
-        for l_ in range(l):
-            prmaps.append(self.prmap_for_nodedec(F,n,l_)) 
-        print("PRMAP")
-        print(prmaps)
-
-        prmaps = filterf(prmaps)
-
-        for p_ in prmaps:
-            self.dcnt = update_SRefMap_counter(self.dcnt,p_)
-        return
-        """
-        ############
-
-
 
     '''
     calculates the optima map for node `n` based on 
