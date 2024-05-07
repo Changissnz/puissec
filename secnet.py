@@ -179,3 +179,8 @@ def SecNet_sample1():
             nsec_node_count,num_entry,\
             rnd_struct,"spine frame",772) 
     return sn 
+
+def SRefMap_sample1(): 
+    sn = SecNet_sample1()
+    return sn.srm 
+    
