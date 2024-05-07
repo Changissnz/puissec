@@ -81,6 +81,7 @@ class SRefMap:
         # (min. possible-decision map,max. possible-decision map)
         self.preproc_map = None
 
+        self.dcnt = defaultdict(Counter)
         self.preprocess() 
         return 
 
@@ -119,7 +120,7 @@ class SRefMap:
         assert s in self.opmn
         opt2pdchain = {}
 
-        for k in self.opmn[s].items():
+        for k in self.opmn[s].keys():
             opt2pdchain[k] = self.greedy_lone_pd_chain_ext(s,k,no_intersecting_keys=True)
         return opt2pdchain
 
@@ -139,10 +140,14 @@ class SRefMap:
         if no_intersecting_keys:
             k1 = set(dm1[0].keys())
             k2 = set(dm1[1].keys())
-            assert len(k1.intersection(k2)) == 0
+            ## TODO: 
+            ##assert len(k1.intersection(k2)) == 0
         
         dm1[0].update(dm2[0])
         dm1[1].update(dm2[1])
+
+        ##print("RETURNING: ",type(dm1[0]))
+        ##print("RETURNING2: ",type(dm1[1]))
         return dm1 
         
     '''
@@ -157,6 +162,16 @@ class SRefMap:
             q = deepcopy(self.cdms[node])
         minny = extdec_dmap_set(q,dec,min)
         maxxy = extdec_dmap_set(q,dec,max)
+
+        ###
+        """
+        print("MINNY")
+        print(minny)
+        print("MAXXY")
+        print(maxxy)
+        """
+        ###
+
         return minny,maxxy 
 
     #################### probability calculations for 
@@ -184,13 +199,14 @@ class SRefMap:
     return: 
     - dict, sec idn -> index of selected opt.
     '''
-    def fc_proc__best_nodedec_map(self,vl,filterf): 
+    def fc_proc__best_nodedec_map(self,vl,indices=[0,1]): 
+        ## TODO: re-write 
         # identifier of optima in <Sec> `s` -> 
         self.dcnt = defaultdict(Counter)
         ks = list(self.opmn.keys())
 
         for ks_ in ks:
-            self.extfc_proc_on_node(ks_,vl,filterf)
+            self.extfc_proc_on_node(ks_,vl,indices)
 
         d = {}
         for k,v in self.dcnt.items():
@@ -206,23 +222,39 @@ class SRefMap:
     return:
     - 
     '''
-    def extfc_proc_on_node(self,n,ft,filterf): 
+    def extfc_proc_on_node(self,n,ft,indices): 
         assert type(self.preproc_map) != type(None) 
         assert ft in self.PRISM_VERTEX_LABELS 
-        assert ft != "actual" 
+        assert ft != "actual"
+        print("INDICES: ",indices)
+        ins = set(indices)
+        assert ins.issubset({0,1}) 
 
         q = self.preproc_map[n]
+        for v in q.values(): 
+            for i in indices: 
+                self.dcnt = update_SRefMap_counter(self.dcnt,v[i])
+        return 
 
+        ##########
+        """
         F = self.prfunc_by_type(ft)
         l = len(self.opmn[n])
         prmaps = []
         for l_ in range(l):
             prmaps.append(self.prmap_for_nodedec(F,n,l_)) 
+        print("PRMAP")
+        print(prmaps)
+
         prmaps = filterf(prmaps)
 
         for p_ in prmaps:
             self.dcnt = update_SRefMap_counter(self.dcnt,p_)
         return
+        """
+        ############
+
+
 
     '''
     calculates the optima map for node `n` based on 
@@ -232,7 +264,7 @@ class SRefMap:
     '''
     def prmap_for_nodedec(self,F,n,dec,fi=0):
         assert n in self.preproc_map
-        assert f in {0,1}
+        assert fi in {0,1}
         return F(n,dec,fi)
 
     # TODO: test.

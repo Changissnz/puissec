@@ -93,6 +93,13 @@ def extdec_dmap_set(dm,o,extf):
     assert extf in {min,max}
 
     oconn = filter_optimum_conn_in_depmap(dm,o)
+    
+    ###
+    """
+    print("OCONN")
+    print(oconn)
+    """
+    ###
 
     # get the max
     def sort_next():
@@ -296,6 +303,9 @@ def update_SRefMap_counter(dcnt:defaultdict,pd):
     assert type(dcnt) == defaultdict
     assert type(pd) in {defaultdict,dict} 
 
+    print("PD:")
+    print(pd)
+    print("--------------------")
     for (k,v) in pd.items():
         x = dcnt[k]
         for v_ in v:

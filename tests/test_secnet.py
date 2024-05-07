@@ -12,7 +12,7 @@ class SecNetClass(unittest.TestCase):
 
     def test__SecNet__generate__case1(self):
         sn = SecNet_sample1()
-        assert True 
+        assert True
 
 if __name__ == '__main__':
     unittest.main()
