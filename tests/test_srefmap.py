@@ -26,6 +26,10 @@ class SRefMapClass(unittest.TestCase):
         assert opm[0] > prmap[0]
         assert prmap[6] > opm[6] 
 
+        prmap = srm.prmap_for_nodedec(0,0,0,'greedy-d')
+        assert opm[0] == prmap[0]
+        assert prmap[6] == opm[6] 
+
 
 if __name__ == '__main__':
     unittest.main() 
