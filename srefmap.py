@@ -220,6 +220,12 @@ class SRefMap:
                 self.dcnt = update_SRefMap_counter(self.dcnt,v[i])
         return 
 
+    def first_decision(self):
+        d = defaultdict(int)
+        for k in self.opmn.keys():
+            d[k] = {0,1} 
+        return d 
+
     '''
     calculates the optima map for node `n` based on 
     its decision `dec` using function `F`, in which 
@@ -240,14 +246,16 @@ class SRefMap:
         f = None
         if pr_type in ['greedy-d','greedy-c']:
             def f(n,dec,fi):
-                dx1 = self.opmn[n]
+                dx1 = deepcopy(self.opmn[n])
 
                 q = self.preproc_map[n]
+                deflt = self.first_decision() 
                 pdx = q[dec][fi]
-                print("PDX")
-                print(pdx)
                 if len(pdx) == 0: 
                     return dx1
+
+                deflt.update(pdx) 
+                pdx = deflt
 
                 pmi = PDMapIter(pdx)
                 ix = next(pmi)
@@ -256,8 +264,9 @@ class SRefMap:
 
                 ix_ = [(k,v) for (k,v) in ix.items()]
                 dm = self.dms[n] if pr_type == 'greedy-d' else self.cdms[n]
-                dx1.update(dep_weighted_Pr_for_node_dec(\
-                    n,dec,self.opmn[n],dm,ix_))
+                dx2 = dep_weighted_Pr_for_node_dec(\
+                    n,dec,self.opmn[n],dm,ix_)
+                dx1.update(dx2)
                 return dx1 
 
         elif pr_type == 'greedy-lone': 
