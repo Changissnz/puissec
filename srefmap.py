@@ -240,14 +240,25 @@ class SRefMap:
         f = None
         if pr_type in ['greedy-d','greedy-c']:
             def f(n,dec,fi):
+                dx1 = self.opmn[n]
+
                 q = self.preproc_map[n]
                 pdx = q[dec][fi]
+                print("PDX")
+                print(pdx)
+                if len(pdx) == 0: 
+                    return dx1
+
                 pmi = PDMapIter(pdx)
                 ix = next(pmi)
+                if type(ix) == type(None): 
+                    return dx1
+
                 ix_ = [(k,v) for (k,v) in ix.items()]
                 dm = self.dms[n] if pr_type == 'greedy-d' else self.cdms[n]
-                return dep_weighted_Pr_for_node_dec(n,dec,self.opmn[n],\
-                    dm,ix_)
+                dx1.update(dep_weighted_Pr_for_node_dec(\
+                    n,dec,self.opmn[n],dm,ix_))
+                return dx1 
 
         elif pr_type == 'greedy-lone': 
             def f(n,dec,fi):
