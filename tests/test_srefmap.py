@@ -11,7 +11,7 @@ class SRefMapClass(unittest.TestCase):
 
     def test__SRefMap__fc_proc__best_nodedec_map__case1(self):
         srm = SRefMap_sample1() 
-        nm = srm.fc_proc__best_nodedec_map([0,1])
+        nm = srm.fc_proc__best_nodedec_map(min,[0,1])
         assert len(nm) == 12
 
     def test__SRefMap__prmap_for_nodedec__case1(self):
@@ -35,13 +35,13 @@ class SRefMapClass(unittest.TestCase):
         sn = SecNet_sample1() 
         srm = sn.srm
 
-        dm = srm.collect_prism_points__DecMap('c',[0])  
-        dm2 = srm.collect_prism_points__DecMap('d',[0])  
-        dm3 = srm.collect_prism_points__DecMap('cd',[0])  
+        dm = srm.collect_prism_points__DecMap('c',max,[0])  
+        dm2 = srm.collect_prism_points__DecMap('d',max,[0])  
+        dm3 = srm.collect_prism_points__DecMap('cd',max,[0])  
 
-        dm4 = srm.collect_prism_points__DecMap('c',[1])
-        dm5 = srm.collect_prism_points__DecMap('d',[1])
-        dm6 = srm.collect_prism_points__DecMap('cd',[1])
+        dm4 = srm.collect_prism_points__DecMap('c',max,[1])
+        dm5 = srm.collect_prism_points__DecMap('d',max,[1])
+        dm6 = srm.collect_prism_points__DecMap('cd',max,[1])
 
         assert dm != dm2 
         assert dm == dm3 

@@ -63,6 +63,12 @@ def generate_filterf_ext_with_binary_op_accum(extf,binop):
         return filterf_ext_with_binary_op_accum_(prmap_seq,extf,binop)
     return f 
 
+
+"""
+<SRefMap> is a data structure that serves as a
+solution-reference map. It outputs values based
+on 
+"""
 class SRefMap: 
 
     PRISM_VERTEX_LABELS = {'greedy-lone',\
@@ -187,7 +193,19 @@ class SRefMap:
     return: 
     - dict, sec idn -> index of selected opt.
     '''
-    def fc_proc__best_nodedec_map(self,indices=[0,1]): 
+    def fc_proc__best_nodedec_map(self,f=max,indices=[0,1]): 
+        self.fc_proc__best_nodedec_map_(indices)
+
+        d = {}
+        for k,v in self.dcnt.items():
+            v_ = sorted([(k2,v2) for k2,v2 in v.items()])
+            if len(v_) == 0:
+                d[k] = -1 
+                continue 
+            d[k] = f(v_,key=lambda x:x[1])[0]
+        return d 
+
+    def fc_proc__best_nodedec_map_(self,indices):
         ## TODO: re-write 
         # identifier of optima in <Sec> `s` -> 
         self.dcnt = defaultdict(Counter)
@@ -196,14 +214,7 @@ class SRefMap:
         for ks_ in ks:
             self.extfc_proc_on_node(ks_,indices)
 
-        d = {}
-        for k,v in self.dcnt.items():
-            v_ = sorted([(k2,v2) for k2,v2 in v.items()])
-            if len(v_) == 0:
-                d[k] = -1 
-                continue 
-            d[k] = max(v_,key=lambda x:x[1])[0]
-        return d 
+
 
     # TODO: test.
     '''
@@ -291,7 +302,6 @@ class SRefMap:
 
     #################################################
 
-
     """
 
     return:
@@ -322,16 +332,17 @@ class SRefMap:
     return:
     - dict, sec idn. -> optima idn.
     """
-    def collect_prism_points__DecMap(self,ndmaptype,indices=[0,1]): 
+    def collect_prism_points__DecMap(self,ndmaptype,f,indices=[0,1]): 
         assert ndmaptype in {'c','d','cd'}
+        assert f in {min,max}
 
         if ndmaptype != self.ndmt: 
             self.reprocess(ndmaptype)
 
-        return self.fc_proc__best_nodedec_map(indices=indices)
+        return self.fc_proc__best_nodedec_map(f,indices=indices)
 
-    
-
-
-
-
+# TODO: 
+'''
+loading the actual solution. 
+fitting the actual solution.
+'''
