@@ -89,6 +89,13 @@ class SRefMap:
         # (min. possible-decision map,max. possible-decision map)
         self.preproc_map = None
 
+        # map structures that constitute prisms
+        # for probability values and their associated
+        # decisions made. 
+        self.prism_typePr = None
+        self.prism_typeDec = None
+
+
         self.dcnt = defaultdict(Counter)
         self.preprocess() 
         return 
@@ -301,6 +308,52 @@ class SRefMap:
         return f 
 
     #################################################
+
+    def build_prism(self):
+        self.build_prism_('pr')
+        self.build_prism_('dec')
+
+    def build_prism_(self,prism_type):
+        assert prism_type in {'pr','dec'}
+        ptx = None 
+        if prism_type == 'pr': 
+            self.prism_typePr = defaultdict(None)
+            ptx = self.prism_typePr
+        else: 
+            self.prism_typeDec = defaultdict(None)
+            ptx = self.prism_typeDec
+
+        map_types = ['c','d','cd']
+        pr_types = ['greedy-lone','greedy-d','greedy-c',\
+            'greedy-dc']
+        F = [min,max] 
+        pdmi = [0,1]
+        pdmi2 = [(0,),(1,),(0,1)]
+
+        X = None
+        PF = None 
+        if prism_type == 'pr':
+            X = defaultdict(set,\
+                {0:deepcopy(map_types),1:deepcopy(pr_types),\
+                2:deepcopy(pdmi)})
+            PF = self.collect_prism_points__PrMap
+        else: 
+            X = defaultdict(set,\
+                {0:map_types,1:F,2:pdmi2})
+            PF  = self.collect_prism_points__DecMap
+
+        pdmi = PDMapIter(X)
+        stat = True
+        while stat:
+            x = next(pdmi)
+            stat = not (type(x) == type(None))
+            if not stat: continue 
+            prism = PF(x[0],x[1],x[2])
+            key = []
+            for i in range(3):
+                key.append(str(x[i]))
+            key = ",".join(key) 
+            ptx[key] = prism 
 
     """
 

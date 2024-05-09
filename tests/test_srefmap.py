@@ -60,5 +60,16 @@ class SRefMapClass(unittest.TestCase):
         dx3 = srm.collect_prism_points__PrMap('c',"greedy-c",0)
         assert True 
 
+    # NOTE: shallow test; checks only for correct 
+    #       number of prism values for each
+    def test__SRefMap__build_prism__case1(self):
+        sn = SecNet_sample1() 
+        srm = sn.srm
+        srm.build_prism() 
+
+        assert len(srm.prism_typePr) == 24
+        assert len(srm.prism_typeDec) == 18 
+
+
 if __name__ == '__main__':
     unittest.main() 
