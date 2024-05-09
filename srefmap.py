@@ -289,3 +289,49 @@ class SRefMap:
                 return defaultdict(float,c1)
         return f 
 
+    #################################################
+
+
+    """
+
+    return:
+    - dict, sec idn. -> optima idn. -> PRMap(optima idn. -> Pr in [0,1])
+    """
+    def collect_prism_points__PrMap(self,map_type,pr_type,pdmi):
+        assert pr_type in self.PRISM_VERTEX_LABELS 
+        assert pdmi in {0,1} 
+
+        def f(n):
+            q = list(self.opmn[n].keys())
+            d = defaultdict(defaultdict)
+            for q_ in q: 
+                prv = self.prmap_for_nodedec(n,q_,pdmi,pr_type)
+                d[q_] = prv
+            return d
+
+        if map_type != self.ndmt: 
+            self.reprocess(map_type)
+
+        sk = set(self.opmn.keys())
+        dx = defaultdict(None)
+        for sk_ in sk: 
+            dx[sk_] = f(sk_)
+        return dx 
+
+    """
+    return:
+    - dict, sec idn. -> optima idn.
+    """
+    def collect_prism_points__DecMap(self,ndmaptype,indices=[0,1]): 
+        assert ndmaptype in {'c','d','cd'}
+
+        if ndmaptype != self.ndmt: 
+            self.reprocess(ndmaptype)
+
+        return self.fc_proc__best_nodedec_map(indices=indices)
+
+    
+
+
+
+
