@@ -64,6 +64,35 @@ def generate_filterf_ext_with_binary_op_accum(extf,binop):
     return f 
 
 
+######################### methods for use with: 
+######################### - decision and probability maps
+
+# symmetric operations
+mapdiff_discrete = lambda x1,x2: round(abs(x1 - x2),10) == 0 if \
+                                type(x1) != type(None) and \
+                                type(x2) != type(None) else False 
+
+mapdiff_cont = lambda x1,x2: round(abs(x1-x2),5) if \
+                    type(x1) != type(None) and \
+                    type(x2) != type(None) else np.nan 
+
+def mapdiff_(d1,d2,f):
+    assert f in {mapdiff_cont,mapdiff_discrete}
+
+    ks = set(d1.keys())
+    ks = ks | set(d2.keys()) 
+
+    q = defaultdict(bool if f \
+        == mapdiff_discrete else \
+        float) 
+    for k in ks:
+        v = d1[k] if k in d1 else None
+        v2 = d2[k] if k in d2 else None
+        q[k] = f(v,v2)
+    return q 
+
+################################################################
+
 """
 <SRefMap> is a data structure that serves as a
 solution-reference map. It outputs values based
@@ -72,8 +101,7 @@ on
 class SRefMap: 
 
     PRISM_VERTEX_LABELS = {'greedy-lone',\
-            'greedy-d','greedy-c','greedy-dc',\
-            'actual'}
+            'greedy-d','greedy-c','greedy-dc'} 
 
     def __init__(self,opmn,dms,cdms,ndmaptype='cd'):
         assert ndmaptype in {'c','d','cd'}
@@ -82,8 +110,6 @@ class SRefMap:
         self.cdms = cdms 
         self.ndmt = ndmaptype
 
-        # vertex label -> vector value
-        self.v = {}
         # node idn ->
         # identifier of optima in <Sec> `s` -> 
         # (min. possible-decision map,max. possible-decision map)
@@ -92,18 +118,46 @@ class SRefMap:
         # map structures that constitute prisms
         # for probability values and their associated
         # decisions made. 
+        """
+        key := str identifier for prism
+        value := dict, sec idn. -> optima idn. -> PRMap(optima idn. -> Pr in [0,1])
+        """
         self.prism_typePr = None
+        """
+        key := str identifier for prism
+        value := dict,sec idn. -> optima idn.
+        """
         self.prism_typeDec = None
+        
+        """
+        comparison map for prism of type Pr. 
 
+        Each key is a comparison-idn str.: 
+            sec idn,opt. #1 idn,opt. #2 idn,F
+        Each value is the map-difference of #1 and #2
+            according to a function F, one of 
+                {<mapdiff_cont>,<mapdiff_discrete>} 
+        """
+        self.prism_typePr_CMP = defaultdict(None)
+        """
+        comparison map for prism of type Dec. 
+
+        Each key is a comparison-idn str.:
+            x_0&x_1&F s.t. for x_i a 3-tuple,
+            0 in {c,d,cd}
+            1 in greedy-*
+            2 in {0,1}.
+
+        and F is identical to the one for 
+        `prism_typePr_CMP`. 
+        """
+        self.prism_typeDec_CMP = None
+
+        self.actual_dec = None
+        self.actual_Pr = None
 
         self.dcnt = defaultdict(Counter)
         self.preprocess() 
-        return 
-
-    def load_prism_vertices(self,d):
-        for (k,v) in d.items():
-            assert k in self.PRISM_VERTEX_LABELS
-            self.v[k] = v
         return
 
     ############# pre-process function and calculating
@@ -221,8 +275,6 @@ class SRefMap:
         for ks_ in ks:
             self.extfc_proc_on_node(ks_,indices)
 
-
-
     # TODO: test.
     '''
     return:
@@ -317,10 +369,10 @@ class SRefMap:
         assert prism_type in {'pr','dec'}
         ptx = None 
         if prism_type == 'pr': 
-            self.prism_typePr = defaultdict(None)
+            self.prism_typePr = defaultdict(defaultdict)
             ptx = self.prism_typePr
         else: 
-            self.prism_typeDec = defaultdict(None)
+            self.prism_typeDec = defaultdict(defaultdict)
             ptx = self.prism_typeDec
 
         map_types = ['c','d','cd']
@@ -394,6 +446,62 @@ class SRefMap:
 
         return self.fc_proc__best_nodedec_map(f,indices=indices)
 
+    # TODO: test
+    """
+    """
+    def binarycmp_prism_points__typePr(self,prism_key,\
+        sec_idn,opt1_index,opt2_index,F):
+
+        if prism_key not in self.prism_typePr: 
+            return None
+
+        d = self.prism_typePr[prism_key]
+        d2 = d[sec_idn]
+        dx1 = d2[opt1_index]
+        dx2 = d2[opt2_index]
+
+        m = mapdiff_(dx1,dx2,F)
+
+        ox = sorted([opt1_index,opt2_index])
+        key = prism_key + "&" + str(sec_idn) + "," +\
+                ox[0] + "," + ox[1] + "&" + str(F)  
+        self.prism_typePr_CMP[key] = m
+        return
+
+    # TODO: test
+    """
+    compares 2 dictionaries d1,d2 in Pr-map; comparative 
+    measures used for introspection of 1 particular 
+    """
+    def binarycmp_prism_points__typeDec(self,prism_key1,prism_key2,F):
+        assert F in {mapdiff_cont,mapdiff_discrete}
+
+        d1 = self.prism_typeDec[prism_key1]
+        d2 = self.prism_typeDec[prism_key2] 
+
+        if type(d1) == type(None) or type(d2) == type(None): 
+            return None
+
+        m = mapdiff_(d1,d2,F) 
+
+        key = prism_key1 + "&" + prism_key2 + "&" + str(F)
+        self.prism_typeDec_CMP[key] = m
+        return m 
+
+    ##################################################################
+
+    '''
+    n2opt_map := dict, node idn. -> 
+                        optima idn. -> 
+                        Pr. value. 
+    nd_map := dict, sec idn. -> optima index
+    ''' 
+    def load_actual(self,n2opt_map,nd_map): 
+        self.actual_Pr = n2opt_map
+        self.nd_map = nd_map 
+        return
+
+##def mapdiff_(d1,d2,f):
 # TODO: 
 '''
 loading the actual solution. 
