@@ -501,9 +501,3 @@ class SRefMap:
         self.nd_map = nd_map 
         return
 
-##def mapdiff_(d1,d2,f):
-# TODO: 
-'''
-loading the actual solution. 
-fitting the actual solution.
-'''
