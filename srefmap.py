@@ -151,13 +151,14 @@ class SRefMap:
         and F is identical to the one for 
         `prism_typePr_CMP`. 
         """
-        self.prism_typeDec_CMP = None
-
+        self.prism_typeDec_CMP = defaultdict(None)
         self.actual_dec = None
         self.actual_Pr = None
 
         self.dcnt = defaultdict(Counter)
         self.preprocess() 
+
+        assert type(self.prism_typeDec_CMP) != type(None)
         return
 
     ############# pre-process function and calculating
@@ -490,6 +491,9 @@ class SRefMap:
     """
     def binarycmp_prism_points__typeDec(self,prism_key1,\
         prism_key2):
+        if type(self.prism_typeDec_CMP) == type(None): 
+            self.prism_typeDec_CMP = defaultdict(None)
+
         d1 = self.prism_typeDec[prism_key1]
         d2 = self.prism_typeDec[prism_key2] 
 

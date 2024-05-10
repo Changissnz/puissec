@@ -108,5 +108,19 @@ class SRefMapClass(unittest.TestCase):
 
         assert cx_ == 51 and cx == 66 
 
+    # NOTE: dummy test; does not check for correct sol'n, only 
+    #       their existence
+    def test__SRefMap__binarycmp_prism_points__typeDec__case1(self):
+
+        srm = pickle.load(open("sampleX","rb")) 
+        assert type(srm) == SRefMap 
+
+        ## demonstrate the Pr-prism. 
+        qx = list(srm.prism_typeDec.keys())
+        for i in range(len(qx) - 1):
+            for j in range(i+1,len(qx)):
+                bpp = srm.binarycmp_prism_points__typeDec(qx[i],qx[j])
+                assert len(bpp) > 0 
+
 if __name__ == '__main__':
     unittest.main() 
