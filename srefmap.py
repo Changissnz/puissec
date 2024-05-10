@@ -155,6 +155,9 @@ class SRefMap:
         self.actual_dec = None
         self.actual_Pr = None
 
+        self.density_cd = None
+        self.density_d = None 
+
         self.dcnt = defaultdict(Counter)
         self.preprocess() 
 
@@ -244,8 +247,8 @@ class SRefMap:
         opmi,dm,decision_chain):
         prmap = dep_weighted_Pr_for_node_dec(node_idn,\
             dec_idn,opmi,dm,decision_chain)
-        return 
-
+        return
+    
     # TODO: test.
     '''
     frequency-counter process that implements
@@ -506,6 +509,72 @@ class SRefMap:
         self.prism_typeDec_CMP[key] = m
         return m 
 
+    ################# density functions for 
+    ################# measuring co-dependencies 
+    ################# and dependencies
+    ##################################################################
+    
+    # TODO: test 
+    def cd_density_measure(self,is_dep:bool=True):
+        ks = list(self.opmi.keys()) 
+
+        q = None 
+        if is_dep:
+            self.density_cd = defaultdict(defaultdict)
+            q = self.density_cd
+        else:
+            self.density_d = defaultdict(defaultdict)
+            q = self.density_d
+
+        for ks_ in ks: 
+            dx = self.cd_density_on_node(ks_,is_dep)
+            q[ks_] = dx
+        return
+
+    # TODO: test 
+    """
+    return:
+    - dict, opt. index -> 
+        (ratio of connected <Sec> instances,ratio of dep/codep. connections made)
+    """
+    def cd_density_on_node(self,n,is_dep:bool=True):
+        x = self.dms[n] if is_dep else self.cdms[n]
+        x = deepcopy(x)
+        ks = list(self.opmi[n].keys())
+
+        """
+        return: 
+        - number of other <Sec> instances connected to,
+          total number of (<Sec> #1 opt.,<Sec> #2 opt.) connections.
+
+        """
+        def measure_opt(opt_index):
+            s = set()
+            q = x[opt_index]
+            c = 0 
+            for k in q.keys():
+                dx = parse_dconn(k)
+                if int(dx[0]) != opt_index: continue 
+                c += 1
+                s = s | {dx[1]}
+            return s,c 
+
+        def measure_to_ratio(opt_index,s,c,t):
+            s_ = measures.zero_div(len(s),len(ks) - 1,0.0)
+            total = t - len(ks)
+            c_ = measures.zero_div(c,total,0.0)
+            return s_,c_
+
+        d = defaultdict(None)
+        t = sum([len(v_) for v_ in self.opmi.values()])
+        for ks_ in ks:
+            mo = measure_opt(ks_)
+            s_,c_ = measure_to_ratio(ks_,mo[0],mo[1],t) 
+            d[ks_] = (s_,c_)
+        return d
+
+    ################# methods related to actual 
+    ################# sol'n and related fitting
     ##################################################################
 
     '''
@@ -518,4 +587,7 @@ class SRefMap:
         self.actual_Pr = n2opt_map
         self.nd_map = nd_map 
         return
+
+    def fit_actual(self): 
+        return -1 
 

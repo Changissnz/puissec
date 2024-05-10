@@ -354,6 +354,9 @@ class SecNetFrameGen:
 
         # randomly choose the second qualifying node
         qx2 = list(set(qx) - set(self.d[n]))
+
+        if len(qx2) == 0: return None 
+        
         j = random.randrange(0,len(qx2))
         n2 = qx2.pop(j)
         return n,n2 
