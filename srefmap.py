@@ -359,8 +359,8 @@ class SRefMap:
                 return defaultdict(float,c1)
         return f 
 
-    #################################################
-
+    ############################## prism-builder
+    
     def build_prism(self):
         self.build_prism_('pr')
         self.build_prism_('dec')
@@ -446,45 +446,59 @@ class SRefMap:
 
         return self.fc_proc__best_nodedec_map(f,indices=indices)
 
+    ############################## binary cmp. on prism-maps.     
+
     # TODO: test
     """
     """
     def binarycmp_prism_points__typePr(self,prism_key,\
-        sec_idn,opt1_index,opt2_index,F):
+        prism_key2,sec_idn,opt1_index,opt2_index):
 
         if prism_key not in self.prism_typePr: 
             return None
+        
+        if prism_key2 not in self.prism_typePr: 
+            return None 
 
         d = self.prism_typePr[prism_key]
         d2 = d[sec_idn]
         dx1 = d2[opt1_index]
-        dx2 = d2[opt2_index]
 
-        m = mapdiff_(dx1,dx2,F)
+        d_ = self.prism_typePr[prism_key2]
+        d2_ = d_[sec_idn]
+        dx2 = d2_[opt2_index]
+
+        """
+        print("DX1")
+        print(dx1)
+        print()
+        print(dx2)
+        print()
+        """
+        m = mapdiff_(dx1,dx2,mapdiff_cont)
 
         ox = sorted([opt1_index,opt2_index])
-        key = prism_key + "&" + str(sec_idn) + "," +\
-                ox[0] + "," + ox[1] + "&" + str(F)  
+        key = prism_key + "&" + prism_key2 + "&" + str(sec_idn) + "," +\
+                str(ox[0]) + "," + str(ox[1])
         self.prism_typePr_CMP[key] = m
-        return
+        return m 
 
     # TODO: test
     """
     compares 2 dictionaries d1,d2 in Pr-map; comparative 
     measures used for introspection of 1 particular 
     """
-    def binarycmp_prism_points__typeDec(self,prism_key1,prism_key2,F):
-        assert F in {mapdiff_cont,mapdiff_discrete}
-
+    def binarycmp_prism_points__typeDec(self,prism_key1,\
+        prism_key2):
         d1 = self.prism_typeDec[prism_key1]
         d2 = self.prism_typeDec[prism_key2] 
 
         if type(d1) == type(None) or type(d2) == type(None): 
             return None
 
-        m = mapdiff_(d1,d2,F) 
+        m = mapdiff_(d1,d2,mapdiff_discrete) 
 
-        key = prism_key1 + "&" + prism_key2 + "&" + str(F)
+        key = prism_key1 + "&" + prism_key2
         self.prism_typeDec_CMP[key] = m
         return m 
 

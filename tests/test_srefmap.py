@@ -70,6 +70,43 @@ class SRefMapClass(unittest.TestCase):
         assert len(srm.prism_typePr) == 24
         assert len(srm.prism_typeDec) == 18 
 
+    def test__SRefMap__binarycmp_prism_points__typePr__case1(self):
+        fobj = open("sampleX","rb")
+        srm = pickle.load(fobj) 
+        fobj.close()
+        assert type(srm) == SRefMap 
+
+        qx = list(srm.prism_typePr.keys())
+        prkey1 = qx[0] 
+        prkey2 = qx[0] 
+
+        prmap = srm.binarycmp_prism_points__typePr(prkey1,\
+                prkey2,0,0,5)
+
+        assert sum(prmap.values()) == 0.0 
+
+    def test__SRefMap__binarycmp_prism_points__typePr__case2(self):
+        fobj = open("sampleX","rb")
+        srm = pickle.load(fobj) 
+        fobj.close()
+        assert type(srm) == SRefMap 
+
+        sec_idn = 0
+        num_opt = len(srm.opmn[sec_idn])
+
+        prkey1 = 'cd,greedy-dc,0'
+        cx_,cx = 0,0
+        for i in range(num_opt - 1): 
+            for j in range(i+1,num_opt): 
+                prmap_ = srm.binarycmp_prism_points__typePr(prkey1,\
+                        prkey1,sec_idn,i,j)
+                #print("sum for {},{}: {}".format(i,j,sum(prmap_.values())))
+                s = sum(prmap_.values())
+                if s != 0.0:
+                    cx_ += 1
+                cx += 1
+
+        assert cx_ == 51 and cx == 66 
 
 if __name__ == '__main__':
     unittest.main() 

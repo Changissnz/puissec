@@ -4,6 +4,7 @@ import random
 from collections import defaultdict,Counter 
 import math 
 import morebs2 
+import pickle 
 
 DEFAULT_SINGLETON_RANGE = [-0.0,1.0]
 
