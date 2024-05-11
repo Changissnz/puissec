@@ -133,23 +133,20 @@ class SRefMap:
         comparison map for prism of type Pr. 
 
         Each key is a comparison-idn str.: 
-            sec idn,opt. #1 idn,opt. #2 idn,F
+            (prism key #1)&(prism key #2)&(sec idn)&(opt. #1 idn)&(opt. #2 idn)
         Each value is the map-difference of #1 and #2
-            according to a function F, one of 
-                {<mapdiff_cont>,<mapdiff_discrete>} 
+            according to a function <mapdiff_cont>.
         """
         self.prism_typePr_CMP = defaultdict(None)
         """
         comparison map for prism of type Dec. 
 
         Each key is a comparison-idn str.:
-            x_0&x_1&F s.t. for x_i a 3-tuple,
+            x_0&x_1 s.t. for x_i a 3-tuple,
             0 in {c,d,cd}
             1 in greedy-*
             2 in {0,1}.
-
-        and F is identical to the one for 
-        `prism_typePr_CMP`. 
+        Each value is an output from <mapdiff_discrete>. 
         """
         self.prism_typeDec_CMP = defaultdict(None)
         self.actual_dec = None
@@ -516,7 +513,7 @@ class SRefMap:
     
     # TODO: test 
     def cd_density_measure(self,is_dep:bool=True):
-        ks = list(self.opmi.keys()) 
+        ks = list(self.opmn.keys()) 
 
         q = None 
         if is_dep:
@@ -540,24 +537,27 @@ class SRefMap:
     def cd_density_on_node(self,n,is_dep:bool=True):
         x = self.dms[n] if is_dep else self.cdms[n]
         x = deepcopy(x)
-        ks = list(self.opmi[n].keys())
+        ks = list(self.opmn[n].keys())
 
         """
         return: 
         - number of other <Sec> instances connected to,
-          total number of (<Sec> #1 opt.,<Sec> #2 opt.) connections.
-
+          total number of (<Sec> #1 opt.,<Sec> #2 opt.) connections,
+          ordered sequence of pairs p := (<Sec> #1 opt.,# of connections)
         """
         def measure_opt(opt_index):
             s = set()
-            q = x[opt_index]
             c = 0 
-            for k in q.keys():
-                dx = parse_dconn(k)
+            d = defaultdict(int)
+            for x_ in x.keys():
+                dx = parse_dconn(x_)
                 if int(dx[0]) != opt_index: continue 
                 c += 1
                 s = s | {dx[1]}
-            return s,c 
+                d[dx[1]] += 1 
+            d_ = sorted([(k, measures.zero_div(v,c,0.0)) for k,v in d.items()],\
+                    key=lambda x:x[1])
+            return s,c,d_ 
 
         def measure_to_ratio(opt_index,s,c,t):
             s_ = measures.zero_div(len(s),len(ks) - 1,0.0)
@@ -566,11 +566,11 @@ class SRefMap:
             return s_,c_
 
         d = defaultdict(None)
-        t = sum([len(v_) for v_ in self.opmi.values()])
+        t = sum([len(v_) for v_ in self.opmn.values()])
         for ks_ in ks:
             mo = measure_opt(ks_)
             s_,c_ = measure_to_ratio(ks_,mo[0],mo[1],t) 
-            d[ks_] = (s_,c_)
+            d[ks_] = (s_,c_,mo[2])
         return d
 
     ################# methods related to actual 
