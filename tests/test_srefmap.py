@@ -111,9 +111,10 @@ class SRefMapClass(unittest.TestCase):
     # NOTE: dummy test; does not check for correct sol'n, only 
     #       their existence
     def test__SRefMap__binarycmp_prism_points__typeDec__case1(self):
-
-        srm = pickle.load(open("sampleX","rb")) 
+        fobj = open("sampleX","rb")
+        srm = pickle.load(fobj) 
         assert type(srm) == SRefMap 
+        fobj.close()
 
         ## demonstrate the Pr-prism. 
         qx = list(srm.prism_typeDec.keys())
@@ -121,6 +122,57 @@ class SRefMapClass(unittest.TestCase):
             for j in range(i+1,len(qx)):
                 bpp = srm.binarycmp_prism_points__typeDec(qx[i],qx[j])
                 assert len(bpp) > 0 
+
+    def test__SRefMap__cd_density_measure__case1(self):
+        fobj = open("sampleX","rb")
+        srm = pickle.load(fobj) 
+        assert type(srm) == SRefMap 
+        fobj.close()
+
+        srm.cd_density_measure(True)
+        srm.cd_density_measure(False)
+
+        ##### measure density of dep.
+
+        # count the number of non-null
+        def count_active(d):
+                return len([v_ for v_ in d.values() if v_[0] != 0.0])
+
+        keys = srm.density_cd.keys()
+        dx = {}
+        for k in keys:
+                c = count_active(srm.density_cd[k]) 
+                dx[k] = c
+
+        ans = {0: 1,\
+                1: 2,\
+                2: 1,\
+                3: 0,\
+                4: 3,\
+                5: 1,\
+                6: 2,\
+                7: 2,\
+                8: 1,\
+                9: 0,\
+                10: 2,\
+                11: 0}
+        assert dx == ans 
+
+        ##### measure density of co-dep.
+
+        ql = []
+        for k,v in srm.density_d.items():
+                for k2,v2 in v.items():
+                        ##print("{}:{}:{}".format(k,k2,v2[0]))
+                        #assert v2[0] >= 0.63
+                        ql.append(v2[0])
+
+        assert min(ql) > 0.09
+        assert max(ql) == 1.0 
+
+        mn = sum(ql) / len(ql)
+        assert round(abs(mn - 0.7929292929292922),12) == 0.0 
+
 
 if __name__ == '__main__':
     unittest.main() 

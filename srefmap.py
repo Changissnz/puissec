@@ -532,7 +532,9 @@ class SRefMap:
     """
     return:
     - dict, opt. index -> 
-        (ratio of connected <Sec> instances,ratio of dep/codep. connections made)
+        [0] ratio of connected <Sec> instances
+        [1] ratio of dep/codep. connections made
+        [2] ordered sequence of pairs p := (<Sec> #1 opt.,# of connections)
     """
     def cd_density_on_node(self,n,is_dep:bool=True):
         x = self.dms[n] if is_dep else self.cdms[n]
