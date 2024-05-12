@@ -1,8 +1,16 @@
 from bridge import * 
 import unittest
 
+### lone file test 
+"""
+python3 -m tests.test_bridge
+"""
+###
 class CBridgeClass(unittest.TestCase):
 
+    """
+    demonstration w/ wrong hypothesis
+    """
     def test__CBridge__next__case1(self):
 
         ir = IsoRing_sample_1()
@@ -27,6 +35,28 @@ class CBridgeClass(unittest.TestCase):
                 stat = type(qc) != type(None)
                 stat = stat and (i < 100)
                 i += 1 
+
+    """
+    demonstration w/ the perfect hypothesis
+    """
+    def test__CBridge__next__case2(self):
+
+        ir = IsoRing_sample_1()
+        ir.explode_contents()
+
+        hs = one_correct_HypStruct_for_IsoRing(ir)
+
+        c = Crackling()
+        c.load_HypStruct(hs)
+
+        cb = CBridge(c,ir,hs,ssih=5)
+        qc = next(cb)
+
+        assert matrix_methods.equal_iterables(qc,ir.sec.seq,5)
+        return
+
+    def test__CBridge__next__case3(self):
+        return -1 
 
 if __name__ == '__main__':
     unittest.main()

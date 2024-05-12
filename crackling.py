@@ -51,10 +51,14 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
         ##print("IR registers attempt")
         ##print(p)
         q,stat = ir.register_attempt(p)
-        ##print("-- register")
-        ##print(q)
-        ##print(stat)
-
+        ##
+        """
+        print("-- register")
+        print(q)
+        print(stat)
+        """
+        ##
+        
         if stat:
             return None
         ##print("cracking resp: ")

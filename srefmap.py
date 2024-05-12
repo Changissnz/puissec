@@ -586,10 +586,21 @@ class SRefMap:
     nd_map := dict, sec idn. -> optima index
     ''' 
     def load_actual(self,n2opt_map,nd_map): 
+        assert type(n2opt_map) in {dict,defaultdict}
+        assert type(nd_map) in {dict,defaultdict}
+
         self.actual_Pr = n2opt_map
         self.nd_map = nd_map 
         return
 
     def fit_actual(self): 
-        return -1 
+        return -1
 
+"""
+The standard solution in <SRefMap> 
+"""
+def std_soln_in_srm(srm:SRefMap):
+    assert type(srm) == SRefMap
+    dx = srm.collect_prism_points__PrMap('c',"greedy-lone",1)
+    dec_map = srm.collect_prism_points__DecMap('cd',max,[1])
+    return dx,dec_map
