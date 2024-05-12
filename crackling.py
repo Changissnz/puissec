@@ -25,6 +25,7 @@ class Crackling:
     def register_response(self,p,q,astat:bool): 
         assert type(self.hs) != type(None)
         self.astat = astat 
+        print("PP: {}\nQQ: {}".format(p,q))
         x = q[self.hs.target_index] 
         self.cvec.append(x,p)
         
@@ -59,8 +60,10 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
         """
         ##
         
+        """
         if stat:
             return None
+        """
         ##print("cracking resp: ")
         d = cracklng.register_response(p,q,stat)
         ##print("\t",d)

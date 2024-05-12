@@ -140,6 +140,8 @@ class IsoRing:
         ##print(outstat)
         outstat = np.any(np.array(outstat) == True) 
         self.cstat = stat
+        print("outstat")
+        print(outstat)
         return q,outstat 
 
     def register_attempt_(self,p):

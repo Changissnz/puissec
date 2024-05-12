@@ -53,6 +53,10 @@ class CBridgeClass(unittest.TestCase):
         qc = next(cb)
 
         assert matrix_methods.equal_iterables(qc,ir.sec.seq,5)
+        cv = c.cvec
+        assert len(c.cvec.v) == 1
+        assert len(c.cvec.input_samples) == 1
+        assert c.cvec.v[0] == 0.0
         return
 
     def test__CBridge__next__case3(self):
