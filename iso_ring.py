@@ -133,15 +133,14 @@ class IsoRing:
         stat = matrix_methods.equal_iterables(p,self.sec.seq)
         outstat = []
         ops = self.rep().optima_points()
-        for q in ops:
-            stat2 = matrix_methods.equal_iterables(p,q) 
+        for ps in ops:
+            stat2 = matrix_methods.equal_iterables(p,ps)
             outstat.append(stat2)
         ##print("got outstat")
         ##print(outstat)
         outstat = np.any(np.array(outstat) == True) 
         self.cstat = stat
         return q,outstat 
-
 
     def register_attempt_(self,p):
         assert matrix_methods.is_vector(p) 

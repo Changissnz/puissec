@@ -8,7 +8,7 @@ class Crackling:
         self.hs = None 
         self.rss = None
         self.set_cvec() 
-        self.astat = False 
+        self.astat = False
 
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
@@ -33,6 +33,10 @@ class Crackling:
 
         m = np.array([qx1,qx2])
         return metric_2dboolmat_to_bool(m,vx=0.65)
+
+    # TODO: 
+    def load_prtable(self):
+        return -1 
 
 
 """
