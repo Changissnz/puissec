@@ -161,7 +161,22 @@ class Sec:
             self.obfsr = None
         sc = Sec(s,sr,opm_,dm_,cdm_,obfsr)
         sc.idn_tag = new_idn_tag
-        return sc 
+        return sc
+
+    def pickle_thyself(self,fp):
+        fobj = open(fp,"wb")
+        q = (self.seq,self.singleton_range,self.opm,\
+            self.dm,self.cdm)
+        pickle.dump(q,fobj)
+        fobj.close()
+        return
+
+    @staticmethod
+    def unpickle_thyself(f): 
+        fobj = open(f,"rb")
+        q = pickle.load(fobj)
+        assert len(q) == 5
+        return Sec(q[0],q[1],q[2],q[3],q[4])
 
     def __str__(self):
         s = "** sequence\n"
@@ -290,7 +305,6 @@ class Sec:
         return
 
     def lone_pr_vec_for_bloom(self):
-        
         x = self.optima_points_to_index_pr_map()
         return self.obfsr.finalize_dcount(x)
         
@@ -351,15 +365,22 @@ class SecSeq:
         self.sequence = sequence
         return
 
-    def pickle_thyself(self):
-
-        sequence = [s.deepcopy()]
-
-        return -1 
+    def pickle_thyself(self,folder):
+        os.mkdir(folder)
+        for s in sequence: 
+            fx = str(s.idn_tag)
+            s.pickle_thyself(folder + "/" + fx) 
+        return
 
     @staticmethod 
     def unpickle_thyself(fp):
-        return -1 
+        s = [] 
+        l = os.listdir(fp)
+
+        for l_ in l: 
+            sec = Sec.unpickle_thyself(fp + "/" + l_)
+            s.append(sec)
+        return SecSeq(s) 
         
     def __getitem__(self,i):
         assert i <= len(self.sequence)
