@@ -9,6 +9,7 @@ class Crackling:
         self.rss = None
         self.set_cvec() 
         self.astat = False
+        self.cracked_dict = defaultdict(float)
 
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
@@ -20,25 +21,44 @@ class Crackling:
         self.cvec = cvec 
 
     """
-    only want 
+    p := vector, the attempted point
+    q := vector, length equal to number of optima,
+            each i'th value is the score of p w.r.t.
+            the i'th optimum point. 
+    astat := bool, ?is `p` equal to any local optima 
+                   of the targeted <IsoRing> instance.
     """
     def register_response(self,p,q,astat:bool): 
         assert type(self.hs) != type(None)
         self.astat = astat 
-        print("PP: {}\nQQ: {}".format(p,q))
+        ##print("PP: {}\nQQ: {}".format(p,q))
         x = q[self.hs.target_index] 
         self.cvec.append(x,p)
         
         qx1 = self.cvec.cmp(measures.zero_div)
         qx2 = self.cvec.cmp(np.less_equal) 
-
+        
+        s = [qx1[self.hs.target_index],qx2[self.hs.target_index]] 
+        
+        return s[0] or s[1] 
+        #####
+        """
+        print("QXX")
+        print(qx1)
+        print(qx2)
+        print()
         m = np.array([qx1,qx2])
         return metric_2dboolmat_to_bool(m,vx=0.65)
+        """
+        ##### 
 
-    # TODO: 
-    def load_prtable(self):
-        return -1 
-
+    def register_lo_pr(self,prx):
+        assert len(self.cvec.input_samples) > 0
+        v = self.cvec.input_samples[-1]
+        s = matrix_methods.vector_to_string(v,float)
+        self.cracked_dict[s] = prx 
+    
+        return
 
 """
 - return: 
@@ -55,18 +75,21 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
         ##
         """
         print("-- register")
-        print(q)
-        print(stat)
+        print("scorevec: ",q)
+        print("stat: ",stat)
         """
         ##
-        
         """
         if stat:
             return None
         """
         ##print("cracking resp: ")
         d = cracklng.register_response(p,q,stat)
-        ##print("\t",d)
+        if stat:
+            prx = ir.response_to_prompt(cracklng.hs.target_index)
+            ##print("PRXXX: ",prx)
+            cracklng.register_lo_pr(prx) 
+        ##print("response: ",d)
         return d
 
     rch = relevance_functions.RChainHead()
@@ -76,7 +99,6 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
     return rch
 
 """
-
 """
 def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih):
     assert type(ir) == IsoRing

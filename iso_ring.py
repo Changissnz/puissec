@@ -109,6 +109,9 @@ class IsoRing:
         # cracked stat 
         self.cstat = False 
 
+        # TODO: 
+        self.sec_script = None
+
     def explode_contents(self,optima_size_limit=1000):
         s = len(self.sec_cache[-1].opm)
         ##print("starting length for {}: {}".format\
@@ -140,8 +143,8 @@ class IsoRing:
         ##print(outstat)
         outstat = np.any(np.array(outstat) == True) 
         self.cstat = stat
-        print("outstat")
-        print(outstat)
+        ##print("outstat")
+        ##print(outstat)
         return q,outstat 
 
     def register_attempt_(self,p):
@@ -159,6 +162,12 @@ class IsoRing:
         ##print("-- reg: ",q)
         return np.array(q)
 
+    def response_to_prompt(self,index):
+        if type(self.sec_script) in {defaultdict,dict}:
+            return self.sec_script[index]
+        m = self.sec.optima_points_to_index_pr_map()
+        return m[index]
+
     def set_isorep(self,i):
         assert len(self.sec_cache) > i and i > -1
         self.repi = i 
@@ -166,11 +175,6 @@ class IsoRing:
 
     def rep(self):
         return deepcopy(self.sec_cache[self.repi])
-
-    def pr_of_optima_index(self,oi):
-
-        return -1 
-
 
 ### an example of an <IsoRing> instantiation
 def IsoRing_sample_1():

@@ -60,7 +60,29 @@ class CBridgeClass(unittest.TestCase):
         return
 
     def test__CBridge__next__case3(self):
-        return -1 
+        ir = IsoRing_sample_1()
+        ir.explode_contents()
+        sec = ir.sec.deepcopy(new_idn_tag=ir.sec.idn_tag,transfer_obfsr=False)
+
+        seq_idn = sec.idn_tag
+        ti = ir.sec.seq_index()
+        bs = np.array([0.91875, 0.90071, 0.03342, 0.95695, 0.13721])
+        q = bs - 0.1
+        q2 = bs + 0.1
+        sbs = [np.array([q,q2]).T]
+        hs = HypStruct(seq_idn,ti,sbs,sb_pr=np.array([1.0]))
+
+        c = Crackling()
+        c.load_HypStruct(hs)
+
+        cb = CBridge(c,ir,hs,ssih=2)
+
+        for i in range(32): 
+            qc = next(cb) 
+
+        ans = defaultdict(float, {'0.91875,0.90071,0.03342,0.95695,0.13721': 0.4})
+        assert c.cracked_dict == ans 
+        
 
 if __name__ == '__main__':
     unittest.main()
