@@ -82,7 +82,6 @@ class CBridgeClass(unittest.TestCase):
 
         ans = defaultdict(float, {'0.91875,0.90071,0.03342,0.95695,0.13721': 0.4})
         assert c.cracked_dict == ans 
-        
 
 if __name__ == '__main__':
     unittest.main()

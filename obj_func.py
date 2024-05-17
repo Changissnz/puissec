@@ -26,10 +26,6 @@ class ObjFunc:
         self.instantiate()
         return
 
-    @staticmethod
-    def generate(self):
-        return -1 
-
     def __str__(self):
         s = "OFUNC\n\t- {}\n\t- {}".format(self.obj_type,self.rnd_seed)
         return s 

@@ -6,6 +6,9 @@ import math
 import morebs2 
 import pickle 
 
+
+############## default variables
+
 DEFAULT_SINGLETON_RANGE = [-0.0,1.0]
 
 DEFAULT_SM_TICKLENGTH_RANGE = [1,10]
@@ -41,8 +44,33 @@ sqrt_fx = lambda x: math.sqrt(x)
 # DEFAULT_BLACKBOX_FUNCTIONS 
 blackbox_df1 = lambda x: (x + random.random()) % 1.0
 
+
+############## miscellaneous functions
+
 def pickle_open_with_typecheck(fp,t): 
     fobj = open(fp,"rb")
     obj = pickle.load(fobj)
     assert type(obj) == t
     return obj 
+
+def strsplit_float(f):
+    assert type(f) in {np.float64,float}
+    dx = str(f)
+    q = dx.split(".") 
+    return q[0],q[1] 
+
+# TODO: relocate
+def all_multiples_decimal(i,rounding_depth=5):
+    qi = round(i,rounding_depth)
+    qi = str(qi)
+    qi = qi.split(".")
+    l = len(qi[1])
+    x = qi[0] + qi[1]
+    qi = int(x) 
+    multiples = morebs2.numerical_extras.all_multiples(qi)
+    multiples = sorted(multiples)
+    for i in range(len(multiples)):
+        multiples[i] = multiples[i] * 10 ** -l
+    return multiples
+
+#all_mu

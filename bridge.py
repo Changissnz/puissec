@@ -22,8 +22,7 @@ class CBridge:
     def __next__(self):
         p = next(self.rssi)
         return p 
-
-
+        
 def one_correct_HypStruct_for_IsoRing(ir:IsoRing):
     ti = ir.sec.seq_index()
     seq = ir.sec.optima_points()[ti]
