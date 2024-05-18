@@ -20,6 +20,10 @@ def subbound_for_decimal(decimal,degree,range2):
     e = min([decimal + dr,range2[1]])
     return (s,e)
 
+LEAKF_MAP = {0:choose_multiple,\
+            1:idn_decimal,\
+            2:subbound_for_decimal}
+
 # TODO: future. 
 def leakf__type_gcd(ir): 
     return -1 
@@ -84,6 +88,110 @@ def leakf__type_MV(ir:IsoRing,rnd_struct,degree,\
     v = np.array(v)
     return v 
 
+
+# TODO: test. 
+"""
+container structure holding the (function,value) 
+pairs of information from a <Leak> instance onto 
+an <IsoRing> w/ identity `ir_idn`. 
+"""
+class LeakInfo:
+
+    def __init__(self,ir_idn):
+        self.ir_idn = ir_idn
+
+        # 0
+        self.leak_info = {0:[],1:[],2:[]}
+
+    @staticmethod
+    def is_more_potent(self,p1,p2):
+        stat1 = p1[0] < p2[0]
+        stat2 = len(p1[1]) < len(p2[1])
+        return stat1,stat2
+
+    """
+    return: 
+    - 2-tuple, [0] is 
+               [1] is subset of indices w/o leaks
+    """
+    def potency(self,b,sb):
+        q = 0
+        l = []
+        for i in range(b.shape[0]):
+            pl = self.process_leak_value_at_index(i,b,sb)
+            if type(pl) != type(None):
+                l.append(i)
+            else:
+                q += pl
+        return q,l
+
+
+    """
+    i := index of the vector
+    b := np.ndarray, bounds matrix
+    sb := np.ndarray, sub-bound of b; the search info. 
+    """
+    def process_leak_value_at_index(self,i,b,sb):
+        qx0 = self.value_at_findex(0,i)
+        qx1 = self.value_at_findex(1,i)
+        qx2 = self.value_at_findex(2,i)
+
+        h = [np.inf,np.inf,np.inf]
+        if type(qx1) != type(None):
+            h[0] = 1
+        if type(qx0) != type(None):
+            sbx = sb[i]
+            h[1] = (sbx[1] - sbx[0]) / qx0
+        if type(qx2) != type(None):
+            sbx = sb[i]
+            bx = b[i]
+            q = measures.zero_div(\
+                sbx[1] - sbx[0],bx[1] - bx[0],np.inf)
+            h[2] = q
+        return min(h) 
+
+    def value_at_index(self,f,i):
+        vx = self.valuelist_at_findex(f,i)
+        if len(vx) == 0:
+            return None
+
+        if i == 0:
+            return max(vx)
+        
+        if i == 1:
+            return vx[0]
+
+        if i == 2:
+            q = []
+            for (i,x) in enumerate(vx):
+                q.append((i,x[1] - x[0]))
+            j = max(q,key=lambda q_:q_[1])[0]
+            return vx[j] 
+
+    def valuelist_at_findex(self,f,i):
+        q = self.leak_info[f]
+        v = float('inf')
+
+        def not_null(rx): 
+            if type(r) != np.ndarray:
+                return not np.isnan(r) 
+            return (not np.isnan(r[0]) and not np.isnan(r[1]))
+
+        q2 = []
+        for qx in q:
+            r = qx[i]
+            cn = not_null(r)
+            if cn:
+                q2.append(deepcopy(r)) 
+        return q2
+
+    def __add__(self,px):
+        assert len(px) == 2
+        assert px[0] in {0,1,2}
+        assert type(px[1]) == np.ndarray
+        self.leak_info[px[0]].append(px[1])
+        return
+
 """
 procedure that leaks information about 
 an <IsoRing>. To be used w/ intersection.
@@ -97,7 +205,7 @@ class Leak:
             [0] leak* function
             [1] `degree` argument of the leak* function. 
     """
-    def __init__(self,rnd_struct,fd_seq):
+    def __init__(self,rnd_struct,fd_seq,leak_type="stationary"):
         assert len(fd_seq) > 0, "leak cannot be empty"
 
         for fd in fd_seq:
@@ -113,14 +221,15 @@ class Leak:
                 assert type(fd[1]) in {float,np.float64}
             else: 
                 assert len(fd[1]) == 3 
-        
+        assert leak_type = {"stationary","mobile"}
+
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
         return
 
     @staticmethod
     def generate_Leak():
-        return -1 
+        return -1
 
     def leak_info(self,ir:IsoRing):
         i = ir.leak_stage
