@@ -102,18 +102,20 @@ class Leak:
 
         for fd in fd_seq:
             assert len(fd) == 2
-            assert fd[0] in {leakf__type_ivmap,\
-                            leakf__type_multiple,\
-                            leakf__type_subbound}
-            if fd[0] == leakf__type_multiple:
+            assert fd[0] in {choose_multiple,\
+                            idn_decimal,\
+                            subbound_for_decimal}
+            if fd[0] == choose_multiple:
                 assert len(fd[1]) == 2
                 assert fd[1][0] >= 0.0 and fd[1][0] <= 1.0
+                assert fd[1][0] >= 0.0 and fd[1][0] <= 1.0
+            elif fd[1] == idn_decimal:
+                assert type(fd[1]) in {float,np.float64}
             else: 
-                assert fd[1] >= 0.0 and fd[1] <= 1.0  
-
+                assert len(fd[1]) == 3 
+        
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
-        self.index = 0
         return
 
     @staticmethod
@@ -121,6 +123,13 @@ class Leak:
         return -1 
 
     def leak_info(self,ir:IsoRing):
-        assert self.index < len(self.fd_seq)
+        i = ir.leak_stage
+        if i >= len(self.fd_seq):
+            return None
 
-        return -1 
+        x = self.fd_seq[i]
+        fx = x[0]
+        d = x[1] 
+        outp = leakf__type_MV(ir,self.rnd_struct,d,fx)
+        ir.leak_stage += 1 
+        return outp

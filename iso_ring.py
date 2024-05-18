@@ -112,6 +112,10 @@ class IsoRing:
         # TODO: 
         self.sec_script = None
 
+        self.leak_stage = 0
+
+
+
     def explode_contents(self,optima_size_limit=1000):
         s = len(self.sec_cache[-1].opm)
         ##print("starting length for {}: {}".format\
