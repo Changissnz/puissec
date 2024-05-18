@@ -107,6 +107,7 @@ class LeaketteClass(unittest.TestCase):
         l = Leak(random,L)
 
         ir = IsoRing_sample_1() 
+        ir.sec.idn_tag = 12 
 
         p = l.leak_info(ir)
         p2 = l.leak_info(ir)
@@ -117,6 +118,10 @@ class LeaketteClass(unittest.TestCase):
         assert type(p2) != type(None)
         assert type(p3) != type(None)
         assert type(p4) == type(None)
+
+        assert len(l.leakm.d[12].leak_info[0]) == 2 
+        assert len(l.leakm.d[12].leak_info[1]) == 0 
+        assert len(l.leakm.d[12].leak_info[2]) == 1
 
 if __name__ == '__main__':
     unittest.main()

@@ -25,6 +25,16 @@ LEAKF_MAP = {0:choose_multiple,\
             1:idn_decimal,\
             2:subbound_for_decimal}
 
+def leakf_to_index(leakf):
+
+    if LEAKF_MAP[0] == leakf: 
+        return 0
+    if LEAKF_MAP[1] == leakf: 
+        return 1
+    if LEAKF_MAP[2] == leakf: 
+        return 2
+    return -1
+
 # TODO: future. 
 def leakf__type_gcd(ir): 
     return -1 
@@ -206,6 +216,28 @@ class LeakInfo:
         self.leak_info[px[0]].append(px[1])
         return self
 
+class LeakMem:
+
+    def __init__(self):
+        self.d = {}
+        return
+
+    def __add__(self,ir_idn):
+        """
+        assert len(ir_idn_px) == 3
+        ir_idn = ir_idn_px[0] 
+        px = (ir_idn_px[1],ir_idn_px[2])
+
+        if ir_idn not in self.d:
+            self.d[ir_idn] = LeakInfo(ir_idn)
+        self.d[ir_idn] = self.d[ir_idn] + px 
+        """
+        ###
+        assert len(ir_idn) == 3
+        if ir_idn[0] not in self.d:
+            self.d[ir_idn[0]] = LeakInfo(ir_idn[0])
+        self.d[ir_idn[0]] = self.d[ir_idn[0]] + (ir_idn[1],ir_idn[2]) 
+        return self
 """
 procedure that leaks information about 
 an <IsoRing>. To be used w/ intersection.
@@ -239,6 +271,8 @@ class Leak:
 
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
+        self.leakm = LeakMem()
+
         return
 
     @staticmethod
@@ -255,8 +289,12 @@ class Leak:
         d = x[1] 
         outp = leakf__type_MV(ir,self.rnd_struct,d,fx)
         ir.leak_stage += 1 
+
+        self.save_mem(ir,fx,outp)
         return outp
 
-    def save_mem(self):
-
-        return -1
+    def save_mem(self,ir,fx,outp):
+        it = ir.sec.idn_tag
+        fi = leakf_to_index(fx)
+        self.leakm = self.leakm + (it,fi,outp)
+        return
