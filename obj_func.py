@@ -29,8 +29,7 @@ class ObjFunc:
     def __str__(self):
         s = "OFUNC\n\t- {}\n\t- {}".format(self.obj_type,self.rnd_seed)
         return s 
-
-
+        
     def instantiate(self):
         if self.obj_type == "e.d.":
             self.ofunc = matrix_methods.euclidean_point_distance

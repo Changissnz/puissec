@@ -165,18 +165,40 @@ class Sec:
 
     def pickle_thyself(self,fp):
         fobj = open(fp,"wb")
-        q = (self.seq,self.singleton_range,self.opm,\
-            self.dm,self.cdm)
+        q = self.to_pickle_list()
         pickle.dump(q,fobj)
         fobj.close()
         return
+
+    def to_pickle_list(self):
+        return (self.seq,self.singleton_range,\
+            self.opm,self.dm,self.cdm)
 
     @staticmethod
     def unpickle_thyself(f): 
         fobj = open(f,"rb")
         q = pickle.load(fobj)
+        fobj.close()
+        return Sec.varl_to_Sec(q)
+    
+    @staticmethod 
+    def varl_to_Sec(q): 
         assert len(q) == 5
         return Sec(q[0],q[1],q[2],q[3],q[4])
+
+    @staticmethod
+    def unpickle_thyselves(fx):
+        rx_ = open(fx,"rb")
+        rx = pickle.load(rx_)
+
+
+        s = []
+        for i in range(len(rx)):
+            q = rx[i]
+            sec = Sec.varl_to_Sec(q)
+            s.append(sec)
+        rx_.close()
+        return s
 
     def __str__(self):
         s = "** sequence\n"

@@ -1,6 +1,7 @@
 from obj_func import * 
 from secnet_gen import * 
 from cvec import * 
+import os 
 
 class BoundedObjFunc:
 
@@ -36,6 +37,33 @@ class BoundedObjFunc:
             s += "\n"
         s += "--------------"
         return s  
+
+    def pickle_thyself(self,fp):
+        cobjf = []
+        for x in self.corr_objf: 
+            cobjf.append((x.obj_type,x.rnd_seed))
+        dobjf = (self.dobjf.obj_type,self.dobjf.rnd_seed)
+
+        rx = [deepcopy(self.bounds_seq),\
+            cobjf,dobjf]
+
+        fobj = open(fp,"wb")
+        pickle.dump(rx,fobj)
+        fobj.close()
+        return 
+
+    # TODO: test. 
+    @staticmethod
+    def unpickle_thyself(fp):
+        fobj = open(fp,"rb")
+        q = pickle.load(fobj)
+        fobj.close()
+
+        cx = []
+        for q_ in q[1]:
+            cx.append(ObjFunc(q_[0],q_[1]))
+        dx = ObjFunc(q[2][0],q[2][1])
+        return BoundedObjFunc(q[0],cx,dx)
 
     @staticmethod
     def generate_BoundedObjFunc(superbound,\
@@ -111,10 +139,80 @@ class IsoRing:
 
         # TODO: 
         self.sec_script = None
-
         self.leak_stage = 0
 
+    """
+    pickles instance through values
+    [F1] sec  
+    [F2] list::(sec cache)
+    [F3] ofunc 
 
+    [F4] bounds
+         bstat 
+         repi
+         leak_stage
+    """
+    def pickle_thyself(self,fp_base):
+
+        if not os.path.isdir(fp_base):
+            os.mkdir(fp_base)
+        fp1 = fp_base + "/__SEC0"
+        fp2 = fp_base + "/__SECL"
+        fp3 = fp_base + "/__OFUNC"
+        fp4 = fp_base + "/__REM"
+
+        # [F1]
+        self.sec.pickle_thyself(fp1)
+
+        # [F2]
+        qx = []
+        for i in range(len(self.sec_cache)):
+            q = self.sec_cache[i].to_pickle_list()
+            qx.append(q)
+        fobj = open(fp2,"wb")
+        pickle.dump(qx,fobj)
+        fobj.close()
+
+        # [F3]
+        self.ofunc.pickle_thyself(fp3)
+
+        # [F4]
+        rx = [deepcopy(self.bounds),\
+            deepcopy(self.bstat),\
+            deepcopy(self.repi),\
+            deepcopy(self.leak_stage)]
+        fobj = open(fp4,"wb")
+        pickle.dump(rx,fobj)
+        fobj.close()
+        return 
+
+    @staticmethod
+    def unpickle_thyself(fp_base):
+        fp1 = fp_base + "/__SEC0"
+        fp2 = fp_base + "/__SECL"
+        fp3 = fp_base + "/__OFUNC"
+        fp4 = fp_base + "/__REM"
+
+        # [0]
+        s = Sec.unpickle_thyself(fp1)
+
+        # [1] 
+        s1 = Sec.unpickle_thyselves(fp2)
+
+        # [2]
+        s2 = BoundedObjFunc.unpickle_thyself(fp3) 
+
+        # [3]
+        fobj = open(fp4,"rb")
+        s3 = pickle.load(fobj)
+        fobj.close()
+
+
+        ir = IsoRing(s,s2,s3[0])
+        ir.bstat = s3[1]
+        ir.repi = s3[2] 
+        ir.leak_stage = s3[3]
+        return ir 
 
     def explode_contents(self,optima_size_limit=1000):
         s = len(self.sec_cache[-1].opm)
@@ -132,6 +230,7 @@ class IsoRing:
             self.sec_cache.append(s2)
             if type(ts2) == type(None):
                 break
+        self.bstat = False
         return
 
     def register_attempt(self,p):

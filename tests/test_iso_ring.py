@@ -63,5 +63,11 @@ class IsoRingClass(unittest.TestCase):
         ir.explode_contents()
         assert len(ir.sec_cache) == 5
 
+    def test__IsoRing__unpickle_thyself_case1(self):
+        rx = IsoRing.unpickle_thyself('isosave')
+        assert type(rx) == IsoRing
+        ans_seq = np.array([0.083  , 0.67198, 0.80659, 0.98274, 0.63566])
+        assert matrix_methods.equal_iterables(rx.sec.seq,ans_seq,5)
+
 if __name__ == '__main__':
     unittest.main()
