@@ -83,6 +83,40 @@ class LeaketteClass(unittest.TestCase):
                 1.e-05,1.e-05,\
                 1.e-05])
         assert matrix_methods.equal_iterables(ans,q)
+        return -1
+
+    def test__Leak__leak_info__case1(self):
+
+        l1 = (LEAKF_MAP[0],np.array((0.5,0.5)))
+        l2 = (LEAKF_MAP[2],(0.2,0.4,(0.0,1.0)))
+        l3 = (LEAKF_MAP[0],np.array((0.5,0.5)))
+
+        B = np.array([[0,1.],\
+                [-1,1],\
+                [0,3],\
+                [-1,1.5]])
+
+        SB = np.array([[0,1.],\
+                [0,1.],\
+                [0.,1],\
+                [0,1.]])
+
+        L = [l1,l2,l3]
+
+        random.seed(332)
+        l = Leak(random,L)
+
+        ir = IsoRing_sample_1() 
+
+        p = l.leak_info(ir)
+        p2 = l.leak_info(ir)
+        p3 = l.leak_info(ir)
+        p4 = l.leak_info(ir) 
+
+        assert type(p) != type(None)
+        assert type(p2) != type(None)
+        assert type(p3) != type(None)
+        assert type(p4) == type(None)
 
 if __name__ == '__main__':
     unittest.main()

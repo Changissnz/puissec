@@ -16,6 +16,7 @@ def subbound_for_decimal(decimal,degree,range2):
     assert range2[1] >= range2[0]
 
     dr = degree * (range2[1] - range2[0])
+    
     s = max([decimal - dr,range2[0]])
     e = min([decimal + dr,range2[1]])
     return (s,e)
@@ -28,8 +29,17 @@ LEAKF_MAP = {0:choose_multiple,\
 def leakf__type_gcd(ir): 
     return -1 
 
-
 """
+rnd_struct := .
+degree := [0] fx := choose multiple -->
+                (f1,f2); fx a float 
+          [1] fx := idn_decimal -->
+                f1; a float. 
+          [2] fx := subbound_for_decimal -->
+                (f1,(r1,r2)); f1,rx are floats,
+                    and (r1,r2) is an ordered 
+                    range.
+fx := function
 """
 def leakf__type_MV(ir:IsoRing,rnd_struct,degree,\
         fx):#degree2):
@@ -111,7 +121,7 @@ class LeakInfo:
 
     """
     return: 
-    - 2-tuple, [0] is 
+    - 2-tuple, [0] is summation of potency per index
                [1] is subset of indices w/o leaks
     """
     def potency(self,b,sb):
@@ -130,6 +140,10 @@ class LeakInfo:
     i := index of the vector
     b := np.ndarray, bounds matrix
     sb := np.ndarray, sub-bound of b; the search info. 
+    
+    return: 
+    - the minumum value from the 3 leak functions
+      for index i. 
     """
     def process_leak_value_at_index(self,i,b,sb):
         qx0 = self.value_at_findex(0,i)
@@ -150,7 +164,7 @@ class LeakInfo:
             h[2] = q
         return min(h) 
 
-    def value_at_index(self,f,i):
+    def value_at_findex(self,f,i):
         vx = self.valuelist_at_findex(f,i)
         if len(vx) == 0:
             return None
@@ -188,9 +202,9 @@ class LeakInfo:
     def __add__(self,px):
         assert len(px) == 2
         assert px[0] in {0,1,2}
-        assert type(px[1]) == np.ndarray
+        assert type(px[1]) in {np.ndarray,list,tuple}
         self.leak_info[px[0]].append(px[1])
-        return
+        return self
 
 """
 procedure that leaks information about 
@@ -220,8 +234,8 @@ class Leak:
             elif fd[1] == idn_decimal:
                 assert type(fd[1]) in {float,np.float64}
             else: 
-                assert len(fd[1]) == 3 
-        assert leak_type = {"stationary","mobile"}
+                assert len(fd[1]) == 3
+        assert leak_type in {"stationary","mobile"}
 
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
@@ -242,3 +256,7 @@ class Leak:
         outp = leakf__type_MV(ir,self.rnd_struct,d,fx)
         ir.leak_stage += 1 
         return outp
+
+    def save_mem(self):
+
+        return -1
