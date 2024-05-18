@@ -139,7 +139,7 @@ class LeakInfo:
         l = []
         for i in range(b.shape[0]):
             pl = self.process_leak_value_at_index(i,b,sb)
-            if type(pl) != type(None):
+            if np.isinf(pl):#type(pl) == type(None):
                 l.append(i)
             else:
                 q += pl
@@ -179,13 +179,14 @@ class LeakInfo:
         if len(vx) == 0:
             return None
 
-        if i == 0:
+        if f == 0:
             return max(vx)
         
-        if i == 1:
+        if f == 1:
             return vx[0]
 
-        if i == 2:
+
+        if f == 2:
             q = []
             for (i,x) in enumerate(vx):
                 q.append((i,x[1] - x[0]))
@@ -193,20 +194,36 @@ class LeakInfo:
             return vx[j] 
 
     def valuelist_at_findex(self,f,i):
+        ##print("value list for f={} @ i={}".format(f,i))
         q = self.leak_info[f]
         v = float('inf')
 
         def not_null(rx): 
             if type(r) != np.ndarray:
                 return not np.isnan(r) 
+                ##
+            """
+            print("NOTNULL? ")
+            print(rx) 
+            print("\t----")
+            """
+                ##
             return (not np.isnan(r[0]) and not np.isnan(r[1]))
-
+        
+        #print("Q")
+        #print(q) 
         q2 = []
         for qx in q:
+            #print("QX")
+            #print(qx)
             r = qx[i]
+            #print("R")
+            #print(r)
             cn = not_null(r)
+            #print("STAT: ",cn)
             if cn:
                 q2.append(deepcopy(r)) 
+        #print("ANS: ",q2)
         return q2
 
     def __add__(self,px):

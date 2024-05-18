@@ -92,14 +92,16 @@ class LeaketteClass(unittest.TestCase):
         l3 = (LEAKF_MAP[0],np.array((0.5,0.5)))
 
         B = np.array([[0,1.],\
-                [-1,1],\
-                [0,3],\
-                [-1,1.5]])
-
-        SB = np.array([[0,1.],\
+                [0.,1],\
                 [0,1.],\
                 [0.,1],\
-                [0,1.]])
+                [0.,1.]])
+
+        SB = np.array([[0,0.5],\
+                [0,0.5],\
+                [0.,0.5],\
+                [0,0.5],\
+                [0.,1.]])
 
         L = [l1,l2,l3]
 
@@ -122,6 +124,13 @@ class LeaketteClass(unittest.TestCase):
         assert len(l.leakm.d[12].leak_info[0]) == 2 
         assert len(l.leakm.d[12].leak_info[1]) == 0 
         assert len(l.leakm.d[12].leak_info[2]) == 1
+
+        li = l.leakm.d[12]
+        q = li.potency(B,SB)
+        x = 141.1214318684255
+
+        assert round(abs(q[0] - x),5) == 0.0
+        assert q[1] == [1,2]
 
 if __name__ == '__main__':
     unittest.main()
