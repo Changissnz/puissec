@@ -531,6 +531,7 @@ class SecNetDepGen:
             stat = self.make_conn(deepcopy(l))
             stat = stat and i < size_limt
             i += 1
+            #print("i: ",i)
         self.write_conn_to_Sec()
         return
 
@@ -907,5 +908,5 @@ def Sec_list_sample2(num_secs=12):
         sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
         countermeasure,rnd_struct=np.random)
         secs.append(sec)
-        ##print("sec {}".format(i))
+        #print("sec {}".format(i))
     return secs 

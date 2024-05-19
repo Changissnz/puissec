@@ -4,12 +4,13 @@ from hype import *
 
 class Crackling:
 
-    def __init__(self,target_indices=None):
+    def __init__(self):
         self.hs = None 
         self.rss = None
         self.set_cvec() 
         self.astat = False
         self.cracked_dict = defaultdict(float)
+        self.flagged_pts = []
 
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
@@ -37,27 +38,24 @@ class Crackling:
         
         qx1 = self.cvec.cmp(measures.zero_div)
         qx2 = self.cvec.cmp(np.less_equal) 
+        ##print("QX1: ",qx1)
+        ##print("QX2: ",qx2)
+
+        ##s = [qx1[self.hs.target_index],qx2[self.hs.target_index]] 
         
-        s = [qx1[self.hs.target_index],qx2[self.hs.target_index]] 
-        
-        return s[0] or s[1] 
-        #####
-        """
-        print("QXX")
-        print(qx1)
-        print(qx2)
-        print()
-        m = np.array([qx1,qx2])
-        return metric_2dboolmat_to_bool(m,vx=0.65)
-        """
-        ##### 
+        s = [np.sum(qx1) >= len(qx1) / 1.5,\
+            np.sum(qx2) >= len(qx2) / 1.5]
+
+        d = s[0] or s[1] 
+        if d: 
+            self.flagged_pts.append(len(self.cvec) - 1)
+        return d
 
     def register_lo_pr(self,prx):
         assert len(self.cvec.input_samples) > 0
         v = self.cvec.input_samples[-1]
         s = matrix_methods.vector_to_string(v,float)
         self.cracked_dict[s] = prx 
-    
         return
 
 """

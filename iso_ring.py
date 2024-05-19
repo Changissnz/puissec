@@ -63,6 +63,16 @@ class BoundedObjFunc:
             cx.append(ObjFunc(q_[0],q_[1]))
         dx = ObjFunc(q[2][0],q[2][1])
         return BoundedObjFunc(q[0],cx,dx)
+    
+    @staticmethod
+    def one_simple_BoundedObjFunc(superbound,rnd_seed:int):
+        bounds_seq = np.array([deepcopy(superbound)])
+
+        corr_objf = [ObjFunc("e.d.",rnd_seed)]
+        default_objf = ObjFunc("e.d.",rnd_seed)
+
+        return BoundedObjFunc(bounds_seq,\
+            corr_objf,default_objf)
 
     @staticmethod
     def generate_BoundedObjFunc(superbound,\
@@ -304,11 +314,11 @@ def SecSeq_sample_1(num_components=1):
     ss = SecSeq(sndg.sq)
     return ss 
 
-def SecSeq_sample_2(num_secs=80):
+def SecSeq_sample_2(num_secs=80,num_conn=5000):
     s = Sec_list_sample2(num_secs=num_secs)
     sndg = SecNetDepGen(s,random,4,0.5,[1,4])
-    ##print("assigning conn")
-    sndg.assign_conn(5000)
+    print("assigning conn")
+    sndg.assign_conn(num_conn)
 
     # TODO: delesha
     # make 100 random dependent conn
@@ -321,6 +331,7 @@ def SecSeq_sample_2(num_secs=80):
     """
     
     ss = SecSeq(sndg.sq)
+    print("declared <SecSeq>")
     return ss 
 
 def duplicate_Sec_list(sec_list,indices_to_dup,\

@@ -182,6 +182,9 @@ class CVec:
         self.cvis = cvis 
         return
 
+    def __len__(self):
+        return len(self.input_samples) 
+
     def append(self,v,sample):
         assert type(v) in {int,float,np.float64,np.int32},"got {}".format(type(v))
         if len(self.input_samples) > 0:

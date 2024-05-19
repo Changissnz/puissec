@@ -9,11 +9,6 @@ class IsoRingedChain:
         self.irl = []
         self.load_IsoRings(bound,rnd_struct,rs_seed)  
 
-    @staticmethod
-    def blank_instance():
-        ss = rr 
-        return -1 
-
     """
     default args. are 
         - spacing_ratio_range := 
@@ -45,6 +40,11 @@ class IsoRingedChain:
 
     def __len__(self): 
         return len(self.irl)
+
+    def __getitem__(self,i):
+        assert i <= len(self.irl)
+        assert i >= 0 
+        return self.irl[i] 
 
     def load_IsoRings(self,singleton_bound=DEFAULT_SINGLETON_RANGE,\
         rnd_struct=random,rs_seed=8): 
