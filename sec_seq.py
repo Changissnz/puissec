@@ -172,7 +172,7 @@ class Sec:
 
     def to_pickle_list(self):
         return (self.seq,self.singleton_range,\
-            self.opm,self.dm,self.cdm)
+            self.opm,self.dm,self.cdm,self.idn_tag)
 
     @staticmethod
     def unpickle_thyself(f): 
@@ -183,8 +183,10 @@ class Sec:
     
     @staticmethod 
     def varl_to_Sec(q): 
-        assert len(q) == 5
-        return Sec(q[0],q[1],q[2],q[3],q[4])
+        assert len(q) == 6
+        s = Sec(q[0],q[1],q[2],q[3],q[4])
+        s.idn_tag = q[5]
+        return s 
 
     @staticmethod
     def unpickle_thyselves(fx):

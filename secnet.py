@@ -9,6 +9,11 @@ class IsoRingedChain:
         self.irl = []
         self.load_IsoRings(bound,rnd_struct,rs_seed)  
 
+    @staticmethod
+    def blank_instance():
+        ss = rr 
+        return -1 
+
     """
     default args. are 
         - spacing_ratio_range := 
@@ -23,6 +28,8 @@ class IsoRingedChain:
     def default_Sec2IsoRing(sec:Sec,bound,rnd_struct,rs_seed):
         if type(rs_seed) != type(None): 
             rnd_struct.seed(rs_seed)
+        else: 
+            rnd_struct.seed(113)
         
         # generate the BOF
         spacing_ratio_range = rnd_struct.uniform(0.1,0.8)
@@ -42,6 +49,10 @@ class IsoRingedChain:
     def load_IsoRings(self,singleton_bound=DEFAULT_SINGLETON_RANGE,\
         rnd_struct=random,rs_seed=8): 
 
+        if len(self.ss.sequence) == 0:
+            self.ss = None
+            return 
+
         self.irl = [] 
         if type(rs_seed) != type(None):
             rnd_struct.seed(rs_seed)
@@ -57,9 +68,36 @@ class IsoRingedChain:
                 bound_,rnd_struct,sd) 
             self.irl.append(ir) 
         self.ss = None 
+
+    """
+    fp := folder path
+    """
+    def pickle_thyself(self,fp):
+        if not os.path.isdir(fp):
+            os.mkdir(fp)
+
+        for x in self.irl:
+            fp_ = fp + "/node_{}".format(x.sec.idn_tag)
+            x.pickle_thyself(fp_)
     
-    def pickle_thyself(self):
-        return -1
+    @staticmethod
+    def unpickle_thyself(fp,rnd_struct,rs_seed):
+
+        q = os.listdir(fp)
+        ls = [] 
+        for q_ in q:
+            fp_ = fp + "/" + q_
+            ir = IsoRing.unpickle_thyself(fp_) 
+            ls.append(ir) 
+
+        # sort all elements by idn
+        ls = sorted(ls,key=lambda x: x.sec.idn_tag) 
+
+        ss = SecSeq([])
+        irc = IsoRingedChain(ss,None,rnd_struct,rs_seed)
+        irc.irl = ls 
+        return irc
+
 
 # TODO: test this. 
 """

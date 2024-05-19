@@ -52,7 +52,6 @@ class BoundedObjFunc:
         fobj.close()
         return 
 
-    # TODO: test. 
     @staticmethod
     def unpickle_thyself(fp):
         fobj = open(fp,"rb")
