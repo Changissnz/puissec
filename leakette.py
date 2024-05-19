@@ -46,7 +46,7 @@ degree := [0] fx := choose multiple -->
           [1] fx := idn_decimal -->
                 f1; a float. 
           [2] fx := subbound_for_decimal -->
-                (f1,(r1,r2)); f1,rx are floats,
+                (f1,f2,(r1,r2)); fx,rx are floats,
                     and (r1,r2) is an ordered 
                     range.
 fx := function
@@ -108,6 +108,11 @@ def leakf__type_MV(ir:IsoRing,rnd_struct,degree,\
     v = np.array(v)
     return v 
 
+'''
+        l1 = (LEAKF_MAP[0],np.array((0.5,0.5)))
+        l2 = (LEAKF_MAP[1],1.0)
+        l3 = (LEAKF_MAP[2],(0.2,0.4,(0.0,1.0)))
+'''
 
 # TODO: test. 
 """
@@ -292,9 +297,34 @@ class Leak:
 
         return
 
+    """
+    pmap := dict, length is reference dimension d
+    """
     @staticmethod
-    def generate_Leak():
-        return -1
+    def generate_Leak__type1(num_leakf,rnd_struct):
+        leakfs = [] 
+        for i in range(num_leakf):
+            q = rnd_struct.randrange(0,3) 
+            leakf = Leak.generate_leakf_args(q,rnd_struct)
+            leakfs.append(leakf) 
+        return Leak(rnd_struct,leakfs)
+    
+    @staticmethod
+    def generate_leakf_args(idn,rnd_struct):
+        assert idn in {0,1,2}
+
+        if idn == 0: 
+            d1 = rnd_struct.uniform(0.,1.)
+            d2 = rnd_struct.uniform(d1+1e-10,1.) 
+            return np.array((d1,d2)) 
+        if idn == 1:
+            return rnd_struct.uniform(0.,1.)
+
+        d1 = rnd_struct.uniform(0.,1.)
+        d2 = rnd_struct.uniform(0.,1.)
+        d3 = rnd_struct.uniform(0.,1.)
+        d3 = (d3,rnd_struct.uniform(d3+1e-10,1.))
+        return (d1,d2,d3)
 
     def leak_info(self,ir:IsoRing):
         i = ir.leak_stage
