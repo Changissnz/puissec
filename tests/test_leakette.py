@@ -124,6 +124,18 @@ class LeaketteClass(unittest.TestCase):
         assert t1 == (True,True)
         assert t2 == (False,False)
 
+        lk3 = Leak.generate_Leak__type1(5,random)
+        ir3 = IsoRing_sample_1()
+        ir3.sec.idn_tag=12
+        lk3.leak_info(ir3)
+        x = lk3.leakm.d[12]
+        q3 = x.potency(B,SB)
+        assert q3 == (1.5, [1, 2, 3])
+
+        assert LeakInfo.is_more_potent_bool(q3,q1)
+        assert not LeakInfo.is_more_potent_bool(q3,q2)
+
+
     def test__Leak__leak_info__case1(self):
 
         l1 = (LEAKF_MAP[0],np.array((0.5,0.5)))

@@ -16,9 +16,9 @@ def subbound_for_decimal(decimal,degree,range2):
     assert range2[1] >= range2[0]
 
     dr = degree * (range2[1] - range2[0])
-    
     s = max([decimal - dr,range2[0]])
     e = min([decimal + dr,range2[1]])
+    ##print("D,S,E:",dr,s,e)
     return (s,e)
 
 LEAKF_MAP = {0:choose_multiple,\
@@ -108,12 +108,6 @@ def leakf__type_MV(ir:IsoRing,rnd_struct,degree,\
     v = np.array(v)
     return v 
 
-'''
-        l1 = (LEAKF_MAP[0],np.array((0.5,0.5)))
-        l2 = (LEAKF_MAP[1],1.0)
-        l3 = (LEAKF_MAP[2],(0.2,0.4,(0.0,1.0)))
-'''
-
 # TODO: test. 
 """
 container structure holding the (function,value) 
@@ -133,6 +127,22 @@ class LeakInfo:
         stat1 = p1[0] < p2[0]
         stat2 = len(p1[1]) < len(p2[1])
         return stat1,stat2
+
+    @staticmethod
+    def is_more_potent_bool(p1,p2,w=10.0): 
+        assert w >= 1.0
+        d1 = p1[0] - p2[0]
+        d2 = len(p1[1]) - len(p2[1])
+
+        if d1 < 0 and d2 < 0: 
+                return True
+
+        if d1 > 0 and d2 > 0: 
+                return False
+
+        if d2 > 0: 
+                d2 = d2 * w
+        return d1 + d2 < 0
 
     """
     return: 
@@ -238,6 +248,10 @@ class LeakInfo:
         self.leak_info[px[0]].append(px[1])
         return self
 
+"""
+container to hold a <Leak> instance's extracted information
+for each <IsoRing>+<Leak> interaction.
+"""
 class LeakMem:
 
     def __init__(self):
@@ -245,16 +259,6 @@ class LeakMem:
         return
 
     def __add__(self,ir_idn):
-        """
-        assert len(ir_idn_px) == 3
-        ir_idn = ir_idn_px[0] 
-        px = (ir_idn_px[1],ir_idn_px[2])
-
-        if ir_idn not in self.d:
-            self.d[ir_idn] = LeakInfo(ir_idn)
-        self.d[ir_idn] = self.d[ir_idn] + px 
-        """
-        ###
         assert len(ir_idn) == 3
         if ir_idn[0] not in self.d:
             self.d[ir_idn[0]] = LeakInfo(ir_idn[0])
@@ -294,7 +298,6 @@ class Leak:
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
         self.leakm = LeakMem()
-
         return
 
     """
@@ -306,7 +309,7 @@ class Leak:
         for i in range(num_leakf):
             q = rnd_struct.randrange(0,3) 
             leakf = Leak.generate_leakf_args(q,rnd_struct)
-            leakfs.append(leakf) 
+            leakfs.append((LEAKF_MAP[q],leakf)) 
         return Leak(rnd_struct,leakfs)
     
     @staticmethod
@@ -322,8 +325,11 @@ class Leak:
 
         d1 = rnd_struct.uniform(0.,1.)
         d2 = rnd_struct.uniform(0.,1.)
+        d3 = (0.,1.)
+        """
         d3 = rnd_struct.uniform(0.,1.)
         d3 = (d3,rnd_struct.uniform(d3+1e-10,1.))
+        """
         return (d1,d2,d3)
 
     def leak_info(self,ir:IsoRing):
