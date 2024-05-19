@@ -83,7 +83,46 @@ class LeaketteClass(unittest.TestCase):
                 1.e-05,1.e-05,\
                 1.e-05])
         assert matrix_methods.equal_iterables(ans,q)
-        return -1
+        return
+
+    def test__LeakInfo__is_more_potent__case1(self):
+
+        B = np.array([[0,1.],\
+                        [0.,1],\
+                        [0,1.],\
+                        [0.,1],\
+                        [0.,1.]])
+
+        SB = np.array([[0,0.5],\
+                [0,0.5],\
+                [0.,0.5],\
+                [0,0.5],\
+                [0.,1.]])
+
+        ir = IsoRing_sample_1()
+        ir.sec.idn_tag = 12 
+
+        ir2 = IsoRing_sample_1()
+        ir2.sec.idn_tag = 12 
+
+        lk1 = Leak_sample1()
+        for i in range(4):
+                lk1.leak_info(ir)
+
+        lk2 = Leak_sample2()
+        lk2.leak_info(ir2)
+
+        x = lk1.leakm.d[12]
+        q1 = x.potency(B,SB)
+
+        x2 = lk2.leakm.d[12]
+        q2 = x2.potency(B,SB)
+
+        t1 = LeakInfo.is_more_potent(q2,q1)
+        t2 = LeakInfo.is_more_potent(q1,q2)
+
+        assert t1 == (True,True)
+        assert t2 == (False,False)
 
     def test__Leak__leak_info__case1(self):
 
@@ -131,6 +170,8 @@ class LeaketteClass(unittest.TestCase):
 
         assert round(abs(q[0] - x),5) == 0.0
         assert q[1] == [1,2]
+
+
 
 if __name__ == '__main__':
     unittest.main()

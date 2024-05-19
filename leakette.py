@@ -124,7 +124,7 @@ class LeakInfo:
         self.leak_info = {0:[],1:[],2:[]}
 
     @staticmethod
-    def is_more_potent(self,p1,p2):
+    def is_more_potent(p1,p2):
         stat1 = p1[0] < p2[0]
         stat2 = len(p1[1]) < len(p2[1])
         return stat1,stat2
@@ -280,7 +280,7 @@ class Leak:
                 assert len(fd[1]) == 2
                 assert fd[1][0] >= 0.0 and fd[1][0] <= 1.0
                 assert fd[1][0] >= 0.0 and fd[1][0] <= 1.0
-            elif fd[1] == idn_decimal:
+            elif fd[0] == idn_decimal:
                 assert type(fd[1]) in {float,np.float64}
             else: 
                 assert len(fd[1]) == 3
@@ -315,3 +315,45 @@ class Leak:
         fi = leakf_to_index(fx)
         self.leakm = self.leakm + (it,fi,outp)
         return
+
+def Leak_sample1():
+    l1 = (LEAKF_MAP[0],np.array((0.5,0.5)))
+    l2 = (LEAKF_MAP[2],(0.2,0.4,(0.0,1.0)))
+    l3 = (LEAKF_MAP[0],np.array((0.5,0.5)))
+
+    B = np.array([[0,1.],\
+            [0.,1],\
+            [0,1.],\
+            [0.,1],\
+            [0.,1.]])
+
+    SB = np.array([[0,0.5],\
+            [0,0.5],\
+            [0.,0.5],\
+            [0,0.5],\
+            [0.,1.]])
+
+    L = [l1,l2,l3]
+
+    random.seed(332)
+    return Leak(random,L)
+
+def Leak_sample2(): 
+
+    l1 = (LEAKF_MAP[1],1.0)
+
+    B = np.array([[0,1.],\
+                    [0.,1],\
+                    [0,1.],\
+                    [0.,1],\
+                    [0.,1.]])
+
+    SB = np.array([[0,0.5],\
+            [0,0.5],\
+            [0.,0.5],\
+            [0,0.5],\
+            [0.,1.]])
+
+    ir = IsoRing_sample_1()
+    ir.sec.idn_tag = 12 
+    return Leak(random,[l1])

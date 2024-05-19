@@ -21,6 +21,7 @@ def Sec_sample_1():
         dep_map,codep_map)
     return sec
 
+# NOTE: invalid dep./codep. Pr. values. 
 def Sec_sample_2():
     random.seed(3) 
     sequence = np.array([0.4,1.8,2])
