@@ -44,10 +44,6 @@ class SecNetFrameGen:
         self.init_search()
         return
 
-    @staticmethod
-    def generate_node_idns_by_sec_partition(num_sec,num_nsec):
-        return -1
-
     def init_rand(self):
         random.seed(self.sngs.rnd_seed) 
 
