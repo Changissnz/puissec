@@ -10,13 +10,22 @@ metrix_leq = lambda x: x == True
 # these functions are used to assign 1 boolean
 # value for a boolean matrix
 
-def metric_2dboolmat_to_bool(m,vx=0.65):
+def metric_2dboolmat_to_bool(m,vx=0.65,row_wise=False):
     assert type(m) == np.ndarray
     assert str(m.dtype) in {'bool'}
     assert vx >= 0. and vx <= 1.0
 
     if m.size == 0: return False
-    value = np.round(m.sum() / m.size,5)
+
+    if not row_wise:
+        value = np.round(m.sum() / m.size,5)
+    else:
+        value = 0
+        for i in range(m.shape[0]): 
+            q = (m[i].sum() / m.shape[1]) >= vx
+            if q: value += 1
+        value = value / m.shape[0] 
+
     return value >= vx 
 
 ########################################################

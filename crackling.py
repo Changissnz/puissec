@@ -4,7 +4,8 @@ from hype import *
 
 class Crackling:
 
-    def __init__(self):
+    def __init__(self,cmp_deg=1.5):
+        self.cmp_deg = 1.5 
         self.hs = None 
         self.rss = None
         self.set_cvec() 
@@ -43,10 +44,15 @@ class Crackling:
 
         ##s = [qx1[self.hs.target_index],qx2[self.hs.target_index]] 
         
-        s = [np.sum(qx1) >= len(qx1) / 1.5,\
-            np.sum(qx2) >= len(qx2) / 1.5]
-
+        ## arg #1
+        s = [np.sum(qx1) >= len(qx1) / self.cmp_deg,\
+            np.sum(qx2) >= len(qx2) / self.cmp_deg]
+        
         d = s[0] or s[1] 
+        """
+        d = metric_2dboolmat_to_bool(np.array([qx1,qx2]),\
+            0.4,True)
+        """
         if d: 
             self.flagged_pts.append(len(self.cvec) - 1)
         return d
