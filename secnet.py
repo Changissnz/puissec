@@ -98,49 +98,6 @@ class IsoRingedChain:
         irc.irl = ls 
         return irc
 
-"""
-a std. graph is of type dict|defaultdict
-"""
-class StdGraphContainer:
-
-    def __init__(self,m):
-        assert type(m) in {dict,defaultdict}
-        self.d = m
-        self.dfs_cache_map = defaultdict(None)
-        self.sp = defaultdict(NodePath)
-
-    def DFSCache_proc(self,n):
-        dfsc = DFSCache(n,deepcopy(self.d),\
-                search_head_type=1)
-        dfsc.exec_DFS()
-        dfsc.store_minpaths(num_paths=1)
-        self.sp[n] = dfsc
-        return 
-
-    def DFSCache_fullproc(self):
-        for k in self.d.keys():
-            self.DFSCache_proc(k)
-
-    def subgraph_by_radius_at_refnode(self,r,radius):
-        ns = {r}
-
-        # fetch the `subgraph`
-        for k in self.min_paths.keys():
-            # fetch the path 
-            s = self.min_paths[k]
-            if len(s) == 0: continue
-            s = np.sum(s[0].pweights)
-            if s <= radius:
-                ns = ns | {k}
-        return self.subgraph(ns)
-
-    def subgraph(self,ns): 
-        assert type(ns) == set
-        dx = {} 
-        for n in ns:
-            dx[n] = ns.intersection(self.d[n])
-        return defaultdict(set,dx)
-
 # TODO: test this. 
 """
 A graph structure that serves as an 
@@ -177,17 +134,22 @@ class SecNet:
         self.rnd_struct = rnd_struct
         self.srm = self.load_srm()
         self.sgc = None
-        #self.preprocess_shortest_paths() 
+        # occupied cracklings
+        self.occ_crackl = [] 
+        self.preprocess_shortest_paths() 
         return
 
     ######################## graph structure functions 
+    # TODO: 
+    def subgraph_for_TDir(self):
+        return -1 
 
     def preprocess_shortest_paths(self):
         d2 = defaultdict(set)
         for k in self.d.keys():
             d2[k] = set(self.d[k])
 
-        self.sgc = StdGraphContainer(d2)
+        self.sgc = StdGraphContainer(d2,sec_nodeset)
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):

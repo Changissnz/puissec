@@ -17,6 +17,9 @@ class NodePath:
         npath.pweights = pw 
         return npath 
 
+    def __len__(self):
+        return len(self.p)
+
     def __str__(self):
         s1 = str(self.p) + "\n" + str(self.pweights)
         return s1 
