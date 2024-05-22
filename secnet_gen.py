@@ -361,7 +361,6 @@ class SecNetFrameGen:
         l = len(self.d[node])
         return l == len(self.nsec_nodevec) + len(self.sec_nodevec) - 1  
 
-
     ######### distance update functions  
     ############################################################
 
@@ -890,12 +889,11 @@ def Sec_list_sample1():
         secs.append(sec)
     return secs 
 
-def Sec_list_sample2(num_secs=12): 
+def Sec_list_sample2(num_secs=12,num_optima=12): 
     random.seed(14)
     np.random.seed(19)
 
     singleton_range = [0.,1.] 
-    num_optima = 12 
     dimension = 5
     countermeasure = (0.7,0.5) 
     secs = []
@@ -903,6 +901,22 @@ def Sec_list_sample2(num_secs=12):
     for i in range(num_secs): 
         sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
         countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+        #print("sec {}".format(i))
+    return secs 
+
+def Sec_list_sample3(num_secs,\
+    singleton_range,rnd_struct):
+
+    secs = []
+    for i in range(num_secs): 
+        dimension = rnd_struct.randrange(2,17)
+        countermeasure = (rnd_struct.uniform(0.,1.),\
+                    rnd_struct.uniform(0.,1.))
+        num_optima = rnd_struct.randrange(2,17)
+        sec = Sec.generate_bare_instance(singleton_range,\
+            dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
         secs.append(sec)
         #print("sec {}".format(i))
     return secs 

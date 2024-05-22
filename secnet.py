@@ -1,5 +1,6 @@
 from collections import defaultdict 
 from bridge import * 
+from tdir import * 
 
 class IsoRingedChain:
 
@@ -140,16 +141,19 @@ class SecNet:
         return
 
     ######################## graph structure functions 
-    # TODO: 
-    def subgraph_for_TDir(self):
-        return -1 
+    # TODO: test 
+    def subgraph_for_TDir(self,tdir):
+        assert type(self.sgc) != type(None)
+        rx = tdir.radius 
+        return self.sgc.subgraph_by_radius_at_refnode(tdir.location,\
+            rx,deepcopy(self.node_loc_assignment))
 
     def preprocess_shortest_paths(self):
         d2 = defaultdict(set)
         for k in self.d.keys():
             d2[k] = set(self.d[k])
 
-        self.sgc = StdGraphContainer(d2,sec_nodeset)
+        self.sgc = StdGraphContainer(d2,deepcopy(self.sec_nodeset))
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):

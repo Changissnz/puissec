@@ -1,3 +1,4 @@
+from dfs_struct import *
 
 """
 a std. graph is of type dict|defaultdict
@@ -72,11 +73,12 @@ By,through, and for the connection.
 class TDir:
 
     def __init__(self,loc,target_node,\
-        vantage_point,velocity=1):
+        vantage_point,radius=4,velocity=1):
         assert vantage_point in {"I","C"}
         self.location = loc
         self.target_node = target_node
         self.vantage_point = vantage_point
+        self.radius = radius
         self.velocity = velocity 
         self.node_path = None
         self.index = None
@@ -96,4 +98,5 @@ class TDir:
         q = min([len(self.node_path) - 1,self.index])
 
         q = self.node_path.p[self.index]
+        self.location = q
         return q
