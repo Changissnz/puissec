@@ -252,6 +252,8 @@ def SecNet_sample1():
             rnd_struct,"spine frame",772) 
     return sn 
 
+    
+
 def SRefMap_sample1(): 
     sn = SecNet_sample1()
     return sn.srm 

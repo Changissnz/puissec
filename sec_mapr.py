@@ -224,15 +224,20 @@ def depchain_for_Sec(sec2dm,sec_id):
 
         d = sec2dm[si]
         ql = list(d.keys())
+        ##print("QL: ",ql)
         qls = set([parse_dconn(ql_)[1] for ql_ in ql])
-
+        ##print("QLS: ",qls)
+        
         # check for circular dependencies
         for q_ in qls: 
             if in_chain(q_):
-                return None 
+                ##print("BAD")
+                break  
+        ##print("L: ",len(qls))
         if len(qls) > 0: 
             chain.append(qls)
         q.extend(list(qls)) 
+        ##print("CHAIN: ",chain)
 
     return chain 
 

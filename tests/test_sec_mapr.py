@@ -30,8 +30,6 @@ class SecMaprFunctionsClass(unittest.TestCase):
         assert outp == (1, {7})
 
     def test__SecMaprFunctions__depchain_for_Sec__case1(self):
-
-        
         ss = SecSeq_sample_1()
         sm = ss.sec_instances_to_supermap('d')
 
