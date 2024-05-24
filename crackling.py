@@ -120,3 +120,19 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih):
             resplattingMode)
     ##print("DECLARED RSS")
     return rss
+
+class HypInfer: 
+
+    def __init__(self):
+        return -1
+
+    """
+    return:
+    - sequence of points in dimension d that are 
+      used to formulate bounds for the next search.
+    """
+    def point_infer_by_leak(self,hypStruct,leak_map):
+        ps = []
+        return ps 
+
+    

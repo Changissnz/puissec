@@ -229,10 +229,18 @@ def depchain_for_Sec(sec2dm,sec_id):
         ##print("QLS: ",qls)
         
         # check for circular dependencies
+        qls_ = [] 
         for q_ in qls: 
             if in_chain(q_):
                 ##print("BAD")
-                break  
+                #return None 
+                ##break  
+                ##continue 
+                continue
+            else:
+                qls_.append(q_) 
+        qls = set(qls_)
+
         ##print("L: ",len(qls))
         if len(qls) > 0: 
             chain.append(qls)

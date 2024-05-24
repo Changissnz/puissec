@@ -241,8 +241,8 @@ class SecNet:
             rnd_struct=rnd_struct)
         return sn 
 
-def SecNet_sample1():
-    ss = SecSeq_sample_1(1)
+def SecNet_sample1(ss=SecSeq_sample_1(1)):
+    #ss = SecSeq_sample_1(1)
     sec_node_count = 12
     nsec_node_count = 23
     num_entry = 4

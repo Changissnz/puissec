@@ -7,8 +7,6 @@ python3 -m tests.test_cvec
 """
 ###
 
-
-
 class CVecISelectorClass(unittest.TestCase):
 
     def test__CVecISelector__output__case1(self):

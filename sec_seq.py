@@ -43,7 +43,7 @@ class OptimaBloomFuncSecRep:
 
         self.sz = self.sz_map(self.sz)
         if self.sz in self.tdim:
-            print("VIOLA")
+            ##print("VIOLA")
             if attempts > 0:
                 return self.set_sz(attempts - 1)
             self.sz = None 
