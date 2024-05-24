@@ -135,4 +135,6 @@ class HypInfer:
         ps = []
         return ps 
 
+    def infer_F1(self):
+        return -1 
     

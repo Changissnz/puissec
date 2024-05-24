@@ -231,6 +231,7 @@ class IsoRing:
             sc = self.sec_cache.pop(-1)
             sc.process_one_bloomiso()
             s2 = sc.generate_next_Sec()
+            s2[0].idn_tag = sc.idn_tag 
             ts2 = s2[2]
             ##print("transition: {}->{}".format(s2[1],s2[2]))
             s2 = s2[0]
@@ -283,6 +284,7 @@ class IsoRing:
     def set_isorep(self,i):
         assert len(self.sec_cache) > i and i > -1
         self.repi = i 
+        self.sec = self.sec_cache[self.repi]
         return
 
     def rep(self):

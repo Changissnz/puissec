@@ -30,7 +30,6 @@ class BackgroundInfo:
             ##print(dx[k])
 
         dec_map = srm.collect_prism_points__DecMap('cd',max,[0,1])
-
         lm = BackgroundInfo.generate_background_leak(irc,random)
         return BackgroundInfo(dm_pr,dx,cs,dec_map,lm)
 
@@ -43,7 +42,9 @@ class BackgroundInfo:
     def generate_background_leak(irc,rnd_struct):
         assert type(irc) == IsoRingedChain
         leak_map = {}
+        ##print("LENGO: ",len(irc.irl))
         for irl_ in irc.irl:
+            ##print("IRL_: ",irl_.sec.idn_tag)
             dx = BackgroundInfo.leak_process_IsoRing(irl_,rnd_struct)
             leak_map[irl_.sec.idn_tag] = dx 
         return leak_map
@@ -58,12 +59,14 @@ class BackgroundInfo:
     def leak_process_IsoRing(ir,rnd_struct):
         lk = BackgroundInfo.default_IsoRing_leak(rnd_struct)
         d = {}
+        print("IR SEC: ",ir.sec.idn_tag)
+
         for i in range(len(ir.sec_cache)):
             lk = BackgroundInfo.default_IsoRing_leak(rnd_struct)
             ir.set_isorep(i)
             lk.leak_info(ir)
-            ##print("LK-LEAKM") 
-            ##print(lk.leakm.d)
+            #print("LK-LEAKM") 
+            #print(lk.leakm.d)
             if ir.sec.idn_tag not in lk.leakm.d: 
                 continue 
             leakInfo = lk.leakm.d[ir.sec.idn_tag]

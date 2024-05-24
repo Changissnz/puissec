@@ -348,6 +348,7 @@ class Leak:
 
     def save_mem(self,ir,fx,outp):
         it = ir.sec.idn_tag
+        print("IT: ",it)
         fi = leakf_to_index(fx)
         self.leakm = self.leakm + (it,fi,outp)
         return
