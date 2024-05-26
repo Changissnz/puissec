@@ -164,6 +164,15 @@ def default_cvec_iselector_seq():
     cseq.append(cvis)
     return cseq
 
+def basic_cvec_iselector_seq(): 
+    ref_range = [-1,0]
+    prev_range = [-2,-1] 
+    cvis = CVecISelector(ref_range,prev_range)
+    
+    cseq = [] 
+    cseq.append(cvis)
+    return cseq 
+
 class CVec:
 
     """
@@ -287,3 +296,66 @@ def cmp_seq_with_cvec(cvec,seq):
 
     bvec = cvec.cmp()
     return bvec 
+
+############################ functions below 
+############################ used for the k-multiplier search
+
+
+def kmult_diffvec(V_m,V_f,k):
+        return np.abs(V_m - V_f * k)
+
+def CVec__scan_in_range(V_m,V_f,mrange,increment=0.1):
+        cvec = CVec(cvis=basic_cvec_iselector_seq())
+
+        q = float(mrange[0])
+        min_ed = float('inf')
+        best_sample = None
+        stat = False
+        while q < mrange[1] and not stat:
+                V_ = V_f * q
+                ed = matrix_methods.euclidean_point_distance(V_,V_m)
+                ##print("q: {} d: {}".format(q,ed))
+                if ed < min_ed: 
+                        min_ed = ed
+                        best_sample = q
+
+                cvec.append(ed,q) 
+                stat = cvec.cmp(output_type=np.less_equal)
+                ##print("STAT: ",stat)
+                q += increment
+        return best_sample,min_ed 
+
+def CVec__scan__kmult_search(V_m,V_f,depth=5):
+
+        # get the k-vector
+        kvec = np.array([measures.zero_div(v2,v1,np.nan) \
+                for v2,v1 in zip(V_m,V_f)])
+        kvec = np.unique(kvec)
+
+        # sort the elements of kvec
+        diffvec = [(k,np.sum(kmult_diffvec(V_m,V_f,k))) for \
+                k in kvec]
+        diffvec = sorted(diffvec,key=lambda x:x[1])
+        ##print("diffvec: ",diffvec)
+        
+        # best sol'n, best case
+        if len(diffvec) == 1: 
+                return diffvec[0],0.0 
+
+        dx = 1
+        mrange = sorted([diffvec[0][0],diffvec[1][0]])
+        ##print("MRANGE: ",mrange)
+        bs,ed = None,float('inf')
+        while dx <= depth:
+                ##print("+ MRANGE: ",mrange)
+                best_sample,best_ed = CVec__scan_in_range(\
+                        V_m,V_f,mrange,increment=10**-dx)
+                ##print("BEST SAMPLE: ",best_sample, best_ed)
+                if best_ed < ed: 
+                        bs,ed = best_sample,best_ed
+                        mrange = [best_sample,best_sample + 10 **-dx] 
+                else:
+                        break
+
+                dx += 1 
+        return bs,ed

@@ -60,7 +60,6 @@ class BackgroundInfo:
         lk = BackgroundInfo.default_IsoRing_leak(rnd_struct)
         d = {}
         print("IR SEC: ",ir.sec.idn_tag)
-
         for i in range(len(ir.sec_cache)):
             lk = BackgroundInfo.default_IsoRing_leak(rnd_struct)
             ir.set_isorep(i)

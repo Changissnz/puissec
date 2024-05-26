@@ -51,6 +51,20 @@ class CVecClass(unittest.TestCase):
         bvec = cmp_seq_with_cvec(cvec,x) 
         assert np.all(bvec == np.array([False,  True, False, False, False, False, False]))
 
+    def test__CVec__scan_kmult_search(self):
+        # case 1 
+        V_m = np.array([33,36.,6,40,12,16])
+        V_f = np.array([11,9.,2,8.,1,4])
+
+        bs,me = CVec__scan__kmult_search(V_m,V_f,depth=5)
+        assert round(abs(bs - 3.82),5) == 0.0
+
+        # case 2 
+        V_m = np.array([51.,36.,21.])
+        V_f = np.array([3.,4.,7.]) 
+        bs,me = CVec__scan__kmult_search(V_m,V_f,depth=5)
+        assert round(abs(bs - 5.99999999),5) == 0.0
+
 
 
 

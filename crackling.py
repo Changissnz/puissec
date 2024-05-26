@@ -121,20 +121,41 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih):
     ##print("DECLARED RSS")
     return rss
 
+"""
+class w/ no variables; contains basic functions to 
+improve a <HypStruct> instance. 
+"""
 class HypInfer: 
 
     def __init__(self):
-        return -1
+        return
 
     """
     return:
     - sequence of points in dimension d that are 
       used to formulate bounds for the next search.
     """
-    def point_infer_by_leak(self,hypStruct,leak_map):
-        ps = []
-        return ps 
+    def point_infer_by_leak(self,hypStruct,leak_info):
+        assert type(leak_info) == LeakInfo
 
+        # check the leak_info 
+        for (k,v) in leak_info.leak_info.items():
+            if k == 1:
+                if len(v) == 0: 
+                    continue
+                v_ = v[0]
+                sb = np.array([v_,v_ + 0.005]).T 
+                hypStruct.add_subbound(sb,1.0,True)
+
+            """
+bi.leak_map[0][5].leak_info
+        ps = []
+
+        >>> bi.leak_map[0][5].leak_info
+{0: [array([0.083  , 0.67198, 0.80659, 0.98274, 0.63566])],
+        return ps 
+            """
+            
     def infer_F1(self):
         return -1 
     
