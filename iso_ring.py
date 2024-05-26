@@ -243,6 +243,13 @@ class IsoRing:
         self.bstat = False
         return
 
+    def secdim_seq(self):
+        l = []
+        for s in self.sec_cache:
+            q = len(s.seq) 
+            l.append(q) 
+        return l 
+
     def register_attempt(self,p):
         ##print("-- RA")
         q = self.register_attempt_(p)
@@ -288,7 +295,7 @@ class IsoRing:
         return
 
     def rep(self):
-        return deepcopy(self.sec_cache[self.repi])
+        return self.sec_cache[self.repi]
 
 ### an example of an <IsoRing> instantiation
 def IsoRing_sample_1():

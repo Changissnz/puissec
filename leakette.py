@@ -6,6 +6,9 @@ from iso_ring import *
 def choose_multiple(decimal,degree):
     mx = all_multiples_decimal(decimal)
     l = len(mx)
+    if l == 0:
+        return 0.0 
+        ##print("DEC: ",decimal)
     q = min(int(round(l * degree,0)),l-1)
     return mx[q]
 
@@ -348,7 +351,7 @@ class Leak:
 
     def save_mem(self,ir,fx,outp):
         it = ir.sec.idn_tag
-        print("IT: ",it)
+        ##print("IT: ",it)
         fi = leakf_to_index(fx)
         self.leakm = self.leakm + (it,fi,outp)
         return
