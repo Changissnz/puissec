@@ -66,40 +66,11 @@ class HypStruct:
         self.sb_pr = sx
         return 
 
-    def update_contents(self):
-
-        return -1
-
-    """
-    return:
-    - <HypStruct>, instance that builds on top of a leak info
-    """
-    def leak_delta(self,leak_type,leak_value):
-        assert leak_type in {0,1,2} 
-        # closest multiple
-        if leak_type == 0:
-            return -1
-        elif leak_type == 1:
-            return -1 
-        else:
-            return -1 
-        return
-
-    @staticmethod
-    def update_subbound_type0(sb,update_value):
-        # get the closest multiple to 
-
-        ##assert matrix_methods.
-        return -1 
-
-
 """
 the closest int|float multiple of v1
 to v2
 """
 def closest_single_multiple__v2v(v1,v2):
-    return -1
-
-
-
-
+    bs,_ = CVec__scan_kmult_search(v2,v1,depth=1)
+    bsx = max([bs,1.0])
+    return int(round(bsx,0.))

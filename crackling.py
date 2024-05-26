@@ -147,15 +147,71 @@ class HypInfer:
                 sb = np.array([v_,v_ + 0.005]).T 
                 hypStruct.add_subbound(sb,1.0,True)
 
-            """
-bi.leak_map[0][5].leak_info
-        ps = []
+    @staticmethod
+    def infer_FX(hypStruct,leak_value,leak_idn):
+        assert leak_idn in {0,1,2}
 
-        >>> bi.leak_map[0][5].leak_info
-{0: [array([0.083  , 0.67198, 0.80659, 0.98274, 0.63566])],
-        return ps 
-            """
-            
-    def infer_F1(self):
-        return -1 
-    
+        def exec_fn(sx):
+            if leak_idn == 0:
+                return adjust_bounds__F0(s,leak_value)
+            elif leak_idn == 1:
+                return adjust_bounds__F1(s,leak_value)
+            else: 
+                return adjust_bounds__F2(s,leak_value)
+
+        for (i,s) in enumerate(hypStruct.suspected_subbounds):
+            s_ = exec_fn(s)
+            hypStruct.suspected_subbounds[i] = s_ 
+        return hypStruct
+
+def closest_reference_to_bound_start(b,V_f):
+
+    null_vec = np.zeros((len(V_f,)))
+    start_vec = deepcopy(null_vec) 
+
+    for (i,v) in enumerate(V_f):
+        if not np.isnan(v): 
+            qx = matrix_methods.zero_div(b[i,0],v,np.nan)
+
+            if np.isnan(qx):
+                null_vec[i] = b[i,0]
+                continue
+
+            xq = int(round(qx))
+            start_vec[i] = xq * v
+        else: 
+            null_vec[i] = b[i,0]
+
+    return start_vec + null_vec 
+
+def adjust_bounds__F0(b,V_f):
+
+    r = closest_reference_to_bound_start(b,V_f)
+    bx = deepcopy(b[:,1])
+
+    q = int(CVec__scan__kmult_search(bx,V_f,depth=1))
+    nb = np.array([r,r+ V_f*q]).T
+    return nb 
+
+def adjust_bounds__F1(b,V_f):
+    bx = deepcopy(b)
+
+    for (i,bx_) in enumerate(bx):
+        if not np.isnan(V_f[i]):
+            rx = np.array([V_f[i],V_f[i] + 0.05]).T
+            bx[i] = rx
+    return bx
+
+def adjust_bounds__F2(b,V_f):
+    assert matrix_methods.is_proper_bounds_vector(V_f) 
+    b2 = deepcopy(b)
+
+    for (i,bx) in enumerate(V_f):
+        stat1 = np.isnan(bx[0]) 
+        stat2 = np.isnan(bx[1])
+        stat = stat1 or stat2
+
+        if stat: continue
+        b2[i] = deepcopy(bx)
+
+    return b2 
