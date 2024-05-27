@@ -147,6 +147,7 @@ class HypInfer:
                 sb = np.array([v_,v_ + 0.005]).T 
                 hypStruct.add_subbound(sb,1.0,True)
 
+    # TODO: test 
     @staticmethod
     def infer_FX(hypStruct,leak_value,leak_idn):
         assert leak_idn in {0,1,2}

@@ -26,15 +26,53 @@ class BackgroundInfo:
         self.dm = depchain_map
         self.cdm = codep_sets
         self.dec_map = dec_map 
+        # sec idn -> opt. dim -> <LeakInfo>
         self.leak_map = leak_map
         return
 
+    # TODO: test this. 
+    """
+    """
+    def apply_leakmap_on_IRC2HypStruct_map(self,i2hm):
+
+        for (k,v) in self.leak_map.items():
+            if k not in i2hm: 
+                continue
+            v2 = i2hm[k]
+
+            for k_,v_ in v.items():
+                if k_ in v2:
+                    hs = v2[k_]
+                    hs2 = HypInfer.infer_by_LeakInfo(hs,v_)
+                    v2[k_] = hs2
+            i2hm[k] = v2
+        return i2hm 
+
+    # TODO: test this.
+    """
+    return:
+    - sec idn -> sec dim. -> <HypStruct>
+    """
+    @staticmethod
+    def naive_IRC2HypStruct_map(irc,full_hypseq=True,\
+        naive_split=2):
+        assert type(irc) == IsoRingedChain
+
+        l = defaultdict(None)
+        for irl_ in irc.irl:
+            m = BackgroundInfo.naive_IsoRing2HypStruct_map(irl_,\
+                full_hypseq,naive_split)
+            l[irl_.sec.idn_tag] = m 
+        return l 
+
+    # TODO: test this.
     '''
     outputs a map 
         sec. dimension -> <HypStruct>
     '''
     @staticmethod 
-    def naive_HypStruct_map(ir:IsoRing,naive_split=1): 
+    def naive_IsoRing2HypStruct_map(ir:IsoRing,full_hypseq,\
+        naive_split=1):
 
         d = defaultdict(list)  
         for s in ir.sec_cache:
@@ -44,14 +82,22 @@ class BackgroundInfo:
             sb = even_bound_split(z,naive_split)
             sb_pr = list(np.ones((naive_split,)) * \
                 1.0/naive_split)
+            if not full_hypseq: 
+                si = s.seq_index()
+                hs = HypStruct(ir.sec.idn_tag,\
+                    si,deepcopy(sb),deepcopy(sb_pr))
+                d[lx] = [hs] 
+                continue 
+
             q = [] 
             for i in range(len(s.opm)):
                 hs = HypStruct(ir.sec.idn_tag,\
-                    i,sb,sb_pr)
+                    i,deepcopy(sb),deepcopy(sb_pr))
                 q.append(hs)
             d[lx] = q 
         return d 
 
+    # TODO: test this.
     @staticmethod
     def generate_instance(irc,srm):
         assert type(irc) == IsoRingedChain
@@ -73,7 +119,12 @@ class BackgroundInfo:
     ###
 
     """
-    output 
+    return:
+    - dict,
+        [0] sec idn. tag 
+        [1] [0] dim. of opt.
+            [1]  <LeakInfo> 
+
     """
     @staticmethod
     def generate_background_leak(irc,rnd_struct):
@@ -83,14 +134,14 @@ class BackgroundInfo:
         for irl_ in irc.irl:
             ##print("IRL_: ",irl_.sec.idn_tag)
             dx = BackgroundInfo.leak_process_IsoRing(irl_,rnd_struct)
-            leak_map[irl_.sec.idn_tag] = [dx] 
+            leak_map[irl_.sec.idn_tag] = dx
         return leak_map
 
     """
     return: 
     - dict, 
             [0] dimension of opt.
-            [1] leak
+            [1] <LeakInfo> 
     """
     @staticmethod 
     def leak_process_IsoRing(ir,rnd_struct,targets=None):
@@ -132,6 +183,3 @@ class Cracker:
         self.bi = backgroundInfo
         self.cracklings = [] 
         return
-
-    def apply_backgroundinfo_to_hypmap(self):
-        return -1
