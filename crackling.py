@@ -1,4 +1,4 @@
-from iso_ring import * 
+from leakette import * 
 from morebs2 import relevance_functions
 from hype import * 
 
@@ -154,7 +154,7 @@ class HypInfer:
 
         for lk1,lk2 in leak_info.leak_info.items():
             for lk2_ in lk2:
-                hypStruct = Crackling.infer_FX(\
+                hypStruct = HypInfer.infer_FX(\
                     hypStruct,lk2_,lk1)
         return hypStruct
 
@@ -165,11 +165,11 @@ class HypInfer:
 
         def exec_fn(sx):
             if leak_idn == 0:
-                return adjust_bounds__F0(s,leak_value)
+                return adjust_bounds__F0(sx,leak_value)
             elif leak_idn == 1:
-                return adjust_bounds__F1(s,leak_value)
+                return adjust_bounds__F1(sx,leak_value)
             else: 
-                return adjust_bounds__F2(s,leak_value)
+                return adjust_bounds__F2(sx,leak_value)
 
         for (i,s) in enumerate(hypStruct.suspected_subbounds):
             s_ = exec_fn(s)
@@ -183,7 +183,7 @@ def closest_reference_to_bound_start(b,V_f):
 
     for (i,v) in enumerate(V_f):
         if not np.isnan(v): 
-            qx = matrix_methods.zero_div(b[i,0],v,np.nan)
+            qx = measures.zero_div(b[i,0],v,np.nan)
 
             if np.isnan(qx):
                 null_vec[i] = b[i,0]
@@ -201,7 +201,24 @@ def adjust_bounds__F0(b,V_f):
     r = closest_reference_to_bound_start(b,V_f)
     bx = deepcopy(b[:,1])
 
-    q = int(CVec__scan__kmult_search(bx,V_f,depth=1))
+    ##print("ADJUSTING ",bx) 
+    ##print("UNIT ",V_f)
+
+    qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
+    V_f = np.array(qi) 
+    ##print("UNIT2: ",V_f)
+
+    q = CVec__scan__kmult_search(bx,V_f,depth=1)
+    ##print("Q0: ",q)
+    q = q[0]
+    ##print("Q: ",q)
+
+    if type(q) in {type(None),tuple}: 
+        print("k-mult search failed.")
+        return b 
+
+    ##print("V_F: ",V_f)
+    ##print("Q: ",q)
     nb = np.array([r,r+ V_f*q]).T
     return nb 
 
@@ -215,7 +232,8 @@ def adjust_bounds__F1(b,V_f):
     return bx
 
 def adjust_bounds__F2(b,V_f):
-    assert matrix_methods.is_proper_bounds_vector(V_f) 
+    ##assert matrix_methods.is_proper_bounds_vector(V_f) 
+    assert V_f.shape[1] == 2 and V_f.shape[0] > 0 
     b2 = deepcopy(b)
 
     for (i,bx) in enumerate(V_f):

@@ -32,6 +32,7 @@ class BackgroundInfo:
 
     # TODO: test this. 
     """
+    i2hm := dict, sec idn -> 
     """
     def apply_leakmap_on_IRC2HypStruct_map(self,i2hm):
 
@@ -42,9 +43,32 @@ class BackgroundInfo:
 
             for k_,v_ in v.items():
                 if k_ in v2:
+                    # search for the opt of sec 
                     hs = v2[k_]
+
+                        ### single update 
+                    """
+                    hsx = None
+                    d = self.dec_map[hs]
+                    for hs_ in hs: 
+                        if hs_.seq_idn == d:
+                    """
+                        ### all udpate
+                    hsx = []
+                    for hs_ in hs:
+                        hs2 = HypInfer.infer_by_LeakInfo(hs_,v_)
+                        hsx.append(hs2) 
+                    v2[k_] = hsx 
+                        
+
+                    ###
+                    """
+                    print("HS: ",hs)
                     hs2 = HypInfer.infer_by_LeakInfo(hs,v_)
                     v2[k_] = hs2
+                    """
+                    ###
+                    
             i2hm[k] = v2
         return i2hm 
 

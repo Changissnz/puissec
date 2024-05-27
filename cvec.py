@@ -305,25 +305,26 @@ def kmult_diffvec(V_m,V_f,k):
         return np.abs(V_m - V_f * k)
 
 def CVec__scan_in_range(V_m,V_f,mrange,increment=0.1):
-        cvec = CVec(cvis=basic_cvec_iselector_seq())
+    cvec = CVec(cvis=basic_cvec_iselector_seq())
 
-        q = float(mrange[0])
-        min_ed = float('inf')
-        best_sample = None
-        stat = False
-        while q < mrange[1] and not stat:
-                V_ = V_f * q
-                ed = matrix_methods.euclidean_point_distance(V_,V_m)
-                ##print("q: {} d: {}".format(q,ed))
-                if ed < min_ed: 
-                        min_ed = ed
-                        best_sample = q
+    q = float(mrange[0])
+    min_ed = float('inf')
+    best_sample = None
+    stat = False
+    while q < mrange[1] and not stat:
+            V_ = V_f * q
+            ed = matrix_methods.euclidean_point_distance(V_,V_m)
+            ##print("q: {} d: {}".format(q,ed))
+            if ed < min_ed: 
+                    min_ed = ed
+                    best_sample = q
 
-                cvec.append(ed,q) 
-                stat = cvec.cmp(output_type=np.less_equal)
-                ##print("STAT: ",stat)
-                q += increment
-        return best_sample,min_ed 
+            cvec.append(ed,q) 
+            stat = cvec.cmp(output_type=np.less_equal)
+            ##print("STAT: ",stat)
+            q += increment
+    ##print("DABEST: ",best_sample)
+    return best_sample,min_ed 
 
 def CVec__scan__kmult_search(V_m,V_f,depth=5):
 
@@ -351,6 +352,8 @@ def CVec__scan__kmult_search(V_m,V_f,depth=5):
                 best_sample,best_ed = CVec__scan_in_range(\
                         V_m,V_f,mrange,increment=10**-dx)
                 ##print("BEST SAMPLE: ",best_sample, best_ed)
+                if type(best_sample) == type(None):
+                    break 
                 if best_ed < ed: 
                         bs,ed = best_sample,best_ed
                         mrange = [best_sample,best_sample + 10 **-dx] 
