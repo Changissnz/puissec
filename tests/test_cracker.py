@@ -43,6 +43,28 @@ class BackgroundInfoClass(unittest.TestCase):
         assert type(bi) == BackgroundInfo
         print(bi.dm)
 
+    def test__BackgroundInfo__naive_IRC2HypStruct_map(self):
+
+        sn = SecNet.unpickle_thyself("codename__ASS_SHIT",\
+                DEFAULT_SINGLETON_RANGE,random,9)
+        irc = sn.irc 
+
+        srm = sn.srm
+        random.seed(777)
+
+        ircm = BackgroundInfo.naive_IRC2HypStruct_map(irc,\
+                full_hypseq=True,naive_split=2)
+
+        ircm2 = BackgroundInfo.naive_IRC2HypStruct_map(irc,\
+                full_hypseq=False,naive_split=2)
+
+        assert set(ircm[0].keys()) == {5,9,3,2,8}
+        assert set(ircm2[0].keys()) == set(ircm[0].keys())
+
+        assert len(ircm[0][5]) == 12
+        assert len(ircm2[0][5]) == 1
+        return
+
 
     
 

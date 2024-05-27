@@ -1,9 +1,6 @@
 from morebs2 import matrix_methods 
 
 def any_intersecting_bounds(bounds_seq):
-    print("BOUNDS SEQ")
-    print(bounds_seq)
-    
     for i in range(0,len(bounds_seq) - 1):
         for j in range(i+1,len(bounds_seq)):
             b1 = bounds_seq[i] 

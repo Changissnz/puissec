@@ -221,6 +221,7 @@ class IsoRing:
         ir.bstat = s3[1]
         ir.repi = s3[2] 
         ir.leak_stage = s3[3]
+        ir.sec_cache = s1 
         return ir 
 
     def explode_contents(self,optima_size_limit=1000):
