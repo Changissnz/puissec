@@ -21,5 +21,30 @@ class BackgroundInfoClass(unittest.TestCase):
         assert type(bi) == BackgroundInfo
         print(bi.dm)
 
+    def test__BackgroundInfo__generate_instance_case1(self):
+
+        fp = "codename__ASS_SHIT"
+
+        if not os.path.isdir(fp):
+            pickled_SecNet_sample_Q()
+
+        sn = SecNet.unpickle_thyself(fp,\
+                DEFAULT_SINGLETON_RANGE,random,9)
+
+        irc = sn.irc 
+        srm = sn.srm
+
+        #random.seed(773)
+        random.seed(777)
+
+        #lm = BackgroundInfo.generate_background_leak(irc,random)
+
+        bi = BackgroundInfo.generate_instance(irc,srm)
+        assert type(bi) == BackgroundInfo
+        print(bi.dm)
+
+
+    
+
 if __name__ == '__main__':
     unittest.main()

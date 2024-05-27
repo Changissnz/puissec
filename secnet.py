@@ -10,6 +10,13 @@ class IsoRingedChain:
         self.irl = []
         self.load_IsoRings(bound,rnd_struct,rs_seed)  
 
+    def revert_to_SecSeq(self):
+        sx = []
+        for q in self.irl:
+            sx.append(q.sec) 
+        ss = SecSeq(sx)
+        return ss 
+
     """
     default args. are 
         - spacing_ratio_range := 
@@ -22,6 +29,8 @@ class IsoRingedChain:
     """
     @staticmethod
     def default_Sec2IsoRing(sec:Sec,bound,rnd_struct,rs_seed):
+        ##print("RND_STRUCT: ",rnd_struct)
+
         if type(rs_seed) != type(None): 
             rnd_struct.seed(rs_seed)
         else: 
@@ -55,6 +64,7 @@ class IsoRingedChain:
             return 
 
         self.irl = [] 
+        ##print("RND STRUCT: ",rnd_struct)
         if type(rs_seed) != type(None):
             rnd_struct.seed(rs_seed)
 
@@ -74,6 +84,9 @@ class IsoRingedChain:
     fp := folder path
     """
     def pickle_thyself(self,fp):
+        assert fp not in {"","/","\\"}
+
+        clear_existing_dir(fp)
         if not os.path.isdir(fp):
             os.mkdir(fp)
 
@@ -87,6 +100,8 @@ class IsoRingedChain:
         q = os.listdir(fp)
         ls = [] 
         for q_ in q:
+            if q_ == "excessory": continue
+
             fp_ = fp + "/" + q_
             ir = IsoRing.unpickle_thyself(fp_) 
             ls.append(ir) 
@@ -115,6 +130,7 @@ class SecNet:
         assert len(irc) > 0 and type(irc) == SecSeq
         assert len(sec_nodeset) >= len(irc) 
         self.ss = irc
+        ##print("RNDSTRUCT#1: ",rnd_struct)
         self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
         self.rnd_struct = rnd_struct 
 
@@ -134,11 +150,95 @@ class SecNet:
 
         self.rnd_struct = rnd_struct
         self.srm = self.load_srm()
+        self.ss = None
         self.sgc = None
         # occupied cracklings
         self.occ_crackl = [] 
         self.preprocess_shortest_paths() 
         return
+
+    @staticmethod
+    def alt_instantiate(irc,G,sec_nodeset,\
+        node_loc_assignment,srm,entry_points,\
+        bound=DEFAULT_SINGLETON_RANGE,\
+        rnd_struct=random,rnd_seed=9):
+
+        assert type(irc) == IsoRingedChain
+        assert type(srm) == SRefMap 
+
+        ss = irc.revert_to_SecSeq()
+        
+        ##print("INSTANTIATE S.N.")
+        sn = SecNet(ss,G,sec_nodeset,node_loc_assignment,\
+            entry_points=1,bound=bound,\
+            rnd_struct=rnd_struct,rnd_seed=rnd_seed)
+        sn.irc = irc
+        sn.entry_points = entry_points
+        sn.srm = srm 
+        return sn 
+    ###
+    """
+SecNet:
+    def __init__(self,irc,G,sec_nodeset,\
+        node_loc_assignment= None,entry_points=3,\
+        bound=DEFAULT_SINGLETON_RANGE,\
+        rnd_struct=random,rnd_seed=9):
+    """
+    ###
+
+    """
+    similar to the pickle-pattern for <IsoRingedChain>, except 
+    has an extra file called `excessory` that contains a list 
+    of objects:
+    [0] G, the graph 
+    [1] sec nodeset
+    [2] dict,sec idn.->node loc
+    [3] SRefMap instance
+    [4] set of entry points
+    """
+    def pickle_thyself(self,fp):
+        """
+        self.d = G 
+        self.sec_nodeset = sec_nodeset
+        # sec index -> node location 
+        self.node_loc_assignment = node_loc_assignment
+        self.assign_entry(entry_points)
+        if type(self.node_loc_assignment) == type(None):
+            self.assign_loc()
+        """
+        excessory = [deepcopy(self.d),deepcopy(self.sec_nodeset),\
+                deepcopy(self.node_loc_assignment),\
+                deepcopy(self.srm),deepcopy(self.entry_points)]
+
+        self.irc.pickle_thyself(fp)
+
+        efile = open(fp + "/excessory","wb")
+        pickle.dump(excessory,efile)
+        efile.close()
+        return
+
+    @staticmethod
+    def unpickle_thyself(fp,\
+        bound=DEFAULT_SINGLETON_RANGE,rnd_struct=random,rnd_seed=9): 
+        assert os.path.exists(fp)
+
+        irc = IsoRingedChain.unpickle_thyself(fp,rnd_struct,rnd_seed)
+        efile = open(fp + "/excessory","rb")
+        excessory = pickle.load(efile)
+        efile.close()
+
+        G = excessory[0]
+        sec_nodeset = excessory[1]
+        node_loc_assignment = excessory[2]
+        srefmap = excessory[3]
+        entry_points = excessory[4]
+
+        ##print("instantiating w/ rndstruct=",rnd_struct)
+        sn = SecNet.alt_instantiate(irc,G,sec_nodeset,\
+        node_loc_assignment,srefmap,entry_points,\
+        bound=bound,\
+        rnd_struct=rnd_struct,rnd_seed=rnd_seed)
+        return sn 
 
     ######################## graph structure functions 
     # TODO: test 
@@ -252,7 +352,17 @@ def SecNet_sample1(ss=SecSeq_sample_1(1)):
             rnd_struct,"spine frame",772) 
     return sn 
 
-    
+def pickled_SecNet_sample_Q(): 
+    s = SecNet_sample1(SecSeq_sample_2(9,55)) 
+
+    for s_ in s.irc.irl:
+            s_.explode_contents()
+    """
+    irc = s.irc
+    irc.pickle_thyself("codename__ASS_SHIT")
+    """
+    s.pickle_thyself("codename__ASS_SHIT")
+
 
 def SRefMap_sample1(): 
     sn = SecNet_sample1()

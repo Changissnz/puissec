@@ -28,5 +28,15 @@ class SecNetClass(unittest.TestCase):
         sn = SecNet_sample1()
         assert True
 
+    def test__Secnet__unpickle_thyself(self):
+        fp = "codename__ASS_SHIT"
+
+        if os.path.isdir(fp):
+            sn = SecNet.unpickle_thyself(fp,\
+            DEFAULT_SINGLETON_RANGE,random,9)
+            assert type(sn) == SecNet
+        
+        print("<SECNET> pickle function may not work!")
+
 if __name__ == '__main__':
     unittest.main()

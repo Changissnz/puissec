@@ -4,7 +4,9 @@ import random
 from collections import defaultdict,Counter 
 import math 
 import morebs2 
-import pickle 
+import pickle
+import os  
+import shutil
 
 
 ############## default variables
@@ -72,5 +74,9 @@ def all_multiples_decimal(i,rounding_depth=5):
     for i in range(len(multiples)):
         multiples[i] = multiples[i] * 10 ** -l
     return multiples
+
+def clear_existing_dir(d):
+    if os.path.exists(d):
+        shutil.rmtree(d) 
 
 #all_mu

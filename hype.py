@@ -1,11 +1,14 @@
 from morebs2 import matrix_methods 
 
 def any_intersecting_bounds(bounds_seq):
+    print("BOUNDS SEQ")
+    print(bounds_seq)
+    
     for i in range(0,len(bounds_seq) - 1):
         for j in range(i+1,len(bounds_seq)):
             b1 = bounds_seq[i] 
             b2 = bounds_seq[i+1]
-            q = matrix.intersection_of_bounds(b1,b2)
+            q = matrix_methods.intersection_of_bounds(b1,b2)
             if type(q) != type(None):
                 return True
     return False 

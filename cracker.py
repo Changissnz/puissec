@@ -6,15 +6,18 @@ def even_bound_split(bs,sz):
     assert matrix_methods.is_proper_bounds_vector(bs)
     assert sz >= 1 and type(sz) == int
 
+    print("BS: ",bs)
     r = (bs[:,1] - bs[:,0]) / sz 
-
-    bs = []
+    print("BS0: ",bs[:,0])
+    bsx = []
     q = deepcopy(bs[:,0])
+    print("Q: ",q)
     for i in range(sz):
-        bs_ = q + rs
-        bs.append(deepcopy(bs_))
+        bs_ = q + r
+        bsq = deepcopy(np.array([q,bs_]).T)
+        bsx.append(bsq)
         q = bs_
-    return bs
+    return bsx
 
 class BackgroundInfo:
 
@@ -80,8 +83,10 @@ class BackgroundInfo:
             z = np.zeros((lx,2),dtype=float)
             z[:,1] = 1.0
             sb = even_bound_split(z,naive_split)
-            sb_pr = list(np.ones((naive_split,)) * \
-                1.0/naive_split)
+            print("SB")
+            print(sb)
+            print("##--##")
+            sb_pr = np.ones((naive_split,)) * 1.0/naive_split
             if not full_hypseq: 
                 si = s.seq_index()
                 hs = HypStruct(ir.sec.idn_tag,\
