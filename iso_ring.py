@@ -150,6 +150,12 @@ class IsoRing:
         self.sec_script = None
         self.leak_stage = 0
 
+    def sec_of_dim(self,d):
+        for x in self.sec_cache:
+            if x.dim() == d: 
+                return x
+        return None 
+
     """
     pickles instance through values
     [F1] sec  

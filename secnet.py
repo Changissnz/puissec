@@ -10,6 +10,13 @@ class IsoRingedChain:
         self.irl = []
         self.load_IsoRings(bound,rnd_struct,rs_seed)  
 
+    def fetch_IsoRing(self,sec_idn):
+        for x in self.irl:
+            if x.sec.idn_tag == sec_idn:
+                return x
+        return None
+
+
     def revert_to_SecSeq(self):
         sx = []
         for q in self.irl:
