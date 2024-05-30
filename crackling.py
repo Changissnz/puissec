@@ -4,8 +4,9 @@ from hype import *
 
 class Crackling:
 
-    def __init__(self,cmp_deg=1.5):
+    def __init__(self,cmp_deg=1.5,cidn=None):
         self.cmp_deg = 1.5 
+        self.cidn = None
         self.hs = None 
         self.rss = None
         self.set_cvec() 

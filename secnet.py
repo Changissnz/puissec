@@ -16,7 +16,6 @@ class IsoRingedChain:
                 return x
         return None
 
-
     def revert_to_SecSeq(self):
         sx = []
         for q in self.irl:
@@ -160,7 +159,7 @@ class SecNet:
         self.ss = None
         self.sgc = None
         # occupied cracklings
-        self.occ_crackl = [] 
+        self.occ_crackl = {} # Crackling cidn-> [<Crackling>,node location]
         self.preprocess_shortest_paths() 
         return
 
@@ -183,15 +182,6 @@ class SecNet:
         sn.entry_points = entry_points
         sn.srm = srm 
         return sn 
-    ###
-    """
-SecNet:
-    def __init__(self,irc,G,sec_nodeset,\
-        node_loc_assignment= None,entry_points=3,\
-        bound=DEFAULT_SINGLETON_RANGE,\
-        rnd_struct=random,rnd_seed=9):
-    """
-    ###
 
     """
     similar to the pickle-pattern for <IsoRingedChain>, except 
@@ -204,15 +194,7 @@ SecNet:
     [4] set of entry points
     """
     def pickle_thyself(self,fp):
-        """
-        self.d = G 
-        self.sec_nodeset = sec_nodeset
-        # sec index -> node location 
-        self.node_loc_assignment = node_loc_assignment
-        self.assign_entry(entry_points)
-        if type(self.node_loc_assignment) == type(None):
-            self.assign_loc()
-        """
+
         excessory = [deepcopy(self.d),deepcopy(self.sec_nodeset),\
                 deepcopy(self.node_loc_assignment),\
                 deepcopy(self.srm),deepcopy(self.entry_points)]
@@ -347,6 +329,25 @@ SecNet:
             node_loc_assignment,entry_points=num_entry,\
             rnd_struct=rnd_struct)
         return sn 
+
+    #################################################
+    ###### methods for routing <Crackling>
+    #################################################
+
+    def set_crackling(self,c,node):
+        assert node in self.entry_points
+        assert type(c) == Crackling
+        
+        # use the <HypStruct> for `c` to set 
+        # <TDir>. 
+        
+        self.occ_crackl[c.cidn] = (c,node)
+
+
+        return
+
+    
+
 
 def SecNet_sample1(ss=SecSeq_sample_1(1)):
     #ss = SecSeq_sample_1(1)

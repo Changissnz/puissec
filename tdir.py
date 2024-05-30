@@ -29,10 +29,14 @@ class StdGraphContainer:
         node_loc_assignment):
         ns = {r}
 
+        dfsc_ = self.sp[r] 
+
+        print("SP")
+
         # fetch the `subgraph`
-        for k in self.min_paths.keys():
+        for k in dfsc_.min_paths.keys():
             # fetch the path 
-            s = self.min_paths[k]
+            s = dfsc_.min_paths[k]
             if len(s) == 0: continue
             s = np.sum(s[0].pweights)
             if s <= radius:
@@ -45,11 +49,17 @@ class StdGraphContainer:
                     nla[k] = v
 
         snx = ns.intersection(self.sn)
-        sg = self.subgraph(ns,snx)
+        sg = self.subgraph(ns)
 
         spx = defaultdict(NodePath)
         for ns_ in ns:
-            spx[ns_] = self.sp[ns_]
+            q = deepcopy(self.sp[ns_])
+            k = set(q.min_paths.keys())
+
+            for k_ in k:
+                if k_ not in ns:
+                    del q.min_paths[k_] 
+            spx[ns_] = q 
 
         sgc = StdGraphContainer(sg,snx)
         sgc.ring_locs = nla 
@@ -82,15 +92,35 @@ class TDir:
         self.velocity = velocity 
         self.node_path = None
         self.index = None
+        # time reference to start before travel. 
+        self.t = 0.0
+        self.t_ = 0.0
         return
 
     def load_path(self,G):
         assert type(G) == StdGraphContainer
         assert self.location in G.d
-        nodePath = G.d[self.location][self.target_node][0]
+
+        target_loc = self.search_for_target_node(self.target_node)
+
+        if type(target_loc) == type(None):
+            print("error: target node not found")
+            return
+
+        nodePath = G.d[self.location][target_loc][0]
         self.node_path = nodePath.invert() 
         self.index = 0
 
+    def search_for_target_node(self,G):
+        assert type(G) == StdGraphContainer
+
+        if self.target_node not in self.ring_locs:
+            return None
+
+        loc = self.ring_locs[self.target_node]
+        return loc 
+
+    # TODO: test 
     def __next__(self):
         if self.index >= len(self.node_path):
             return None
@@ -100,3 +130,33 @@ class TDir:
         q = self.node_path.p[self.index]
         self.location = q
         return q
+
+    def scaled__next__(self,scale = 1.0):
+
+        tx = self.t + scale
+        r = int(tx - self.t_)
+
+        stat = True
+        for i in range(r):
+            q = self.__next__()
+            if type(q) == type(None): 
+                stat = not stat
+                break 
+
+        self.t = tx 
+        self.t_ += r 
+        return self.location,stat 
+
+    """
+    on results. 
+    """
+    def reflect(self):
+
+        return -1
+
+
+
+
+"""
+
+"""
