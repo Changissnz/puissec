@@ -330,9 +330,10 @@ def SecSeq_sample_1(num_components=1):
     ss = SecSeq(sndg.sq)
     return ss 
 
-def SecSeq_sample_2(num_secs=80,num_conn=5000):
+def SecSeq_sample_2(num_secs=80,num_conn=5000,\
+    min_components=4,drange_max=4):
     s = Sec_list_sample2(num_secs=num_secs)
-    sndg = SecNetDepGen(s,random,4,0.5,[1,4])
+    sndg = SecNetDepGen(s,random,min_components,0.5,[1,drange_max])
     print("assigning conn")
     sndg.assign_conn(num_conn)
 

@@ -473,7 +473,7 @@ class SecNetDepGen:
         assert max_nconn_ratio >= 0.0 and max_nconn_ratio <= 1.0
 
         assert len(dlength_range) == 2
-        assert dlength_range[0] < dlength_range[1]
+        assert dlength_range[0] <= dlength_range[1]
         assert type(dlength_range[0]) == type(dlength_range[1])
         assert type(dlength_range[0]) == int
         assert dlength_range[1] <= len(sec_seq) 

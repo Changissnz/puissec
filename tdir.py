@@ -5,13 +5,13 @@ a std. graph is of type dict|defaultdict
 """
 class StdGraphContainer:
 
-    def __init__(self,m,sec_nodeset):
+    def __init__(self,m,sec_nodeset,ring_locs):
         assert type(m) in {dict,defaultdict}
         self.d = m
         self.sn = sec_nodeset 
         self.dfs_cache_map = defaultdict(None)
         self.sp = defaultdict(NodePath)
-        self.ring_locs = {}
+        self.ring_locs = ring_locs
 
     def DFSCache_proc(self,n):
         dfsc = DFSCache(n,deepcopy(self.d),\
@@ -25,13 +25,10 @@ class StdGraphContainer:
         for k in self.d.keys():
             self.DFSCache_proc(k)
 
-    def subgraph_by_radius_at_refnode(self,r,radius,\
-        node_loc_assignment):
+    def subgraph_by_radius_at_refnode(self,r,radius):
         ns = {r}
 
         dfsc_ = self.sp[r] 
-
-        print("SP")
 
         # fetch the `subgraph`
         for k in dfsc_.min_paths.keys():
@@ -43,8 +40,8 @@ class StdGraphContainer:
                 ns = ns | {k}
 
         nla = {} 
-        if type(node_loc_assignment) != type(None): 
-            for k,v in node_loc_assignment.items():
+        if type(self.ring_locs) != type(None): 
+            for k,v in self.ring_locs.items():
                 if v in ns:
                     nla[k] = v
 
@@ -61,8 +58,7 @@ class StdGraphContainer:
                     del q.min_paths[k_] 
             spx[ns_] = q 
 
-        sgc = StdGraphContainer(sg,snx)
-        sgc.ring_locs = nla 
+        sgc = StdGraphContainer(sg,snx,nla)
         sgc.sp = spx
         return sgc 
 
@@ -95,44 +91,61 @@ class TDir:
         # time reference to start before travel. 
         self.t = 0.0
         self.t_ = 0.0
+
+        self.active_stat = True 
         return
 
     def load_path(self,G):
         assert type(G) == StdGraphContainer
         assert self.location in G.d
+        ##print("RING LOCS: ",G.ring_locs)
+        ##print("...")
 
-        target_loc = self.search_for_target_node(self.target_node)
+        target_loc = self.search_for_target_node(G)
 
         if type(target_loc) == type(None):
             print("error: target node not found")
             return
 
-        nodePath = G.d[self.location][target_loc][0]
+        ##print("LOC->TARGET")
+        ##print(G.d)
+        ##print("##")
+        dfsc = G.sp[self.location]
+        nodePath = dfsc.min_paths[target_loc][0]
         self.node_path = nodePath.invert() 
         self.index = 0
 
     def search_for_target_node(self,G):
         assert type(G) == StdGraphContainer
-
-        if self.target_node not in self.ring_locs:
+        ##print("TARGET NODE: ",self.target_node)
+        if self.target_node not in G.ring_locs:
             return None
 
-        loc = self.ring_locs[self.target_node]
+        loc = G.ring_locs[self.target_node]
         return loc 
 
     # TODO: test 
     def __next__(self):
+        if not self.active_stat: return None 
+
         if self.index >= len(self.node_path):
             return None
         self.index += self.velocity
         q = min([len(self.node_path) - 1,self.index])
-
+        self.index = q 
         q = self.node_path.p[self.index]
         self.location = q
+
+        if self.index == len(self.node_path) - 1:
+            self.index += 1
+            self.active_stat = False 
+
         return q
 
     def scaled__next__(self,scale = 1.0):
-
+        if not self.active_stat: 
+            return self.location,False
+            
         tx = self.t + scale
         r = int(tx - self.t_)
 
@@ -154,7 +167,41 @@ class TDir:
 
         return -1
 
+class TDirector:
 
+    def __init__(self,loc,target_node,\
+        vantage_point,radius=4,velocity=1):
+        self.td = TDir(loc,target_node,vantage_point,\
+            radius,velocity) 
+        self.ref_nodes = [deepcopy(self.td.location)]
+        return
+
+    def update_tdir(self):
+        return -1
+
+    def check_obj(self):
+        return -1
+
+
+    #######################
+    ######### loc search mode
+
+    """
+    searches for the next location
+    """
+    def loc_search_at_ref(self):
+        q = self.ref_nodes[-1] 
+        return -1  
+
+    def loc_search_set(self):
+
+        return -1
+
+
+
+"""
+TDir:
+"""
 
 
 """

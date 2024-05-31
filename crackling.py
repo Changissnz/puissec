@@ -1,6 +1,7 @@
 from leakette import * 
 from morebs2 import relevance_functions
 from hype import * 
+from tdir import * 
 
 class Crackling:
 
@@ -8,6 +9,7 @@ class Crackling:
         self.cmp_deg = 1.5 
         self.cidn = None
         self.hs = None 
+        self.td = None
         self.rss = None
         self.set_cvec() 
         self.astat = False
@@ -17,6 +19,10 @@ class Crackling:
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
         self.hs = hs 
+
+    def load_TDir(self,tdir):
+        assert type(tdir) == TDir
+        self.td = tdir
 
     def set_cvec(self):
         ciseq = default_cvec_iselector_seq()
@@ -130,23 +136,6 @@ class HypInfer:
 
     def __init__(self):
         return
-
-    """
-    return:
-    - sequence of points in dimension d that are 
-      used to formulate bounds for the next search.
-    """
-    def point_infer_by_leak(self,hypStruct,leak_info):
-        assert type(leak_info) == LeakInfo
-
-        # check the leak_info 
-        for (k,v) in leak_info.leak_info.items():
-            if k == 1:
-                if len(v) == 0: 
-                    continue
-                v_ = v[0]
-                sb = np.array([v_,v_ + 0.005]).T 
-                hypStruct.add_subbound(sb,1.0,True)
 
     @staticmethod
     def infer_by_LeakInfo(hypStruct,leak_info):

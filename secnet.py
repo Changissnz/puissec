@@ -1,6 +1,5 @@
 from collections import defaultdict 
 from bridge import * 
-from tdir import * 
 
 class IsoRingedChain:
 
@@ -234,15 +233,16 @@ class SecNet:
     def subgraph_for_TDir(self,tdir):
         assert type(self.sgc) != type(None)
         rx = tdir.radius 
-        return self.sgc.subgraph_by_radius_at_refnode(tdir.location,\
-            rx,deepcopy(self.node_loc_assignment))
+        return self.sgc.subgraph_by_radius_at_refnode(tdir.\
+            location,rx)
 
     def preprocess_shortest_paths(self):
         d2 = defaultdict(set)
         for k in self.d.keys():
             d2[k] = set(self.d[k])
 
-        self.sgc = StdGraphContainer(d2,deepcopy(self.sec_nodeset))
+        ring_locs = deepcopy(self.node_loc_assignment)
+        self.sgc = StdGraphContainer(d2,deepcopy(self.sec_nodeset),ring_locs)
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):
@@ -333,21 +333,19 @@ class SecNet:
     #################################################
     ###### methods for routing <Crackling>
     #################################################
-
+    """
+    set <Crackling> `c` loaded with a 
+    <HypStruct> and <TDir> at location `node`. 
+    """
     def set_crackling(self,c,node):
         assert node in self.entry_points
         assert type(c) == Crackling
-        
+        assert type(c.hs) == HypStruct
+        assert type(c.td) == TDir
         # use the <HypStruct> for `c` to set 
         # <TDir>. 
-        
         self.occ_crackl[c.cidn] = (c,node)
-
-
         return
-
-    
-
 
 def SecNet_sample1(ss=SecSeq_sample_1(1)):
     #ss = SecSeq_sample_1(1)
@@ -371,6 +369,25 @@ def pickled_SecNet_sample_Q():
     """
     s.pickle_thyself("codename__ASS_SHIT")
 
+"""
+sample tes
+"""
+def SecNet_sample_TDir1v1():
+    random.seed(100)
+    ss = SecSeq_sample_2(num_secs=1,num_conn=1,\
+        min_components=1,drange_max=1)
+
+    sec_node_count = 19
+    nsec_node_count = 10
+    num_entry = 4
+    rnd_struct = random
+    sn = SecNet.generate(ss,sec_node_count,\
+            nsec_node_count,num_entry,\
+            rnd_struct,"pairing frame",223) 
+
+    for s_ in sn.irc.irl:
+        s_.explode_contents()
+    return sn 
 
 def SRefMap_sample1(): 
     sn = SecNet_sample1()
