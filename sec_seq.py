@@ -41,7 +41,10 @@ class OptimaBloomFuncSecRep:
         self.sz = self.obf.oseeds.shape[1]
         ##self.tdim.append(self.sz) 
 
+        ##print("SZ[0]: ",self.sz)
         self.sz = self.sz_map(self.sz)
+        ##print("SZ[1]: ",self.sz)
+
         if self.sz in self.tdim:
             ##print("VIOLA")
             if attempts > 0:
@@ -113,6 +116,33 @@ class OptimaBloomFuncSecRep:
 
     def check_fstat(self,dimset):
         self.fstat = set(self.tdim) == dimset 
+
+"""
+function to generate an instance of 
+<OptimaBloomFuncSecRep>.
+"""
+def OptimaBloomFuncSecRep__type_1(opt_points,singleton_range,\
+        rnd_struct):
+
+    abf = default_AltBaseFunc_for_IsoRing()
+    bloom_func = abf.load_AltBaseFunc_function(abf)
+
+    # generate the size-delta function for
+    # the <IsoRingBloomer>
+    multiplier = rnd_struct.uniform(1.1,20.8)
+    szm = generate_default_szmult_mod(multiplier)
+
+    bounds = np.array([deepcopy(singleton_range) for _ in \
+        range(opt_points.shape[1])])
+
+    split_sz = rnd_struct.randrange(4,14)
+    print("D: ",opt_points.shape)
+    obf = OptimaBloomFunc(opt_points,bounds,\
+            None,bloom_func,opt_points.shape[1],split_sz) 
+
+    obfsr = OptimaBloomFuncSecRep(obf,szm,\
+        opt_points.shape[1])
+    return obfsr 
 
 class Sec:
 
@@ -299,21 +329,31 @@ class Sec:
     """
     def __next__(self):
         q = next(self.obfsr)
-
+        ##print("NEXT: ",q) 
         if type(q) == type(None):
             return None,None
 
         q2 = np.array([self.obfsr.obf.prev_i1,self.obfsr.obf.prev_i2])
-        
         self.dimso = len(q)
+        ##print("DIMSO: ",self.dimso)
         return q, q2
 
-    def process_one_bloomiso(self):
+    def process_one_bloomiso(self,sz_limit=float('inf')):
         stat = True 
+        c = 0 
         while stat: 
             ##print("one bloom pt.")
             # next value, indices of derivators
             b1,b2 = self.__next__()
+            
+            ##print("bloom index: ",c)
+            
+            c += 1
+            
+            if c >= sz_limit: 
+                self.obfsr.tstat = True 
+                break 
+            
             ##
             """
             print("SEC NEXT")
@@ -326,6 +366,8 @@ class Sec:
             stat = not (type(b1) == type(None))
             if not stat:
                 continue
+
+        
         return
 
     def lone_pr_vec_for_bloom(self):
@@ -336,7 +378,8 @@ class Sec:
 
     def generate_next_Sec(self):
         assert not self.obfsr.fstat
-        assert self.obfsr.tstat         
+        assert self.obfsr.tstat     
+        ##print("-- blooming for next sec")    
         q = self.lone_pr_vec_for_bloom()
 
         # get the optima points for the `sz`
@@ -350,16 +393,19 @@ class Sec:
         for i,q_ in enumerate(q[0]):
             vs = matrix_methods.vector_to_string(bps[i],float)
             optima_pr_map[vs] = np.round(q_ / sm,5)
+        ##print("-- fetching correlation maps")
 
         # get the dep.,codep. map
         dep_map = exact_correlation_DMap_key_delta(self.dm,deepcopy(q[1]))
         codep_map = exact_correlation_DMap_key_delta(self.cdm,q[1])
 
+        ##print("-- fetching new seq.")
         # get the new seq, which has the highest
         # Pr. in optima_pr_map
         qx = max([(k,v) for (k,v) in optima_pr_map.items()],key=lambda x:x[1])
         nu_pt = matrix_methods.string_to_vector(qx[0],float)
 
+        ##print("-- size of opt. map: ",len(optima_pr_map))
         s = Sec(nu_pt,deepcopy(self.singleton_range),\
             optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)
         sz0 = s.obfsr.sz

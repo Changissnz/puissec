@@ -17,8 +17,8 @@ class OptimaBloomFunc:
     optima seedlings := sequence, of vectors in real numbers R.
     bloom_func := AltBaseFunc, operates on the integers
     """
-    def __init__(self,optima_seedlings,drange,selector_func,bloom_func,\
-        d:int,split_sz:int,splitsz_delta=DEFAULT_OPTIMA_BLOOM_SZ_DELTA_FUNC):
+    def __init__(self,optima_seedlings,drange,selector_func,\
+        bloom_func,d:int,split_sz:int,splitsz_delta=DEFAULT_OPTIMA_BLOOM_SZ_DELTA_FUNC):
         assert type(d) == int and d > 0
         assert type(split_sz) == int and split_sz > 0
         assert type(selector_func) in {Index2DMod,type(None)}

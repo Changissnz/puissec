@@ -1,4 +1,4 @@
-from iso_ring import *
+from secnet import *
 import unittest
 
 # 
@@ -62,6 +62,26 @@ class IsoRingClass(unittest.TestCase):
         ir = IsoRing_sample_1()
         ir.explode_contents()
         assert len(ir.sec_cache) == 5
+
+    def test__IsoRing__explode_contents_case2(self):
+        random.seed(2004)
+        np.random.seed(2004)
+
+        ss = SecSeq_sample_4(num_secs=1,\
+                singleton_range=DEFAULT_SINGLETON_RANGE,\
+                num_conn=1,min_components=1,dconn_ratio = 0.3,\
+                drange_max=1)
+        ss = ss[0]
+
+        irc = IsoRingedChain(ss,DEFAULT_SINGLETON_RANGE,\
+                random,234)
+
+        for x in irc.irl:
+                x.explode_contents()
+        
+        #print("IRCCC")
+        #print(irc.irl[0].secdim_seq())
+        assert irc.irl[0].secdim_seq() == [10, 6, 3, 2, 8, 9]
 
     def test__IsoRing__unpickle_thyself_case1(self):
         rx = IsoRing.unpickle_thyself('isosave')

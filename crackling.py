@@ -20,6 +20,12 @@ class Crackling:
         assert type(hs) == HypStruct
         self.hs = hs 
 
+    def target_of_HypStruct(self):
+        if type(self.hs) == type(None): 
+            return None
+        return self.hs.seq_idn
+
+
     def load_TDir(self,tdir):
         assert type(tdir) == TDir
         self.td = tdir

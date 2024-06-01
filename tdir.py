@@ -3,7 +3,7 @@ from dfs_struct import *
 """
 a std. graph is of type dict|defaultdict
 """
-class StdGraphContainer:
+class SNGraphContainer:
 
     def __init__(self,m,sec_nodeset,ring_locs,clocs):
         assert type(m) in {dict,defaultdict}
@@ -11,8 +11,34 @@ class StdGraphContainer:
         self.sn = sec_nodeset 
         ##self.dfs_cache_map = defaultdict(None)
         self.sp = defaultdict(NodePath)
+        # <IsoRing> idn -> location 
         self.ring_locs = ring_locs
+        # <Crackling> idn -> (location,target node)
         self.crackling_locs = clocs
+
+    def agent_loc(self,agent_idn,is_isoring:bool):
+        if is_isoring:
+            if agent_idn not in self.ring_locs: return None
+            return self.ring_locs[agent_idn]
+
+        if agent_idn not in self.crackling_locs:
+            return None
+        return self.crackling_locs[agent_idn][0]
+
+    def agents_at_loc(self,loc,is_isoring:bool): 
+        ks = []
+        if is_isoring: 
+
+            for k,v in self.ring_locs.items():
+                if v == loc: 
+                    ks.append(k) 
+            return ks
+
+        for k,v in self.crackling_locs.items():
+            if v[0] == loc: 
+                ks.append(k)
+        return ks
+
 
     def DFSCache_proc(self,n):
         dfsc = DFSCache(n,deepcopy(self.d),\
@@ -59,7 +85,12 @@ class StdGraphContainer:
                     del q.min_paths[k_] 
             spx[ns_] = q 
 
-        sgc = StdGraphContainer(sg,snx,nla)
+        occm = {}
+        for k,v in self.crackling_locs.items():
+            if v[0] in ns: 
+                occm[k] = v
+
+        sgc = SNGraphContainer(sg,snx,nla,occm)
         sgc.sp = spx
         return sgc 
 
@@ -102,7 +133,7 @@ class TDir:
         return
 
     def load_path(self,G):
-        assert type(G) == StdGraphContainer
+        assert type(G) == SNGraphContainer
         assert self.location in G.d
         ##print("RING LOCS: ",G.ring_locs)
         ##print("...")
@@ -122,8 +153,14 @@ class TDir:
         self.index = 0
 
     def search_for_target_node(self,G):
-        assert type(G) == StdGraphContainer
+        assert type(G) == SNGraphContainer
         ##print("TARGET NODE: ",self.target_node)
+
+        # case: vp = I; literal node destination 
+        if self.vantage_point == "I": 
+            return self.target_node
+
+        # case: vp = C; target <IsoRing> idn. 
         if self.target_node not in G.ring_locs:
             return None
 
@@ -192,13 +229,31 @@ step that demands that information.
 class TDirector:
 
     def __init__(self,loc,target_node,\
-        vantage_point,radius=4,velocity=1):
+        vantage_point,vantage_idn,radius=4,velocity=1):
         self.td = TDir(loc,target_node,vantage_point,\
             radius,velocity) 
+        self.vantage_idn = vantage_idn
+
         self.ref_nodes = [deepcopy(self.td.location)]
 
         self.td_log = [] 
+
+        # Resource subgraph, of type <SNGraphContainer>
+        self.resource_sg = None
+
+        self.obj_stat = None
+        if self.td.vantage_point == "I":  
+            self.obj_stat = "radar null"
+        else:
+            self.obj_stat = "search for target"
         return
+
+    def vp(self):
+        return self.td.vantage_point 
+
+    def load_graph(self,G:SNGraphContainer):
+        assert type(G) == SNGraphContainer
+        self.resource_sg = G 
 
     def loc(self):
         return self.td.location
@@ -207,6 +262,8 @@ class TDirector:
         return -1
 
     def check_obj(self):
+
+
         return -1
 
     """
@@ -215,8 +272,24 @@ class TDirector:
     for target <IsoRing>.
     """
     def check_radar(self):
-
-        return -1
+        
+        assert type(self.sg) != type(None) 
+        
+        # check for any Cracklings that are 
+        # targetting
+        if self.vp() == "I":
+            q = []
+            for k,v in self.sg.occ_crackl.items():
+                stat = v[1] == self.vantage_idn
+                if stat:
+                    q.append(k)
+            return q 
+        
+        # check for target isoring loc
+        else: 
+            if self.td.target_node in self.sg.ring_locs:
+                return [self.sg.ring_locs[self.td.target_node]]
+            return []
 
     #######################
     ######### loc search mode: used by <Crackling> to locate
@@ -225,7 +298,7 @@ class TDirector:
     """
     searches for a target node to travel the agent I|C. 
     """
-    def loc_search__set_TDir(self,sgc:StdGraphContainer,\
+    def loc_search__set_TDir(self,sgc:SNGraphContainer,\
         rnd_struct=random):#,check_completion=True):
         q = self.loc_search_at_ref(sgc,rnd_struct)
         if type(q) == type(None):
@@ -247,7 +320,7 @@ class TDirector:
     searches for the next location. 
 
     """
-    def loc_search_at_ref(self,sgc:StdGraphContainer,rnd_struct,\
+    def loc_search_at_ref(self,sgc:SNGraphContainer,rnd_struct,\
         exclude_refs:bool=True):
         q = self.ref_nodes[-1] 
         candidate_list = self.loc_search_set(sgc,q)
@@ -267,7 +340,7 @@ class TDirector:
     return:
     - set, nodes of the greatest distance d
     """
-    def loc_search_set(self,sgc:StdGraphContainer,ref):
+    def loc_search_set(self,sgc:SNGraphContainer,ref):
         if len(sgc.sp.keys()) == 0:
             return set()
         
@@ -283,3 +356,8 @@ class TDirector:
             else:
                 break  
         return st 
+
+# TODO: tests
+'''
+loc search: used for objective C.search_for_target
+'''

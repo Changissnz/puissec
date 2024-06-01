@@ -2,6 +2,11 @@ from crackling import *
 from secnet import * 
 from leakette import * 
 
+"""
+splits a bound `bs` by a constant 
+size c corresponding to the splitting
+size `sz`. 
+"""
 def even_bound_split(bs,sz):
     assert matrix_methods.is_proper_bounds_vector(bs)
     assert sz >= 1 and type(sz) == int
@@ -22,13 +27,19 @@ class BackgroundInfo:
     """
     def __init__(self,opm,depchain_map,codep_sets,\
         dec_map,leak_map):
+        # sec idn -> sec dim. -> opt. idn -> Pr. 
         self.opm = opm
         self.dm = depchain_map
         self.cdm = codep_sets
         self.dec_map = dec_map 
         # sec idn -> opt. dim -> <LeakInfo>
         self.leak_map = leak_map
+        # sec idn -> expected Pr. value 
+        self.expected_pr = None
         return
+
+    def load_expected_Pr(self,epr):
+        self.expected_pr = epr
 
     # TODO: test this. 
     """
@@ -74,6 +85,10 @@ class BackgroundInfo:
 
     # TODO: test this.
     """
+
+    full_hypseq := bool, True outputs a map that includes 
+                         all local optima.
+
     return:
     - sec idn -> sec dim. -> <HypStruct>
     """
@@ -125,7 +140,13 @@ class BackgroundInfo:
     def generate_instance(irc,srm):
         assert type(irc) == IsoRingedChain
         assert type(srm) == SRefMap
-        dm_pr = srm.collect_prism_points__PrMap('cd',"greedy-dc",1)
+
+        # sec idn -> sec dim. -> opt. idn -> Pr. 
+        dm_pr = defaultdict(None)
+        for i in irc.irl:
+            it = i.sec.idn_tag
+            dm_pr[it] = i.dim_to_opt_pr_map()
+        ##dm_pr = srm.collect_prism_points__PrMap('cd',"greedy-dc",1)
 
         cs = connected_subsets_of_codepmap(srm.cdms)
         keys = srm.dms.keys() 
@@ -136,6 +157,7 @@ class BackgroundInfo:
             ##print(dx[k])
 
         dec_map = srm.collect_prism_points__DecMap('cd',max,[0,1])
+    
         lm = BackgroundInfo.generate_background_leak(irc,random)
         return BackgroundInfo(dm_pr,dx,cs,dec_map,lm)
 
@@ -197,12 +219,64 @@ class BackgroundInfo:
         #assert type(ir) == IsoRing
         return Leak.generate_Leak__type1(2,rnd_struct)
 
+class CrackSoln:
+
+    def __init__(self):
+        self.d = defaultdict(None) 
+        return
+
+    """
+    - t := (sec idn.,pr of score)
+    """
+    def __add__(self,t:tuple):
+        assert type(t) == tuple
+        assert len(t) == 3
+
+        return -1 
+
+    def match_pr(self):
+
+        return -1 
+
+CRACKLING_STAT = {"stationary","mobile"}
+
 class Cracker:
 
-    def __init__(self,hyp_map,backgroundInfo):
+    def __init__(self,hyp_map,backgroundInfo,\
+        crackling_sz:int):
         assert type(hyp_map) in {dict,type(None)}
         assert type(backgroundInfo) == BackgroundInfo
+        assert type(crackling_sz) == int and crackling_sz > 0
         self.hyp_map = hyp_map 
         self.bi = backgroundInfo
         self.cracklings = [] 
+
+        self.calculate_oop()
         return
+
+    '''
+    calculate the order of operations based on 
+    <BackgroundInfo>.
+
+    return:
+    - dict, sec idn. -> integer index in ordered sequence OR 
+                        np.nan for any location. 
+    '''
+    # TODO: complete
+    def calculate_oop(self): 
+        return -1 
+
+    # TODO: complete
+    def load_crackling(self):
+
+        # declare the HypStruct using <BackgroundInfo> 
+
+        return -1
+
+    # TODO: complete
+    def load_crackling_TDirector(self):
+        return -1 
+
+    # TODO: complete
+    def crackling_stat(self,c_idn):
+        return -1 

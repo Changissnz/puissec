@@ -156,6 +156,13 @@ class IsoRing:
                 return x
         return None 
 
+    def dim_to_opt_pr_map(self):
+        od = {} 
+        for x in self.sec_cache:
+            k = x.dim()
+            od[k] = x.optima_points_to_index_pr_map()
+        return od 
+
     """
     pickles instance through values
     [F1] sec  
@@ -236,11 +243,12 @@ class IsoRing:
         ##    (len(self.sec_cache[-1].seq),s))
         while s < optima_size_limit:
             sc = self.sec_cache.pop(-1)
-            sc.process_one_bloomiso()
+            ##?
+            sc.process_one_bloomiso(optima_size_limit - s)
             s2 = sc.generate_next_Sec()
             s2[0].idn_tag = sc.idn_tag 
             ts2 = s2[2]
-            ##print("transition: {}->{}".format(s2[1],s2[2]))
+            print("transition: {}->{}".format(s2[1],s2[2]))
             s2 = s2[0]
             s = len(s2.opm)
             self.sec_cache.append(sc)
@@ -383,3 +391,14 @@ def SecSeq_sample_3():
     sndg.write_conn_to_Sec() 
     ss = SecSeq(sndg.sq) 
     return ss,sndg
+
+def SecSeq_sample_4(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
+    num_conn=5000,min_components=4,dconn_ratio=0.4,drange_max=4):
+
+    s = Sec_list_sample3(num_secs,singleton_range,random)
+    sndg = SecNetDepGen(s,random,min_components,\
+            dconn_ratio,[1,drange_max])
+    sndg.assign_conn(num_conn)
+
+    ss = SecSeq(sndg.sq)
+    return ss,sndg 

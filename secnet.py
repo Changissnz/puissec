@@ -239,8 +239,8 @@ class SecNet:
             self.node_loc_assignment[idn]
         return -1
 
-    def rc_agent_locs_for_subgraph(self,sgc:StdGraphContainer):
-        assert type(sgc) == StdGraphContainer
+    def rc_agent_locs_for_subgraph(self,sgc:SNGraphContainer):
+        assert type(sgc) == SNGraphContainer
         k = set(sgc.d.keys())
 
         nla,oc = {},{}
@@ -251,7 +251,8 @@ class SecNet:
         
         for k_,v_ in self.occ_crackl.items():
             if v_[1] in k:
-                oc[k_] = v_[1]
+                q = v_[0].hs.seq_idn
+                oc[k_] = (v_[1],q)
 
         sgc.update_rc_agent_locs(nla,oc)
         return nla,oc 
@@ -272,7 +273,10 @@ class SecNet:
             d2[k] = set(self.d[k])
 
         ring_locs = deepcopy(self.node_loc_assignment)
-        self.sgc = StdGraphContainer(d2,deepcopy(self.sec_nodeset),ring_locs)
+
+        ocm = self.occ_crackl_map(set(self.d.keys()))
+
+        self.sgc = SNGraphContainer(d2,deepcopy(self.sec_nodeset),ring_locs,ocm)
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):
@@ -376,6 +380,27 @@ class SecNet:
         # <TDir>. 
         self.occ_crackl[c.cidn] = (c,node)
         return
+
+    """
+    map info passed to <SNGraphContainer>
+    """
+    def occ_crackl_map(self,ks):
+        #ks = set(sn.d.keys())
+
+        """
+        d = {}
+        for k in ks: 
+            x1 = self.occ_crackl[k][1]
+            target = self.occ_crackl[k][0].target_of_HypStruct()
+            d[k] = (x1,target)
+        return d 
+        """
+        d = {} 
+        for k,v in self.occ_crackl.items():
+            if v[1] in ks:
+                target = v[0].target_of_HypStruct()
+                d[k] = (v[1],target)
+        return d 
 
 def SecNet_sample1(ss=SecSeq_sample_1(1)):
     #ss = SecSeq_sample_1(1)

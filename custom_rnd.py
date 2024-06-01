@@ -208,6 +208,7 @@ class AltBaseFunc:
                 raise ValueError
         else:
             q = 0
+        print("CAUGHT VALUE ",q)
         return q
 
     def replace_inf_(self,output):
