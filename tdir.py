@@ -5,13 +5,14 @@ a std. graph is of type dict|defaultdict
 """
 class StdGraphContainer:
 
-    def __init__(self,m,sec_nodeset,ring_locs):
+    def __init__(self,m,sec_nodeset,ring_locs,clocs):
         assert type(m) in {dict,defaultdict}
         self.d = m
         self.sn = sec_nodeset 
-        self.dfs_cache_map = defaultdict(None)
+        ##self.dfs_cache_map = defaultdict(None)
         self.sp = defaultdict(NodePath)
         self.ring_locs = ring_locs
+        self.crackling_locs = clocs
 
     def DFSCache_proc(self,n):
         dfsc = DFSCache(n,deepcopy(self.d),\
@@ -68,6 +69,11 @@ class StdGraphContainer:
         for n in ns:
             dx[n] = ns.intersection(self.d[n])
         return defaultdict(set,dx)
+
+    def update_rc_agent_locs(self,rlocs,clocs):
+        self.ring_locs = rlocs
+        self.crackling_locs = clocs 
+        return
 
 
 """
@@ -167,6 +173,22 @@ class TDir:
 
         return -1
 
+TDIR_SETTINGS = {'I':{"avoid target",\
+                    "radar null"},\
+                'C': {"search for target",\
+                    "capture target"}}
+
+"""
+<TDirector> directs an associated agent <IsoRing>
+or <Crackling> based on objectives.
+
+<TDirector> requires a feedback loop with the 
+connected <SecNet> it operates on.
+
+The <SecNet> handles the subgraph of information 
+given to the <TDirector> instance for any process 
+step that demands that information. 
+"""
 class TDirector:
 
     def __init__(self,loc,target_node,\
@@ -187,10 +209,22 @@ class TDirector:
     def check_obj(self):
         return -1
 
+    """
+    checks for chaser <Crackling> if 
+    vantage_point = I, otherwise checks 
+    for target <IsoRing>.
+    """
+    def check_radar(self):
+
+        return -1
+
     #######################
     ######### loc search mode: used by <Crackling> to locate
     #########                  target <IsoRing>.
 
+    """
+    searches for a target node to travel the agent I|C. 
+    """
     def loc_search__set_TDir(self,sgc:StdGraphContainer,\
         rnd_struct=random):#,check_completion=True):
         q = self.loc_search_at_ref(sgc,rnd_struct)
@@ -210,13 +244,16 @@ class TDirector:
         return
 
     """
-    searches for the next location
+    searches for the next location. 
+
     """
-    def loc_search_at_ref(self,sgc:StdGraphContainer,rnd_struct):
+    def loc_search_at_ref(self,sgc:StdGraphContainer,rnd_struct,\
+        exclude_refs:bool=True):
         q = self.ref_nodes[-1] 
         candidate_list = self.loc_search_set(sgc,q)
 
-        candidate_list = candidate_list - set(self.ref_nodes)
+        if exclude_refs:
+            candidate_list = candidate_list - set(self.ref_nodes)
 
         if len(candidate_list) == 0:
             return None 

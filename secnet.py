@@ -232,20 +232,39 @@ class SecNet:
     ######################## <Crackling>,<IsoRing>
 
     # TODO: 
-    def locset(self,idn,is_isoring):
+    def locset(self,idn,is_isoring:bool):
 
         if is_isoring:
             new_loc = "TODO"
             self.node_loc_assignment[idn]
         return -1
+
+    def rc_agent_locs_for_subgraph(self,sgc:StdGraphContainer):
+        assert type(sgc) == StdGraphContainer
+        k = set(sgc.d.keys())
+
+        nla,oc = {},{}
+
+        for k_,v_ in self.node_loc_assignment.items():
+            if v_ in k: 
+                nla[k_] = v_
+        
+        for k_,v_ in self.occ_crackl.items():
+            if v_[1] in k:
+                oc[k_] = v_[1]
+
+        sgc.update_rc_agent_locs(nla,oc)
+        return nla,oc 
         
     ######################## graph structure functions 
     # TODO: write more tests! 
     def subgraph_for_TDir(self,tdir):
         assert type(self.sgc) != type(None)
         rx = tdir.radius 
-        return self.sgc.subgraph_by_radius_at_refnode(tdir.\
+        sgc1 = self.sgc.subgraph_by_radius_at_refnode(tdir.\
             location,rx)
+        self.rc_agent_locs_for_subgraph(sgc1)
+        return sgc1
 
     def preprocess_shortest_paths(self):
         d2 = defaultdict(set)
