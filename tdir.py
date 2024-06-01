@@ -174,7 +174,12 @@ class TDirector:
         self.td = TDir(loc,target_node,vantage_point,\
             radius,velocity) 
         self.ref_nodes = [deepcopy(self.td.location)]
+
+        self.td_log = [] 
         return
+
+    def loc(self):
+        return self.td.location
 
     def update_tdir(self):
         return -1
@@ -182,28 +187,62 @@ class TDirector:
     def check_obj(self):
         return -1
 
-
     #######################
-    ######### loc search mode
+    ######### loc search mode: used by <Crackling> to locate
+    #########                  target <IsoRing>.
+
+    def loc_search__set_TDir(self,sgc:StdGraphContainer,\
+        rnd_struct=random):#,check_completion=True):
+        q = self.loc_search_at_ref(sgc,rnd_struct)
+        if type(q) == type(None):
+            return 
+
+        l = self.td.location
+        tn = self.td.target_node
+        vp = self.td.vantage_point
+        r = self.td.radius
+        v = self.td.velocity
+
+        tn = q 
+        tdx = TDir(l,tn,vp,r,v)
+        self.td_log.append(self.td)
+        self.td = tdx 
+        return
 
     """
     searches for the next location
     """
-    def loc_search_at_ref(self):
+    def loc_search_at_ref(self,sgc:StdGraphContainer,rnd_struct):
         q = self.ref_nodes[-1] 
-        return -1  
+        candidate_list = self.loc_search_set(sgc,q)
 
-    def loc_search_set(self):
+        candidate_list = candidate_list - set(self.ref_nodes)
 
-        return -1
+        if len(candidate_list) == 0:
+            return None 
 
+        candidate_list = sorted(list(candidate_list))
+        xi = rnd_struct.randrange(0,len(candidate_list))
+        cl = candidate_list[xi]
+        return cl 
 
-
-"""
-TDir:
-"""
-
-
-"""
-
-"""
+    """
+    return:
+    - set, nodes of the greatest distance d
+    """
+    def loc_search_set(self,sgc:StdGraphContainer,ref):
+        if len(sgc.sp.keys()) == 0:
+            return set()
+        
+        rkx = sorted([(k,sum(v.pweights)) for k,v in sgc.sp.items()],\
+            key=lambda x:x[1])[::-1]
+        
+        mx = rkx[0]
+        st = set()
+        st = st | {mx[0]}
+        for i in range(1,len(rkx)):
+            if rkx[i][1] == mx[1]: 
+                st = st | {rkx[i][0]}
+            else:
+                break  
+        return st 

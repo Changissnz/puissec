@@ -228,8 +228,19 @@ class SecNet:
         rnd_struct=rnd_struct,rnd_seed=rnd_seed)
         return sn 
 
+    ######################## loc-set methods for 
+    ######################## <Crackling>,<IsoRing>
+
+    # TODO: 
+    def locset(self,idn,is_isoring):
+
+        if is_isoring:
+            new_loc = "TODO"
+            self.node_loc_assignment[idn]
+        return -1
+        
     ######################## graph structure functions 
-    # TODO: test 
+    # TODO: write more tests! 
     def subgraph_for_TDir(self,tdir):
         assert type(self.sgc) != type(None)
         rx = tdir.radius 
