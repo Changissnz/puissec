@@ -1,7 +1,13 @@
 # PUISSEC 
 
 Pronunciation: pwoy-sec  
-Derivation: poised/poison+security
+Derivation: poised/poison+security  
+Meaning: the technique of data poisoning
+         as an offensive technique involving
+         target information in the context 
+         of a secure environment with a 
+         level of awareness used to defend 
+         against agent intruders. 
 
 Project is not fully operational yet. Expect there
 to be sub-optimal components in processing, and there
