@@ -1,5 +1,8 @@
 # PUISSEC 
 
+Pronunciation: pwoy-sec
+Derivation: poised/poison+security
+
 Project is not fully operational yet. Expect there
 to be sub-optimal components in processing, and there
 are incomplete decision-making pipelines.

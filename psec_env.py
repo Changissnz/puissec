@@ -48,6 +48,18 @@ class SecEnv:
         self.td.pass_info__G(c,self.sn)
         return
 
-    def load_crackling(self):
+    def run_agent(self,is_sn:bool=True):
 
+        if is_sn:
+            q = self.sn
+        else: 
+            q = self.cracker
+
+        return -1
+
+    def run_cracker(self):
+
+        return -1
+
+    def load_crackling(self):
         return -1 

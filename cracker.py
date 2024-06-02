@@ -226,16 +226,14 @@ class CrackSoln:
         return
 
     """
-    - t := (sec idn.,pr of score)
+    - t := (sec idn.,expected sec value,pr of score)
     """
     def __add__(self,t:tuple):
         assert type(t) == tuple
         assert len(t) == 3
-
         return -1 
 
     def match_pr(self):
-
         return -1 
 
 CRACKLING_STAT = {"stationary","mobile"}
