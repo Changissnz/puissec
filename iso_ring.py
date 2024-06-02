@@ -1,7 +1,10 @@
 from obj_func import * 
 from secnet_gen import * 
 from cvec import * 
+from tdir import * 
 import os 
+
+qxs = TDirector 
 
 class BoundedObjFunc:
 
