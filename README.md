@@ -1,18 +1,14 @@
-# PUISSEC
+# PUISSEC 
 
-Expected release: 6/01/2024
+Project is not fully operational yet. Expect there
+to be sub-optimal components in processing, and there
+are incomplete decision-making pipelines.
 
-The gist of the project: 
+There are plans to write a paper detailing the 
+application and operation of this project. The 
+paper will come by 7/1/2024. 
 
-`retellingsofcricxus`, `malthusian`, `pro-corporatist deceit`,
-`psyceptionism`,`mourninjurst`.
+TLDR; the project simulates security breaches 
+on a network that is supposed to guard against
+3rd-party intrusion into sensitive data.
 
----------------------------------------------------------------
-
-# A Possible Application
-- designing <puissec> to deal with the cracking attempts from
-  `FEDS_shield`; see the below image for the permutative 
-  apparatus that aids in the mapping
-  `char to be encrypted --> integer vector sequence`
-
-![alt text](2024-04-09__centerion_fire.PNG)
