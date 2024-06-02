@@ -1,6 +1,6 @@
 # PUISSEC 
 
-Pronunciation: pwoy-sec
+Pronunciation: pwoy-sec  
 Derivation: poised/poison+security
 
 Project is not fully operational yet. Expect there
