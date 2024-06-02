@@ -3,7 +3,7 @@
 Pronunciation: pwoy-sec  
 Derivation: poised/poison+security  
 Meaning: the technique of data poisoning
-         as an offensive technique involving
+         as a combative technique involving
          target information in the context 
          of a secure environment with a 
          level of awareness used to defend 
