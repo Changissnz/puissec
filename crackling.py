@@ -25,10 +25,16 @@ class Crackling:
             return None
         return self.hs.seq_idn
 
+    def load_TDirector(self,td): 
+        assert type(td) == TDirector
+        self.td = tdir 
+        return
 
-    def load_TDir(self,tdir):
-        assert type(tdir) == TDir
-        self.td = tdir
+    ####
+    #def load_TDir(self,tdir):
+    #    assert type(tdir) == TDir
+    #    self.td = tdir
+    ####
 
     def set_cvec(self):
         ciseq = default_cvec_iselector_seq()

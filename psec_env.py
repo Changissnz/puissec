@@ -5,10 +5,17 @@ class TDBridge:
     def __init__(self):
         return 
 
-    def pass_info__G(self,tdir:TDirector,\
-        ):
+    def pass_info__G(self,c:Crackling,g:SecNet):
+        #tdr:TDirector,\):
+        assert type(c) == Crackling
+        assert type(g) == SecNet
 
-        return -1
+        tdr = c.td.tdir
+
+        G = g.subgraph_for_TDir(tdr)
+
+        c.td.load_graph(G)
+        return
 
 """
 environment for the dual-agent 
@@ -26,9 +33,20 @@ class SecEnv:
         self.td = TDBridge()
         return
 
-    def tdbridge_op(self,tdirector, functione):
-        assert 
-        return -1 
+    """
+    fetch the subgraph for the <TDir> of 
+    <TDirector>.
+    """
+    def tdbridge_op__pass_G_to_C(self,cidn):
+        if cidn not in self.sn.occ_crackl:
+            return None
+
+
+        c = self.sn.occ_crackl[cidn][0] 
+        assert type(c.td) != type(None)
+
+        self.td.pass_info__G(c,self.sn)
+        return
 
     def load_crackling(self):
 

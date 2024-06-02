@@ -273,13 +273,13 @@ class TDirector:
     """
     def check_radar(self):
         
-        assert type(self.sg) != type(None) 
+        assert type(self.resource_sg) != type(None) 
         
         # check for any Cracklings that are 
         # targetting
         if self.vp() == "I":
             q = []
-            for k,v in self.sg.occ_crackl.items():
+            for k,v in self.resource_sg.crackling_locs.items():
                 stat = v[1] == self.vantage_idn
                 if stat:
                     q.append(k)
