@@ -21,6 +21,101 @@ def even_bound_split(bs,sz):
         q = bs_
     return bsx
 
+class OrderOfCrackn:
+
+    def __init__(self):
+        self.seq = []
+        # index of set element -> & (for co-dep.) OR | (for non-duplicate choice in set)
+        self.set_operator_map = {}
+        return
+
+    # TODO: finish 
+    def order_by_depchain_map(self,dcm):
+        l = [(k,len(v)) for k,v in dcm.items()]
+        l = sorted(l,key=lambda x:x[1])[::-1]
+        ks = [l_[0] for l_ in l]
+        soln = [{l_[0]} for l_ in l]
+
+        def check_coincidence(k1,k2):
+            assert k1 in dcm
+            assert k2 in dcm
+
+            v1 = dcm[k1]
+            v2 = dcm[k2]
+            vx1,vx2 = set(),set()
+
+            for v1_ in v1:
+                vx1 = vx1 | v1_
+            for v2_ in v2:
+                vx2 = vx2 | v2_
+
+            return len(vx1.intersection(vx2)) > 0
+
+        """
+        if depchains do not coincide, merge. 
+        """
+        def check_set_coincidence(i1,i2):
+            s1,s2 = soln[i1],soln[i2]
+            for s1_ in s1:
+                for s2_ in s2:
+                    if check_coincidence(s1_,s2_):
+                        return False
+            return True
+
+        
+        def sort_swap(key):
+
+            vx = dcm[key][::-1]
+            vx_ = []
+            for vx2 in vx:
+                vx_.extend(list(vx2))
+
+            # get the max index of the 
+            # dependencies.
+            indexio = {}
+            for vx2 in vx_:
+
+                for (i,sx) in enumerate(soln):
+                    if vx2 in sx:
+                        indexio[vx2] = i
+                        break
+
+            index = max(indexio.values())
+
+            keyloc = -1
+            for (i,sx) in enumerate(soln):
+                if key in sx:
+                    keyloc = i
+                    break
+            assert keyloc != -1
+
+            # case: keyloc >= index; do nothing
+            if keyloc >= index:
+                return
+
+            # case: keyloc < index;
+            q = soln.pop(keyloc)
+            soln.insert(index,q)
+
+            #   check the coincidence w/ neighbor
+            if index + 1 >= len(soln):
+                return
+
+            # no coincidences; merge. 
+            if check_set_coincidence(index,index+1): 
+                s1,s2 = soln[index],soln[index+1]
+                s1 = s1 | s2
+                soln.pop(index)
+                soln.pop(index)
+                soln.insert(index,s1) 
+
+            return
+
+        # iterate through each key and locate index
+        for ks_ in ks:
+            sort_swap(ks_) 
+        return soln
+
 class BackgroundInfo:
 
     """
@@ -71,15 +166,6 @@ class BackgroundInfo:
                         hsx.append(hs2) 
                     v2[k_] = hsx 
                         
-
-                    ###
-                    """
-                    print("HS: ",hs)
-                    hs2 = HypInfer.infer_by_LeakInfo(hs,v_)
-                    v2[k_] = hs2
-                    """
-                    ###
-                    
             i2hm[k] = v2
         return i2hm 
 

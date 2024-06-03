@@ -1,11 +1,12 @@
 from cracker import *
-import unittest
+import unittest,time 
 
 ### lone file test 
 """
 python3 -m tests.test_cracker
 """
 ###
+
 class BackgroundInfoClass(unittest.TestCase):
 
     def test__BackgroundInfo__generate_Pr_case1(self):
@@ -63,6 +64,29 @@ class BackgroundInfoClass(unittest.TestCase):
 
         assert len(ircm[0][5]) == 12
         assert len(ircm2[0][5]) == 1
+        return
+
+class OrderOfCracknClass(unittest.TestCase):
+
+    def OrderOfCrackn__order_by_depchain_map__case1(self):
+        sn1 = SecNet.unpickle_thyself("codename__ASS_SHIT",\
+                DEFAULT_SINGLETON_RANGE,random,9)
+
+        irc = sn1.irc 
+        srm = sn1.srm
+
+        bi = BackgroundInfo.generate_instance(irc,srm)
+
+        # testing 
+        q = time.time()
+        ooc = OrderOfCrackn()
+        soln = ooc.order_by_depchain_map(bi.dm)
+        qs = time.time() - q
+        ##print("process time: ",qs)
+
+        ans = [{1}, {0, 4}, {7}, {6}, {8}, {3}, {2}, {5}]
+        assert soln == ans 
+
         return
 
 
