@@ -242,8 +242,17 @@ class BackgroundInfo:
             dx[k] = depchain_for_Sec(srm.dms,k)
             ##print(dx[k])
 
+        # fetch the decision map
         dec_map = srm.collect_prism_points__DecMap('cd',max,[0,1])
-    
+        stat = set(dec_map.keys()) == set(srm.dms.keys())
+
+        # fill in the map for missing decisions; default is
+        # max Pr.
+        if not stat:
+            qx = srm.directF_proc__best_nodedec_map()
+            for k,v in qx.items():
+                if k not in dec_map:
+                    dec_map[k] = v
         lm = BackgroundInfo.generate_background_leak(irc,random)
         return BackgroundInfo(dm_pr,dx,cs,dec_map,lm)
 

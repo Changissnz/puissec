@@ -239,13 +239,16 @@ class SRefMap:
     #################### probability calculations for 
     #################### decision-chains. 
 
-    # get the Pr. range of a node
-    def pr_range_of_node_dec(self,node_idn,dec_idn,
-        opmi,dm,decision_chain):
-        prmap = dep_weighted_Pr_for_node_dec(node_idn,\
-            dec_idn,opmi,dm,decision_chain)
-        return
-    
+    def directF_proc__best_nodedec_map(self,f=max):
+
+        ks = list(self.opmn.keys()) 
+        d = {} 
+        for x in ks:
+            prm = self.prmap_for_nodedec(x,0,1,"greedy-lone")
+            prl = sorted([(k,v) for k,v in prm.items()])
+            d[x] = f(prl,key=lambda y:y[1])[0]
+        return d
+
     # TODO: test.
     '''
     frequency-counter process that implements

@@ -44,6 +44,25 @@ class BackgroundInfoClass(unittest.TestCase):
         assert type(bi) == BackgroundInfo
         print(bi.dm)
 
+    def test__BackgroundInfo__generate_instance_case2(self):
+        sn = SecNet_sample_TDir1v1()
+
+        irc = sn.irc 
+        srm = sn.srm
+
+        bi = BackgroundInfo.generate_instance(irc,srm)
+
+        ks = set(bi.opm[0].keys())
+        assert ks == {5, 9, 3, 2, 8}
+
+        dv = {5:12,9:8,3:13,2:42,8:110}
+
+        for k,v in bi.opm[0].items():
+                #print("K: ",k, " V: ",len(v))
+                assert len(v) == dv[k]
+        assert bi.dec_map == {0: 2}
+
+
     def test__BackgroundInfo__naive_IRC2HypStruct_map(self):
 
         sn = SecNet.unpickle_thyself("codename__ASS_SHIT",\
