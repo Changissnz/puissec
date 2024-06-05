@@ -1,7 +1,8 @@
 from dfs_struct import *
 
 """
-a std. graph is of type dict|defaultdict
+an <SNGraphContainer> (SN := SecNet) holds data of 
+type dict|defaultdict. 
 """
 class SNGraphContainer:
 
@@ -9,8 +10,8 @@ class SNGraphContainer:
         assert type(m) in {dict,defaultdict}
         self.d = m
         self.sn = sec_nodeset 
-        ##self.dfs_cache_map = defaultdict(None)
-        self.sp = defaultdict(NodePath)
+        ## node idn -> corresponding <DFSCache> instance 
+        self.sp = defaultdict(DFSCache)
         # <IsoRing> idn -> location 
         self.ring_locs = ring_locs
         # <Crackling> idn -> (location,target node)
@@ -62,7 +63,7 @@ class SNGraphContainer:
             # fetch the path 
             s = dfsc_.min_paths[k]
             if len(s) == 0: continue
-            s = np.sum(s[0].pweights)
+            s = s[0].cost()
             if s <= radius:
                 ns = ns | {k}
 
@@ -261,15 +262,34 @@ class TDirector:
     def update_tdir(self):
         return -1
 
+    # TODO: 
+    """
+    return: 
+    - bool, if `obj_stat` in {radar null,search for target},
+      otherwise <NodePath> instance to update the <TDir>
+    """
     def check_obj(self):
+        assert self.vp() in {"I","C"}
 
+        if self.obj_stat in {"radar null",\
+                "search for target"}:
+            q = self.check_radar()
+            return len(q) > 0
 
-        return -1
+        if self.obj_stat == "avoid target":
+            return -1
+
+        if self.obj_stat == "capture target": 
+            return -1
+        return
 
     """
     checks for chaser <Crackling> if 
     vantage_point = I, otherwise checks 
     for target <IsoRing>.
+
+    return:
+    - set, node locations
     """
     def check_radar(self):
         
@@ -283,24 +303,28 @@ class TDirector:
                 stat = v[1] == self.vantage_idn
                 if stat:
                     q.append(k)
-            return q 
+            return set(q) 
         
         # check for target isoring loc
         else: 
             if self.td.target_node in self.sg.ring_locs:
-                return [self.sg.ring_locs[self.td.target_node]]
-            return []
+                return set([self.sg.ring_locs[\
+                    self.td.target_node]])
+            return set()
 
     #######################
-    ######### loc search mode: used by <Crackling> to locate
-    #########                  target <IsoRing>.
+    ######### loc search mode: used by agent A to achieve its objective.
+    #########               - <Crackling> to locate target <IsoRing>.
+    #########               - <IsoRing> to distance itself from pursuing <Crackling> instances. 
 
+
+    ########################## section: extremum locator
     """
     searches for a target node to travel the agent I|C. 
     """
-    def loc_search__set_TDir(self,sgc:SNGraphContainer,\
-        rnd_struct=random):#,check_completion=True):
-        q = self.loc_search_at_ref(sgc,rnd_struct)
+    def extloc_search__set_TDir(self,sgc:SNGraphContainer,\
+        extf=max,rnd_struct=random):#,check_completion=True):
+        q = self.extloc_search_at_ref(sgc,rnd_struct,extf)
         if type(q) == type(None):
             return 
 
@@ -319,11 +343,13 @@ class TDirector:
     """
     searches for the next location. 
 
+    return: 
+    - node, of extreme distance d selected by `rnd_struct`.
     """
-    def loc_search_at_ref(self,sgc:SNGraphContainer,rnd_struct,\
-        exclude_refs:bool=True):
+    def extloc_search_at_ref(self,sgc:SNGraphContainer,rnd_struct,\
+        exclude_refs:bool=True,extf=max):
         q = self.ref_nodes[-1] 
-        candidate_list = self.loc_search_set(sgc,q)
+        candidate_list = self.loc_search_set(sgc,q,extf)
 
         if exclude_refs:
             candidate_list = candidate_list - set(self.ref_nodes)
@@ -338,15 +364,19 @@ class TDirector:
 
     """
     return:
-    - set, nodes of the greatest distance d
+    - set, nodes of the most extreme distance d (depending on `extf`). 
     """
-    def loc_search_set(self,sgc:SNGraphContainer,ref):
+    def extloc_search_set(self,sgc:SNGraphContainer,ref,extf):
+        assert extf in {min,max}
+
         if len(sgc.sp.keys()) == 0:
             return set()
         
         rkx = sorted([(k,sum(v.pweights)) for k,v in sgc.sp.items()],\
-            key=lambda x:x[1])[::-1]
-        
+            key=lambda x:x[1])
+        if extf == max:
+            rkx = rkx[::-1]
+
         mx = rkx[0]
         st = set()
         st = st | {mx[0]}
@@ -355,9 +385,87 @@ class TDirector:
                 st = st | {rkx[i][0]}
             else:
                 break  
-        return st 
+        return st
 
-# TODO: tests
-'''
-loc search: used for objective C.search_for_target
-'''
+    ###################### section: SEC-node locator
+
+    """
+    produces metrics for the choice of 
+    target node `tn` as a destination,
+    given the vantage point of the 
+    <TDirector>. 
+    """
+    def targetnode_analysis(self,tn):
+
+        return -1
+
+    """
+    analysis of node `tn` as a destination node
+    given vantage point <IsoRing>.
+
+    return:
+    - dict, <Crackling> idn -> 
+        (distance to tn / mean distance to SEC nodes).
+    """
+    def targetnode_analysis__VPI(self,tn):
+
+        # cracklings detected by radar
+        sn = self.check_radar()
+
+        if len(sn) == 0: 
+            return None
+
+        # get the distance of each crackling 
+        # to `tn`.
+        d = {}
+        dfsc = self.resource_sg.sp[tn]#self.td.location]
+        for sn_ in sn:
+            if sn_ not in dfsc.min_paths:
+                continue
+            d[sn_] = dfsc.min_paths[sn_][0].cost()
+
+        # get <Crackling> distance to SEC node
+        # crackling -> mean distance to SEC node
+        
+        ## MAYBE: min? 
+        mean_distances = self.mean_mindistance_of_nodeset(deepcopy(sn))
+        d2 = {}
+        for k,v in d.items():
+            mds = mean_distances[k] 
+            d2[k] = v / mds  
+        return d2
+
+    def mean_mindistance_of_nodeset(self,ns):
+        d = {}
+        for n in ns:
+            dx = self.secnode_distance_map(n)
+            sx = measures.zero_div(sum(dx.values()),len(dx),0.0)
+            d[n] = sx
+        return d 
+
+    """
+
+    """
+    def targetnode_analysis__VPC(self,tn):
+        return -1
+
+    """
+    calculates distance of node `n` to each 
+    of the sec nodes. 
+
+    return:
+    - sec node idn -> distance
+    """
+    def secnode_distance_map(self,n):
+
+        if n not in self.resource_sg:
+            return {}
+        
+        d = {} 
+        dfsc = self.resource_sg.sp[n]
+        for s in self.resource_sg.sn:
+            if s not in dfsc.min_paths: 
+                continue
+            npath = dfsc.min_paths[s][0]
+            d[s] = npath.cost()
+        return d
