@@ -469,3 +469,7 @@ class TDirector:
             npath = dfsc.min_paths[s][0]
             d[s] = npath.cost()
         return d
+
+    # TODO: 
+    def pass_info(self):
+        return -1 
