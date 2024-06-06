@@ -17,6 +17,9 @@ class SNGraphContainer:
         # <Crackling> idn -> (location,target node)
         self.crackling_locs = clocs
 
+    def nsec_nodeset(self):
+        return set(self.d.keys()) - self.sn
+
     def agent_loc(self,agent_idn,is_isoring:bool):
         if is_isoring:
             if agent_idn not in self.ring_locs: return None
@@ -443,33 +446,89 @@ class TDirector:
             d[n] = sx
         return d 
 
+    # TODO: needs to be demonstrated. 
     """
+    """
+    def targetnode_analysis__VPC(self,tn,rnd_struct):
 
-    """
-    def targetnode_analysis__VPC(self,tn):
-        return -1
+        if tn not in self.resource_sg.sp:
+            return None
+        dfsc = self.resource_sg.sp[tn]
+
+        cs = self.check_radar()
+
+        if len(cs) == 0: 
+            return None
+
+
+        # find the shortest path to cs
+        assert len(cs) == 1
+
+        # spot the security of I's location
+        cs = cs.pop()
+        stat = cs in self.resource_sg.sn 
+
+        # decision: if location is SEC, then 
+        #           travel to it. Otherwise,
+        #           select an NSEC for site of 
+        #           interception.
+        if stat:
+
+            if cs not in dfsc.min_paths:
+                return None
+            return dfsc.min_paths[cs][0] 
+        else:
+            sndict = self.secnode_distance_map(tn,is_sec:bool=False)
+            if len(sndict) == 0: return None
+
+            sndict_ = [(k,v) for k,v in sndict.items()] 
+            sndict_ = sorted(sndict_,key=lambda x: x[1])
+
+            qs = sndict_.pop(0)
+            sx = set([qs[0]])
+            sc = qs[1]
+            while len(sndict_) > 0:
+                snd = sndict_.pop(0)
+                if snd[1] != sc:
+                    break
+                else: 
+                    sx = sx | {snd[0]}
+
+            # choose a random nsec node of min distance to
+            # tn
+            sx = list(sx)
+            sxi = rnd_struct.randrange(0,len(sx))
+            target = sx[sxi]
+
+            if target not in dfsc.min_paths:
+                return None
+            return dfsc.min_paths[target][0]
+
+    # TODO: future
+    def load_predicted_travel_at_node(self,n,npath):
+        return -1 
 
     """
     calculates distance of node `n` to each 
     of the sec nodes. 
 
     return:
-    - sec node idn -> distance
+    - dict, sec node idn -> distance
     """
-    def secnode_distance_map(self,n):
+    def secnode_distance_map(self,n,is_sec:bool=True):
 
         if n not in self.resource_sg:
             return {}
         
+        sns = deepcopy(self.resource_sg.sn)
+        if not is_sec:
+            sns = self.resource_sg.nsec_nodeset()
+
         d = {} 
         dfsc = self.resource_sg.sp[n]
-        for s in self.resource_sg.sn:
+        for s in sns:
             if s not in dfsc.min_paths: 
                 continue
             npath = dfsc.min_paths[s][0]
             d[s] = npath.cost()
         return d
-
-    # TODO: 
-    def pass_info(self):
-        return -1 
