@@ -87,7 +87,7 @@ class BackgroundInfoClass(unittest.TestCase):
 
 class OrderOfCracknClass(unittest.TestCase):
 
-    def OrderOfCrackn__order_by_depchain_map__case1(self):
+    def test__OrderOfCrackn__order_by_depchain_map__case1(self):
         sn1 = SecNet.unpickle_thyself("codename__ASS_SHIT",\
                 DEFAULT_SINGLETON_RANGE,random,9)
 

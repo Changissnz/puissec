@@ -337,7 +337,7 @@ class Cracker:
 
     def __init__(self,hyp_map,backgroundInfo,\
         crackling_sz:int):
-        assert type(hyp_map) in {dict,type(None)}
+        assert type(hyp_map) in {dict,defaultdict,type(None)}
         assert type(backgroundInfo) == BackgroundInfo
         assert type(crackling_sz) == int and crackling_sz > 0
         self.hyp_map = hyp_map 

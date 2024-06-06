@@ -148,6 +148,8 @@ class SecNet:
         if type(self.node_loc_assignment) == type(None):
             self.assign_loc()
         else: 
+            print("ASS ERTIA")
+            
             assert type(self.node_loc_assignment) == dict
             assert max(self.node_loc_assignment.keys()) == len(self.irc) - 1 
             assert min(self.node_loc_assignment.keys()) == 0 
@@ -470,21 +472,25 @@ def SecNet_sample_TDir1v1():
 sample used to demonstrate correctness of 
 <TDirector>. 
 """
-def SecNet_sample_C3(sec_nodeset={3,6,9,14},\
-    node_loc_assignment={}):
+def SecNet_sample_C3():
 
-    """
-class SecNet:
-
-    def __init__(self,irc,G,sec_nodeset,\
-        node_loc_assignment= None,entry_points=3,\
-        bound=DEFAULT_SINGLETON_RANGE,\
-        rnd_struct=random,rnd_seed=9):
-    """
+    random.seed(14324)
+    np.random.seed(14324)
+    ss,sndg = SecSeq_sample_4(num_secs=1,singleton_range=DEFAULT_SINGLETON_RANGE,\
+        num_conn=5000,min_components=1,dconn_ratio=0.4,drange_max=1)
 
     G = SecNet_graph_sample_C3()
+    sec_nodeset = {3,6,9,14}
+    node_loc_assignment = {0:4}
+    entry_points = {1,5,10,12,17} 
+    bound = DEFAULT_SINGLETON_RANGE
+    rnd_struct = random
+    rnd_seed = 94312
 
-    return -1 
+    sn = SecNet(ss,G,sec_nodeset,\
+            node_loc_assignment,entry_points,\
+            bound,rnd_struct,rnd_seed)
+    return sn
 
 def SRefMap_sample1(): 
     sn = SecNet_sample1()

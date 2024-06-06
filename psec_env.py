@@ -1,4 +1,4 @@
-from secnet import * 
+from cracker import * 
 
 class TDBridge:
 
@@ -24,12 +24,12 @@ and 1 <Cracker> instance.
 """
 class SecEnv:
 
-    def __init__(self,sn,cracker):
+    def __init__(self,sn,crck):
         assert type(sn) == SecNet
-        assert type(cracker) == Cracker
+        assert type(crck) == Cracker
 
         self.sn = sn
-        self.cracker = cracker
+        self.crck = crck 
         self.td = TDBridge()
         return
 
@@ -63,3 +63,14 @@ class SecEnv:
 
     def load_crackling(self):
         return -1 
+
+def SecEnv_sample_1():
+    sn3 = SecNet_sample_C3()
+    bi = BackgroundInfo.generate_instance(\
+            sn3.irc,sn3.srm)
+    i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn3.irc,full_hypseq=False,\
+            naive_split=2)
+
+    crck = Cracker(i2hm,bi,6)
+
+    return SecEnv(sn3,crck) 
