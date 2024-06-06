@@ -30,11 +30,15 @@ class Crackling:
         self.td = tdir 
         return
 
-    ####
-    #def load_TDir(self,tdir):
-    #    assert type(tdir) == TDir
-    #    self.td = tdir
-    ####
+    # TODO: test 
+    """
+    used by <Crackling> instance to decide 
+    to accept an entry point as a point
+    """
+    def accept_TDirector_at_entry_point(self):
+        assert type(self.td) == TDirector
+        q = self.td.check_radar()
+        return len(q) > 0
 
     def set_cvec(self):
         ciseq = default_cvec_iselector_seq()

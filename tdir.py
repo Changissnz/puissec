@@ -6,7 +6,8 @@ type dict|defaultdict.
 """
 class SNGraphContainer:
 
-    def __init__(self,m,sec_nodeset,ring_locs,clocs):
+    def __init__(self,m,sec_nodeset,ring_locs,clocs,\
+        entry_points):
         assert type(m) in {dict,defaultdict}
         self.d = m
         self.sn = sec_nodeset 
@@ -16,6 +17,8 @@ class SNGraphContainer:
         self.ring_locs = ring_locs
         # <Crackling> idn -> (location,target node)
         self.crackling_locs = clocs
+        # set, node idn. for entry points
+        self.entry_points = entry_points
 
     def nsec_nodeset(self):
         return set(self.d.keys()) - self.sn
@@ -94,7 +97,9 @@ class SNGraphContainer:
             if v[0] in ns: 
                 occm[k] = v
 
-        sgc = SNGraphContainer(sg,snx,nla,occm)
+        entry_points = self.entry_points.intersection(ns)
+
+        sgc = SNGraphContainer(sg,snx,nla,occm,entry_points)
         sgc.sp = spx
         return sgc 
 
@@ -242,6 +247,10 @@ class TDirector:
 
         self.td_log = [] 
 
+        # list of entry point node idn. that <TDirector>
+        # attempted. 
+        self.entry_point_attempts = []
+
         # Resource subgraph, of type <SNGraphContainer>
         self.resource_sg = None
 
@@ -257,7 +266,7 @@ class TDirector:
 
     def load_graph(self,G:SNGraphContainer):
         assert type(G) == SNGraphContainer
-        self.resource_sg = G 
+        self.resource_sg = G
 
     def loc(self):
         return self.td.location
@@ -398,9 +407,11 @@ class TDirector:
     given the vantage point of the 
     <TDirector>. 
     """
-    def targetnode_analysis(self,tn):
+    def targetnode_analysis(self,tn,rnd_struct):
 
-        return -1
+        if self.vp() == "C": 
+            return self.targetnode_analysis__VPC(tn,rnd_struct)
+        return self.targetnode_analysis__VPI(tn,rnd_struct)
 
     """
     analysis of node `tn` as a destination node

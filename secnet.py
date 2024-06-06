@@ -276,7 +276,8 @@ class SecNet:
 
         ocm = self.occ_crackl_map(set(self.d.keys()))
 
-        self.sgc = SNGraphContainer(d2,deepcopy(self.sec_nodeset),ring_locs,ocm)
+        self.sgc = SNGraphContainer(d2,deepcopy(self.sec_nodeset),\
+            ring_locs,ocm,deepcopy(self.entry_points))
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):
@@ -401,6 +402,23 @@ class SecNet:
                 target = v[0].target_of_HypStruct()
                 d[k] = (v[1],target)
         return d 
+
+    # TODO: test.
+    def tdirector_instance_for_crackling_at_entry_point(self,\
+        cidn,entry_point,radius=4):
+
+        assert cidn in self.occ_crackl
+        assert entry_point in self.entry_points
+        assert type(self.occ_crackl[cidn][0].hs) == HypStruct
+
+        target = self.occ_crack[cidn][0].hs.seq_idn
+        td = TDirector(entry_point,target,"C",cidn,radius)
+
+        sngc = self.subgraph_for_TDir(td.td)
+        td.load_graph(sngc)
+
+        self.occ_crackl[cidn][0].load_TDirector(td)
+        return
 
 def SecNet_sample1(ss=SecSeq_sample_1(1)):
     #ss = SecSeq_sample_1(1)
