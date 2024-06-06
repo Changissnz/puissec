@@ -489,7 +489,7 @@ class TDirector:
                 return None
             return dfsc.min_paths[cs][0] 
         else:
-            sndict = self.secnode_distance_map(tn,is_sec:bool=False)
+            sndict = self.secnode_distance_map(tn,is_sec=False)
             if len(sndict) == 0: return None
 
             sndict_ = [(k,v) for k,v in sndict.items()] 

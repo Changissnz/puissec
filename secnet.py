@@ -1,5 +1,6 @@
 from collections import defaultdict 
 from bridge import * 
+from struct_samples import *
 
 class IsoRingedChain:
 
@@ -420,6 +421,9 @@ class SecNet:
         self.occ_crackl[cidn][0].load_TDirector(td)
         return
 
+############################################################
+############################################################
+
 def SecNet_sample1(ss=SecSeq_sample_1(1)):
     #ss = SecSeq_sample_1(1)
     sec_node_count = 12
@@ -461,6 +465,26 @@ def SecNet_sample_TDir1v1():
     for s_ in sn.irc.irl:
         s_.explode_contents()
     return sn 
+
+"""
+sample used to demonstrate correctness of 
+<TDirector>. 
+"""
+def SecNet_sample_C3(sec_nodeset={3,6,9,14},\
+    node_loc_assignment={}):
+
+    """
+class SecNet:
+
+    def __init__(self,irc,G,sec_nodeset,\
+        node_loc_assignment= None,entry_points=3,\
+        bound=DEFAULT_SINGLETON_RANGE,\
+        rnd_struct=random,rnd_seed=9):
+    """
+
+    G = SecNet_graph_sample_C3()
+
+    return -1 
 
 def SRefMap_sample1(): 
     sn = SecNet_sample1()
