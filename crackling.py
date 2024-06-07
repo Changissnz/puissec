@@ -27,7 +27,7 @@ class Crackling:
 
     def load_TDirector(self,td): 
         assert type(td) == TDirector
-        self.td = tdir 
+        self.td = td
         return
 
     # TODO: test 

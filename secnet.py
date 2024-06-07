@@ -379,7 +379,9 @@ class SecNet:
         assert node in self.entry_points
         assert type(c) == Crackling
         assert type(c.hs) == HypStruct
-        assert type(c.td) == TDir
+        ## TODO: delete. 
+        ##assert type(c.td) == TDir
+        
         # use the <HypStruct> for `c` to set 
         # <TDir>. 
         self.occ_crackl[c.cidn] = (c,node)
@@ -414,7 +416,7 @@ class SecNet:
         assert entry_point in self.entry_points
         assert type(self.occ_crackl[cidn][0].hs) == HypStruct
 
-        target = self.occ_crack[cidn][0].hs.seq_idn
+        target = self.occ_crackl[cidn][0].hs.seq_idn
         td = TDirector(entry_point,target,"C",cidn,radius)
 
         sngc = self.subgraph_for_TDir(td.td)

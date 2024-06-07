@@ -342,7 +342,7 @@ CRACKLING_STAT = {"stationary","mobile"}
 class Cracker:
 
     def __init__(self,hyp_map,backgroundInfo,\
-        crackling_sz:int):
+        crackling_sz:int,radar_radius:int=4):
         assert type(hyp_map) in {dict,defaultdict,type(None)}
         assert type(backgroundInfo) == BackgroundInfo
         assert type(crackling_sz) == int and crackling_sz > 0
@@ -352,12 +352,14 @@ class Cracker:
         # holds <HypStruct> instances attempted from `hyp_map`
         self.hyp_map_cache = defaultdict(None)
         self.bi = backgroundInfo
+        self.crackling_sz = crackling_sz
+        self.radar_radius = radar_radius
         self.cracklings = [] 
         self.cidn_counter = 0
 
         self.calculate_oop()
         self.csoln = CrackSoln() 
-
+        self.td = None
         return
 
     '''
@@ -381,7 +383,6 @@ class Cracker:
             if c.cidn == cidn:
                 return c
         return None 
-
 
     """
     return:
@@ -448,6 +449,11 @@ class Cracker:
         assert type(c) != type(None)
         return td.check_obj()
 
+    def load_TDirector(self,cidn,td):
+        c = self.fetch_crackling(cidn)
+        assert type(c) != type(None)
+        c.load_TDirector(td)
+        
     # TODO: complete
     def crackling_stat(self,c_idn):
         return -1 
