@@ -91,12 +91,10 @@ class SecEnv:
         # find an entry point that crcklng accepts
         tds = []
         cidn = crcklng.cidn
-        print("crackling #{}".format(cidn))
         stat_ = False
         for x in self.sn.entry_points:
             # set crackling at entry point
             self.sn.set_crackling(crcklng,x)
-            print('declare tdirector: {}'.format(x)) 
             tdirector = self.sn.tdirector_instance_for_crackling_at_entry_point(\
                 cidn,x,radius=self.crck.radar_radius)
         

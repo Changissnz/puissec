@@ -17,8 +17,6 @@ class SecEnvClass(unittest.TestCase):
     def test__SecEnv__instantiate_cracker_target__case1(self):
 
         senv = SecEnv_sample_1()
-
-        print("instantiating cracker target")
         senv.instantiate_cracker_target()
 
         cx = senv.crck.cracklings[0]

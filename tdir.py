@@ -157,7 +157,7 @@ class TDir:
         assert self.location in G.d
         ##print("RING LOCS: ",G.ring_locs)
         ##print("...")
-        print("LOADING PATH")
+        ##print("LOADING PATH")
 
         target_loc = self.search_for_target_node(G)
 
