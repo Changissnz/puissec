@@ -141,11 +141,23 @@ class TDir:
         self.active_stat = True 
         return
 
+    def __str__(self):
+        s = "<TDIR>\n"
+        s += "\t* loc: {}\n".format(self.location)
+        s += "\t* target: {}\n".format(self.target_node)
+        s += "\t* vantage: {}\n".format(self.vantage_point)
+        s += "\t* radius: {}\n".format(self.radius)
+        s += "\t* velocity: {}\n".format(self.velocity)
+        s += "\t* nodepath:\n{}".format(str(self.node_path))
+        return s 
+
+
     def load_path(self,G):
         assert type(G) == SNGraphContainer
         assert self.location in G.d
         ##print("RING LOCS: ",G.ring_locs)
         ##print("...")
+        print("LOADING PATH")
 
         target_loc = self.search_for_target_node(G)
 
@@ -267,6 +279,7 @@ class TDirector:
     def load_graph(self,G:SNGraphContainer):
         assert type(G) == SNGraphContainer
         self.resource_sg = G
+        self.td.load_path(G) 
 
     def loc(self):
         return self.td.location
@@ -319,8 +332,8 @@ class TDirector:
         
         # check for target isoring loc
         else: 
-            if self.td.target_node in self.sg.ring_locs:
-                return set([self.sg.ring_locs[\
+            if self.td.target_node in self.resource_sg.ring_locs:
+                return set([self.resource_sg.ring_locs[\
                     self.td.target_node]])
             return set()
 
