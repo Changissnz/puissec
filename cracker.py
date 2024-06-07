@@ -317,16 +317,22 @@ class BackgroundInfo:
 class CrackSoln:
 
     def __init__(self):
-        self.d = defaultdict(None) 
+        self.d = defaultdict(None)
+        self.prev_soln = defaultdict(list) 
         return
 
     """
-    - t := (sec idn.,expected sec value,pr of score)
+    - t := (sec idn.,opt. idn,expected sec value,pr of score)
     """
     def __add__(self,t:tuple):
         assert type(t) == tuple
-        assert len(t) == 3
-        return -1 
+        assert len(t) == 4
+
+        # case: update soln
+        if t[0] in self.d:
+            self.prev_soln[t[0]].append(self.d[t[0]])
+        self.d[t[0]] = (t[1],t[2],t[3])
+        return
 
     def match_pr(self):
         return -1 
@@ -340,11 +346,18 @@ class Cracker:
         assert type(hyp_map) in {dict,defaultdict,type(None)}
         assert type(backgroundInfo) == BackgroundInfo
         assert type(crackling_sz) == int and crackling_sz > 0
+        
+        # <sec idn> -> <sec dim> -> list::<HypStruct> 
         self.hyp_map = hyp_map 
+        # holds <HypStruct> instances attempted from `hyp_map`
+        self.hyp_map_cache = defaultdict(None)
         self.bi = backgroundInfo
         self.cracklings = [] 
+        self.cidn_counter = 0
 
         self.calculate_oop()
+        self.csoln = CrackSoln() 
+
         return
 
     '''
@@ -357,19 +370,85 @@ class Cracker:
     '''
     # TODO: complete
     def calculate_oop(self): 
-        return -1 
+        ooc = OrderOfCrackn()
+        soln = ooc.order_by_depchain_map(self.bi.dm)
+        self.oop = soln 
+        self.oopi = 0
+        return
+
+    def fetch_crackling(self,cidn):
+        for c in self.cracklings: 
+            if c.cidn == cidn:
+                return c
+        return None 
+
+
+    """
+    return:
+    - set, idn of <Sec> to target
+    """
+    def next_target(self):
+
+        if self.oopi >= len(self.oop):
+            return None
+        return self.oop[self.oopi]
+
+    def load_cracklings_for_secset(self,targetdim_seq):
+        #nt = self.next_target()
+        self.cracklings.clear() 
+
+        for (nt_,d) in targetdim_seq: 
+            self.load_crackling(nt_,d)
+        return
 
     # TODO: complete
-    def load_crackling(self):
+    def load_crackling(self,sec_idn,sec_dim):
 
-        # declare the HypStruct using <BackgroundInfo> 
+        hs = self.next_hypstruct(sec_idn,sec_dim)
 
-        return -1
+        if type(hs) == type(None):
+            return False
 
-    # TODO: complete
-    def load_crackling_TDirector(self):
-        return -1 
+        cr = Crackling(cidn=self.cidn_counter)
+        self.cidn_counter += 1
+        cr.load_HypStruct(hs) 
+        self.cracklings.append(cr) 
+        return cr
+
+    """
+    return:
+    - <HypStruct>, the next attempt given the variables
+                   `sec_idn`,`sec_dim`. 
+    """
+    def next_hypstruct(self,sec_idn,sec_dim):
+
+        if sec_idn not in self.hyp_map:
+            return None
+
+        if sec_dim not in self.hyp_map[sec_idn]:
+            return None
+
+        if len(self.hyp_map[sec_idn][sec_dim]) == 0:
+            return None
+
+        hs = self.hyp_map[sec_idn][sec_dim].pop(0)
+        return hs
+
+    """
+    return:
+    - bool; response to accept <TDirector> given the 
+            <HypStruct> of <Crackling> `cidn`. 
+    """
+    def accept_TDirector_at_entry_point(self,cidn,td):
+        assert type(td) == TDirector
+        assert td.vp() == "C"
+        assert td.obj_stat == "search for target"
+
+        c = self.fetch_crackling(cidn)
+        assert type(c) != type(None)
+        return td.check_obj()
 
     # TODO: complete
     def crackling_stat(self,c_idn):
         return -1 
+

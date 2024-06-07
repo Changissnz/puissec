@@ -420,8 +420,18 @@ class SecNet:
         sngc = self.subgraph_for_TDir(td.td)
         td.load_graph(sngc)
 
-        self.occ_crackl[cidn][0].load_TDirector(td)
-        return
+        return td
+        ##self.occ_crackl[cidn][0].load_TDirector(td)
+        ##return
+
+    def isoringset_dim(self,ir_set):
+        dx = {}
+        for ir in ir_set:
+            irx = self.irc.fetch_IsoRing(ir)
+            assert type(irx) != type(None)
+            sx = irx.sec_cache[irx.repi]
+            dx[ir] = sx.dim()
+        return dx 
 
 ############################################################
 ############################################################

@@ -6,8 +6,8 @@ from tdir import *
 class Crackling:
 
     def __init__(self,cmp_deg=1.5,cidn=None):
-        self.cmp_deg = 1.5 
-        self.cidn = None
+        self.cmp_deg = cmp_deg 
+        self.cidn = cidn
         self.hs = None 
         self.td = None
         self.rss = None
