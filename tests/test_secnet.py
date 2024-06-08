@@ -1,5 +1,6 @@
 from secnet import *
 import unittest 
+import time
 
 ### lone file test 
 """
@@ -27,6 +28,14 @@ class SecNetClass(unittest.TestCase):
     def test__SecNet__generate__case1(self):
         sn = SecNet_sample1()
         assert True
+
+    def test__SecNet__generate__case2(self):
+        ts = time.time()
+        sn = SecNet_sample_TDirNv1()
+        ts2 = time.time() - ts
+
+        assert ts2 <= 30.0 # seconds 
+        return
 
     def test__Secnet__unpickle_thyself(self):
         fp = "codename__ASS_SHIT"
@@ -71,7 +80,6 @@ class SecNetClass(unittest.TestCase):
                 v_ = v[0]
                 assert sum(v_.pweights) <= 4
         return 
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -26,8 +26,8 @@ class SecEnvClass(unittest.TestCase):
         assert q.target_node == 0
         assert q.location == 1
 
-        p = [1, 0, 4]
-        pw = [1, 1]
+        p = [1, 4]
+        pw = [1]
         npath_actual = NodePath.preload(p,pw) 
         assert q.node_path == npath_actual
         assert senv.sn.node_loc_assignment[0] == q.node_path.p[-1]

@@ -7,7 +7,7 @@ type dict|defaultdict.
 class SNGraphContainer:
 
     def __init__(self,m,sec_nodeset,ring_locs,clocs,\
-        entry_points):
+        entry_points,path_size=10):
         assert type(m) in {dict,defaultdict}
         self.d = m
         self.sn = sec_nodeset 
@@ -19,6 +19,9 @@ class SNGraphContainer:
         self.crackling_locs = clocs
         # set, node idn. for entry points
         self.entry_points = entry_points
+        # 
+
+        self.path_size = path_size
 
     def nsec_nodeset(self):
         return set(self.d.keys()) - self.sn
@@ -46,17 +49,17 @@ class SNGraphContainer:
                 ks.append(k)
         return ks
 
-
     def DFSCache_proc(self,n):
         dfsc = DFSCache(n,deepcopy(self.d),\
                 search_head_type=1)
         dfsc.exec_DFS()
-        dfsc.store_minpaths(num_paths=1)
+        dfsc.store_minpaths(num_paths=self.path_size)
         self.sp[n] = dfsc
         return 
 
     def DFSCache_fullproc(self):
         for k in self.d.keys():
+            ##print('dfs proc for {}'.format(k))
             self.DFSCache_proc(k)
 
     def subgraph_by_radius_at_refnode(self,r,radius):
@@ -121,7 +124,6 @@ Was supposed to be named Traversal Directing [Wang Fong Qhong].
 By and through the connection. 
 By,through, and for the connection.
 """
-
 class TDir:
 
     def __init__(self,loc,target_node,\

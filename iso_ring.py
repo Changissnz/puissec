@@ -240,14 +240,17 @@ class IsoRing:
         ir.sec_cache = s1 
         return ir 
 
-    def explode_contents(self,optima_size_limit=1000):
+    def explode_contents(self,optima_size_limit=1000,\
+        num_blooms=float('inf')):
         s = len(self.sec_cache[-1].opm)
         ##print("starting length for {}: {}".format\
         ##    (len(self.sec_cache[-1].seq),s))
-        while s < optima_size_limit:
+        i = 0
+        while s < optima_size_limit and i < num_blooms:
             sc = self.sec_cache.pop(-1)
             ##?
             sc.process_one_bloomiso(optima_size_limit - s)
+            i += 1 
             s2 = sc.generate_next_Sec()
             s2[0].idn_tag = sc.idn_tag 
             ts2 = s2[2]

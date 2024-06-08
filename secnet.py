@@ -131,7 +131,7 @@ class SecNet:
     def __init__(self,irc,G,sec_nodeset,\
         node_loc_assignment= None,entry_points=3,\
         bound=DEFAULT_SINGLETON_RANGE,\
-        rnd_struct=random,rnd_seed=9):
+        rnd_struct=random,rnd_seed=9,path_size=10):
         
         assert len(irc) > 0 and type(irc) == SecSeq
         assert len(sec_nodeset) >= len(irc) 
@@ -139,6 +139,9 @@ class SecNet:
         ##print("RNDSTRUCT#1: ",rnd_struct)
         self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
         self.rnd_struct = rnd_struct 
+        self.path_size = path_size 
+
+        print("made IRC")
 
         self.d = G 
         self.sec_nodeset = sec_nodeset
@@ -281,6 +284,7 @@ class SecNet:
 
         self.sgc = SNGraphContainer(d2,deepcopy(self.sec_nodeset),\
             ring_locs,ocm,deepcopy(self.entry_points))
+        self.sgc.path_size = self.path_size
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):
@@ -348,7 +352,7 @@ class SecNet:
     """
     @staticmethod
     def generate(irc,sec_node_count,\
-        nsec_node_count,num_entry,rnd_struct,*sngs_args):
+        nsec_node_count,num_entry,path_size,rnd_struct,*sngs_args):
         q = sec_node_count + nsec_node_count
         assert q >= len(irc) 
         assert num_entry <= q and num_entry > 0 
@@ -356,16 +360,18 @@ class SecNet:
         q_ = [i for i in range(q)] 
         rnd_struct.shuffle(q_)
 
+        print("make frame")
         snv = q_[:sec_node_count]
         nsnv = q_[sec_node_count:]
         sngs = SecNetGenScheme(*sngs_args)
         snfg = SecNetFrameGen(snv,nsnv,sngs)
         snfg.construct_frame()
+        print("after frame")
 
         node_loc_assignment = None
         sn = SecNet(irc,snfg.d,set(snfg.sec_nodevec),\
             node_loc_assignment,entry_points=num_entry,\
-            rnd_struct=rnd_struct)
+            rnd_struct=rnd_struct,path_size=path_size)
         return sn 
 
     #################################################
@@ -446,7 +452,7 @@ def SecNet_sample1(ss=SecSeq_sample_1(1)):
     rnd_struct = random
     sn = SecNet.generate(ss,sec_node_count,\
             nsec_node_count,num_entry,\
-            rnd_struct,"spine frame",772) 
+            10,rnd_struct,"spine frame",772) 
     return sn 
 
 def pickled_SecNet_sample_Q(): 
@@ -474,7 +480,7 @@ def SecNet_sample_TDir1v1():
     rnd_struct = random
     sn = SecNet.generate(ss,sec_node_count,\
             nsec_node_count,num_entry,\
-            rnd_struct,"pairing frame",223) 
+            10,rnd_struct,"pairing frame",223) 
 
     for s_ in sn.irc.irl:
         s_.explode_contents()
@@ -503,6 +509,31 @@ def SecNet_sample_C3():
             node_loc_assignment,entry_points,\
             bound,rnd_struct,rnd_seed)
     return sn
+
+"""
+sample tes
+"""
+def SecNet_sample_TDirNv1():
+    random.seed(100734)
+    np.random.seed(371224)
+    ##print("SS")
+    ss,sndg = SecSeq_sample_4(num_secs=25,singleton_range=DEFAULT_SINGLETON_RANGE,\
+        num_conn=100,min_components=3,dconn_ratio=0.8,drange_max=4)
+
+    sec_node_count = 25
+    nsec_node_count = 34
+    num_entry = 4
+    rnd_struct = random
+    ##print("SN")
+    sn = SecNet.generate(ss,sec_node_count,\
+            nsec_node_count,num_entry,\
+            1,rnd_struct,"pairing frame",223) 
+
+    ##print("exploding")
+    for s_ in sn.irc.irl:
+        ##print("exploding {}".format(s_.sec.idn_tag))
+        s_.explode_contents(num_blooms=2)
+    return sn 
 
 def SRefMap_sample1(): 
     sn = SecNet_sample1()

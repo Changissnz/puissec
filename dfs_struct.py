@@ -97,7 +97,7 @@ class DFSCache:
 
         # move to a random available node from the reference
         q = self.ref_neighbors_travelled[self.reference]
-        available = self.d[self.reference] - self.ref_neighbors_travelled[self.reference]
+        available = set(self.d[self.reference]) - self.ref_neighbors_travelled[self.reference]
 
         stat1 = len(available) == 0
         stat2 = len(self.reference_varcache) == 0
@@ -184,8 +184,8 @@ class DFSCache:
         for k in ns:
             paths = self.paths_to_head(k,num_paths)
             ##print("num paths: ",len(paths))
-            sorted_paths = paths
-            #sorted_paths = sorted(paths,key=lambda p: p.cost(cost_func))
+            #sorted_paths = paths
+            sorted_paths = sorted(paths,key=lambda p: p.cost(cost_func))
             self.min_paths[k] = sorted_paths
         return
 

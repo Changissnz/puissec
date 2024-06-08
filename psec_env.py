@@ -112,8 +112,9 @@ class SecEnv:
             self.sn.set_crackling(crcklng,tds[qi]) 
         return True
 
-def SecEnv_sample_1():
-    sn3 = SecNet_sample_C3()
+def SecEnv_sample_1(sn3=SecNet_sample_C3()):
+    #sn3 = SecNet_sample_C3()
+    print("generating background info")
     bi = BackgroundInfo.generate_instance(\
             sn3.irc,sn3.srm)
     i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn3.irc,full_hypseq=False,\
@@ -122,3 +123,16 @@ def SecEnv_sample_1():
     crck = Cracker(i2hm,bi,6)
 
     return SecEnv(sn3,crck) 
+
+"""
+def SecEnv_sample_2():
+    sn3 = SecNet_sample_TDirNv1()
+    bi = BackgroundInfo.generate_instance(\
+            sn3.irc,sn3.srm)
+    i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn3.irc,full_hypseq=False,\
+            naive_split=2)
+
+    crck = Cracker(i2hm,bi,6)
+
+    return SecEnv(sn3,crck) 
+""" 
