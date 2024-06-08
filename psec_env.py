@@ -75,16 +75,15 @@ class SecEnv:
         self.update_cracklings_to_SecNet()
         return 
 
+    # TODO: 
     def run_cracklings(self):
 
         # iterate through each crackling in 
         return -1
 
+    # TODO: 
     def run_crackling(self,crackling_index):
-
         crckl = self.crck.cracklings[crackling_index]
-
-
         return -1 
 
     """
