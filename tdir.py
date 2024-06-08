@@ -286,6 +286,16 @@ class TDirector:
     def loc(self):
         return self.td.location
 
+    def switch_obj_stat(self):
+        if self.obj_stat == "avoid target":
+            self.obj_stat = "radar null"
+        elif self.obj_stat == "radar null":
+            self.obj_stat = "avoid target"
+        elif self.obj_stat == "search for target":
+            self.obj_stat = "capture target"
+        else:
+            self.obj_stat = "search for target"
+
     def update_tdir(self):
         return -1
 
@@ -349,8 +359,10 @@ class TDirector:
     """
     searches for a target node to travel the agent I|C. 
     """
-    def extloc_search__set_TDir(self,sgc:SNGraphContainer,\
-        extf=max,rnd_struct=random):#,check_completion=True):
+    def extloc_search__set_TDir(self,extf=max,rnd_struct=random): 
+    #(self,sgc:SNGraphContainer,extf=max,rnd_struct=random):#,check_completion=True):
+
+        assert type(self.resource_sg) == SNGraphContainer
         q = self.extloc_search_at_ref(sgc,rnd_struct,extf)
         if type(q) == type(None):
             return 
@@ -361,6 +373,7 @@ class TDirector:
         r = self.td.radius
         v = self.td.velocity
 
+        print("target node, before {} after {}".format(tn,q))
         tn = q 
         tdx = TDir(l,tn,vp,r,v)
         self.td_log.append(self.td)

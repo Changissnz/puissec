@@ -50,6 +50,9 @@ class SecEnv:
         self.td.pass_info__G(c,self.sn)
         return
 
+    ############### methods for instantiating and running
+    ############### <Crackling> agents. 
+
     def run_agent(self,is_sn:bool=True):
         if is_sn:
             q = self.sn
@@ -57,10 +60,6 @@ class SecEnv:
             q = self.crck
         return -1
 
-    def run_cracker(self):
-        return -1
-
-    # TODO: test this
     """
     process that handles the instantiation
     of <Crackling>+<TDirector> for the 
@@ -75,6 +74,29 @@ class SecEnv:
         self.crck.load_cracklings_for_secset(dx)
         self.update_cracklings_to_SecNet()
         return 
+
+    def run_cracklings(self):
+
+        # iterate through each crackling in 
+        return -1
+
+    def run_crackling(self,crackling_index):
+
+        crckl = self.crck.cracklings[crackling_index]
+
+
+        return -1 
+
+    """
+    pass graph info to the Crackling tdirector
+    """
+    def update_crackling_graph(self,crackling_index):
+        crckl = self.crck.cracklings[crackling_index]
+        tdr = crckl.fetch_tdir()
+        sg = self.sn.subgraph_for_TDir(tdr)
+        crckl.td.load_graph(sngc)
+
+    ########################################################
 
     """
     update the <Crackling> instances declared by 
@@ -109,6 +131,7 @@ class SecEnv:
             print()
             stat_ = self.crck.accept_TDirector_at_entry_point(cidn,tdirector)
             if stat_: 
+                tdirector.switch_obj_stat()
                 self.crck.load_TDirector(cidn,tdirector)
                 break
             tds.append(tdirector)

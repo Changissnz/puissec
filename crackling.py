@@ -30,6 +30,19 @@ class Crackling:
         self.td = td
         return
 
+    def fetch_tdir(self):
+        if type(self.td) == type(None):
+            return None
+        return self.td.td 
+
+    def move_TDirector(self,timespan=1.0):
+
+        if self.td.obj_stat == "search for target":
+            assert False, "not programmed yet."
+        else: 
+            assert False, "not programmed yet."
+        return
+
     # TODO: test 
     """
     used by <Crackling> instance to decide 

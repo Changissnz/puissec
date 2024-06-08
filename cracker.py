@@ -394,8 +394,12 @@ class Cracker:
             return None
         return self.oop[self.oopi]
 
+    """
+    loads the appropriate number of <Crackling> 
+    instances for the target set of <Sec> instances, 
+    `targetdim_seq`. 
+    """
     def load_cracklings_for_secset(self,targetdim_seq):
-        #nt = self.next_target()
         self.cracklings.clear() 
 
         for (nt_,d) in targetdim_seq: 
@@ -453,7 +457,7 @@ class Cracker:
         c = self.fetch_crackling(cidn)
         assert type(c) != type(None)
         c.load_TDirector(td)
-        
+
     # TODO: complete
     def crackling_stat(self,c_idn):
         return -1 
