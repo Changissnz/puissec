@@ -33,5 +33,14 @@ class SecEnvClass(unittest.TestCase):
         assert senv.sn.node_loc_assignment[0] == q.node_path.p[-1]
         assert q.node_path.p[-1] == 4
 
+    def test__SecEnv__instantiate_cracker_target__case2(self):
+
+        se = SecEnv_sample_1(sn3=SecNet_sample_TDirNv1())
+        se.instantiate_cracker_target()
+        assert len(se.crck.cracklings) == 1
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

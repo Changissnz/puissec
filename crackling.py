@@ -207,8 +207,8 @@ def adjust_bounds__F0(b,V_f):
     r = closest_reference_to_bound_start(b,V_f)
     bx = deepcopy(b[:,1])
 
-    print("ADJUSTING ",bx) 
-    print("UNIT ",V_f)
+    ##print("ADJUSTING ",bx) 
+    ##print("UNIT ",V_f)
 
     qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
     V_f = np.array(qi) 

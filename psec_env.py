@@ -76,6 +76,10 @@ class SecEnv:
         self.update_cracklings_to_SecNet()
         return 
 
+    """
+    update the <Crackling> instances declared by 
+    <Cracker> to <SecNet> var.
+    """
     def update_cracklings_to_SecNet(self):
         stat = True
         for i in range(len(self.crck.cracklings)):
@@ -85,6 +89,9 @@ class SecEnv:
             stat = stat and stat2
         return stat
 
+    """
+    pre-requisite method for above method. 
+    """
     def update_crackling_to_SecNet(self,crackling_index):
         crcklng = self.crck.cracklings[crackling_index]
     
@@ -97,7 +104,9 @@ class SecEnv:
             self.sn.set_crackling(crcklng,x)
             tdirector = self.sn.tdirector_instance_for_crackling_at_entry_point(\
                 cidn,x,radius=self.crck.radar_radius)
-        
+            print("X: ",x)
+            print(tdirector.loc())
+            print()
             stat_ = self.crck.accept_TDirector_at_entry_point(cidn,tdirector)
             if stat_: 
                 self.crck.load_TDirector(cidn,tdirector)
@@ -105,34 +114,25 @@ class SecEnv:
             tds.append(tdirector)
 
         if not stat_:
+            print("NO ENTRY POINT; choose random.")
             if len(tds) == 0:
                 return False
-            qi = rnd_struct.randrange(0,len(tds))
+            qi = self.rnd_struct.randrange(0,len(tds))
+
+            print("TDS SELECTION")
+            xs = tds[qi]
+            print(xs)
+            print("location: ",xs.loc())
+
             self.crck.load_TDirector(cidn,tds[qi])
-            self.sn.set_crackling(crcklng,tds[qi]) 
+            self.sn.set_crackling(crcklng,tds[qi].loc()) 
         return True
 
 def SecEnv_sample_1(sn3=SecNet_sample_C3()):
-    #sn3 = SecNet_sample_C3()
     print("generating background info")
     bi = BackgroundInfo.generate_instance(\
             sn3.irc,sn3.srm)
     i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn3.irc,full_hypseq=False,\
             naive_split=2)
-
     crck = Cracker(i2hm,bi,6)
-
     return SecEnv(sn3,crck) 
-
-"""
-def SecEnv_sample_2():
-    sn3 = SecNet_sample_TDirNv1()
-    bi = BackgroundInfo.generate_instance(\
-            sn3.irc,sn3.srm)
-    i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn3.irc,full_hypseq=False,\
-            naive_split=2)
-
-    crck = Cracker(i2hm,bi,6)
-
-    return SecEnv(sn3,crck) 
-""" 
