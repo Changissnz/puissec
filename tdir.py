@@ -23,6 +23,32 @@ class SNGraphContainer:
 
         self.path_size = path_size
 
+    @staticmethod
+    def unpickle_thyself(fp): 
+        fx = open(fp,"rb")
+
+        fobj = pickle.load(fx) 
+        assert type(fobj) == SNGraphContainer
+        
+        for v in fobj.sp.values():
+            v.ecf = DEFAULT_EDGE_COST_FUNCTION
+        return fobj 
+
+    def pickle_thyself(self,fp):
+        fx = open(fp,"wb")
+
+        qr = {}
+
+        for k,v in self.sp.items():
+            qr[k] = v.ecf
+            v.ecf = None
+
+        pickle.dump(self,fx)
+        fx.close()
+
+        for k,v in qr.items():
+            self.sp[k].ecf = v 
+
     def nsec_nodeset(self):
         return set(self.d.keys()) - self.sn
 

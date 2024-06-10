@@ -106,7 +106,7 @@ class IsoRingedChain:
         q = os.listdir(fp)
         ls = [] 
         for q_ in q:
-            if q_ == "excessory": continue
+            if q_ in {"excessory","sngc"}: continue
 
             fp_ = fp + "/" + q_
             ir = IsoRing.unpickle_thyself(fp_) 
@@ -131,7 +131,7 @@ class SecNet:
     def __init__(self,irc,G,sec_nodeset,\
         node_loc_assignment= None,entry_points=3,\
         bound=DEFAULT_SINGLETON_RANGE,\
-        rnd_struct=random,rnd_seed=9,path_size=10):
+        rnd_struct=random,rnd_seed=9,path_size=10,sngc=None):
         
         assert len(irc) > 0 and type(irc) == SecSeq
         assert len(sec_nodeset) >= len(irc) 
@@ -165,24 +165,27 @@ class SecNet:
         self.sgc = None
         # occupied cracklings
         self.occ_crackl = {} # Crackling cidn-> [<Crackling>,node location]
-        self.preprocess_shortest_paths() 
+
+        if type(sngc) == type(None):
+            self.preprocess_shortest_paths() 
+        else:
+            assert type(sngc) == SNGraphContainer
+            self.sgc = sngc 
         return
 
     @staticmethod
     def alt_instantiate(irc,G,sec_nodeset,\
         node_loc_assignment,srm,entry_points,\
         bound=DEFAULT_SINGLETON_RANGE,\
-        rnd_struct=random,rnd_seed=9):
+        rnd_struct=random,rnd_seed=9,sngc=None):
 
         assert type(irc) == IsoRingedChain
         assert type(srm) == SRefMap 
-
-        ss = irc.revert_to_SecSeq()
-        
-        ##print("INSTANTIATE S.N.")
+        ss = irc.revert_to_SecSeq()        
         sn = SecNet(ss,G,sec_nodeset,node_loc_assignment,\
             entry_points=1,bound=bound,\
-            rnd_struct=rnd_struct,rnd_seed=rnd_seed)
+            rnd_struct=rnd_struct,rnd_seed=rnd_seed,\
+            sngc=sngc)
         sn.irc = irc
         sn.entry_points = entry_points
         sn.srm = srm 
@@ -205,10 +208,11 @@ class SecNet:
                 deepcopy(self.srm),deepcopy(self.entry_points)]
 
         self.irc.pickle_thyself(fp)
-
         efile = open(fp + "/excessory","wb")
         pickle.dump(excessory,efile)
         efile.close()
+
+        self.sgc.pickle_thyself(fp + "/sngc")
         return
 
     @staticmethod
@@ -227,11 +231,16 @@ class SecNet:
         srefmap = excessory[3]
         entry_points = excessory[4]
 
+        sngc = None
+
+        if os.path.exists(fp + "/sngc"):
+            sngc = SNGraphContainer.unpickle_thyself(fp + "/sngc")
+        
         ##print("instantiating w/ rndstruct=",rnd_struct)
         sn = SecNet.alt_instantiate(irc,G,sec_nodeset,\
         node_loc_assignment,srefmap,entry_points,\
-        bound=bound,\
-        rnd_struct=rnd_struct,rnd_seed=rnd_seed)
+        bound=bound,rnd_struct=rnd_struct,\
+        rnd_seed=rnd_seed,sngc=sngc)
         return sn 
 
     ######################## loc-set methods for 

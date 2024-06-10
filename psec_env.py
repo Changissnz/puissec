@@ -164,7 +164,10 @@ class SecEnv:
             self.sn.set_crackling(crcklng,tds[qi].loc()) 
         return True
 
-def SecEnv_sample_1(sn3=SecNet_sample_C3()):
+def SecEnv_sample_1(sn3=None):
+    if type(sn3) == type(None):
+        sn3 = SecNet_sample_C3()
+
     print("generating background info")
     bi = BackgroundInfo.generate_instance(\
             sn3.irc,sn3.srm)
