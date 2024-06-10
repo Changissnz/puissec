@@ -164,16 +164,42 @@ class TDir:
         target_loc = self.search_for_target_node(G)
 
         if type(target_loc) == type(None):
+            self.active_stat = False 
             print("error: target node not found")
             return
 
+        p = self.load_path_(G,target_loc)
+
+        if type(p) != NodePath:
+            print("no path")
+            return
+        self.node_path = p
+        self.index = 0
+
+        ## TODO: delete? 
         ##print("LOC->TARGET")
         ##print(G.d)
         ##print("##")
+        """
         dfsc = G.sp[self.location]
         nodePath = dfsc.min_paths[target_loc][0]
         self.node_path = nodePath.invert() 
         self.index = 0
+        """ 
+    
+    def load_path_(self,G,loc):
+        if loc not in G.sp:
+            print("no location in DFS")
+            return
+
+        dfsc = G.sp[loc]
+        if self.location not in dfsc.min_paths:
+            print("no path in DFS")
+            return
+
+        nodePath = dfsc.min_paths[self.location][0]
+        return nodePath
+
 
     def search_for_target_node(self,G):
         assert type(G) == SNGraphContainer
@@ -258,12 +284,8 @@ class TDirector:
         self.vantage_idn = vantage_idn
 
         self.ref_nodes = [deepcopy(self.td.location)]
-
+        # log of <TDir> instances
         self.td_log = [] 
-
-        # list of entry point node idn. that <TDirector>
-        # attempted. 
-        self.entry_point_attempts = []
 
         # Resource subgraph, of type <SNGraphContainer>
         self.resource_sg = None
@@ -361,11 +383,14 @@ class TDirector:
     """
     def extloc_search__set_TDir(self,extf=max,rnd_struct=random): 
     #(self,sgc:SNGraphContainer,extf=max,rnd_struct=random):#,check_completion=True):
+        print("INITIATE EXTLOC")
 
         assert type(self.resource_sg) == SNGraphContainer
-        q = self.extloc_search_at_ref(sgc,rnd_struct,extf)
+        q = self.extloc_search_at_ref(self.resource_sg,rnd_struct,extf)
         if type(q) == type(None):
             return 
+
+        print("node EXTLOC: ",q)
 
         l = self.td.location
         tn = self.td.target_node
@@ -373,9 +398,18 @@ class TDirector:
         r = self.td.radius
         v = self.td.velocity
 
-        print("target node, before {} after {}".format(tn,q))
-        tn = q 
+        ##tn = q 
+        print("target <Sec>: {} node dest: {}".format(tn,q))
+
         tdx = TDir(l,tn,vp,r,v)
+        print("loading EXTLOC path")
+        node_path = tdx.load_path_(self.resource_sg,q) 
+        if type(node_path) != NodePath: 
+            print("no node path")
+            return
+        tdx.node_path = node_path
+        tdx.index = 0
+
         self.td_log.append(self.td)
         self.td = tdx 
         return
@@ -389,7 +423,7 @@ class TDirector:
     def extloc_search_at_ref(self,sgc:SNGraphContainer,rnd_struct,\
         exclude_refs:bool=True,extf=max):
         q = self.ref_nodes[-1] 
-        candidate_list = self.loc_search_set(sgc,q,extf)
+        candidate_list = self.extloc_search_set(sgc,q,extf)
 
         if exclude_refs:
             candidate_list = candidate_list - set(self.ref_nodes)
@@ -412,8 +446,17 @@ class TDirector:
         if len(sgc.sp.keys()) == 0:
             return set()
         
-        rkx = sorted([(k,sum(v.pweights)) for k,v in sgc.sp.items()],\
-            key=lambda x:x[1])
+        ##self.sp = defaultdict(DFSCache)
+        rkx = []
+        for k,v in sgc.sp.items():
+            if ref not in v.min_paths: 
+                continue
+
+            q = v.min_paths[ref][0].cost()
+            rkx.append((k,q))
+
+        #rkx = sorted([(k,sum(v.pweights)) for k,v in sgc.sp.items()],\
+        #    key=lambda x:x[1])
         if extf == max:
             rkx = rkx[::-1]
 

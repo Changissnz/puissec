@@ -34,6 +34,22 @@ class SecEnv:
         self.td = TDBridge()
         return
 
+    def pickle_thyself(self,cpath,spath):
+        self.crck.pickle_thyself(cpath)
+        self.sn.pickle_thyself(spath)
+
+    # TODO: slow process, needs improvements. 
+    @staticmethod
+    def unpickle_thyself(spath,sargs,cpath,rnd_struct):
+        assert len(sargs) == 3
+        print("unpickling <Cracker>")
+        crck = Cracker.unpickle_thyself(cpath)
+
+        print("unpickling <SecNet>")
+        sn = SecNet.unpickle_thyself(spath,\
+            sargs[0],sargs[1],sargs[2])
+        return SecEnv(sn,crck,rnd_struct)
+
     # TODO: test or delete. 
     """
     fetch the subgraph for the <TDir> of 
@@ -42,8 +58,6 @@ class SecEnv:
     def tdbridge_op__pass_G_to_C(self,cidn):
         if cidn not in self.sn.occ_crackl:
             return None
-
-
         c = self.sn.occ_crackl[cidn][0] 
         assert type(c.td) != type(None)
 

@@ -359,8 +359,53 @@ class Cracker:
 
         self.calculate_oop()
         self.csoln = CrackSoln() 
-        self.td = None
+        ##self.td = None
         return
+
+    
+    # NOTE: pickle does not save crackling instances
+    def pickle_thyself(self,fp_base):
+        if not os.path.isdir(fp_base):
+            os.mkdir(fp_base)
+        fp1 = fp_base + "/hm"
+        fp2 = fp_base + "/bi"
+        fp3 = fp_base + "/extra"
+
+        fpx1 = open(fp1,"wb")
+        pickle.dump([self.hyp_map,self.hyp_map_cache],fpx1)
+        fpx1.close() 
+
+        fpx2 = open(fp2,"wb")
+        pickle.dump(self.bi,fpx2)
+        fpx2.close()
+
+        fpx3 = open(fp3,"wb")
+        pickle.dump([self.crackling_sz,self.radar_radius,\
+            self.cidn_counter,self.csoln],fpx3)
+        fpx3.close()
+
+    @staticmethod
+    def unpickle_thyself(fp_base):
+        fpx1 = open(fp_base + "/hm","rb")
+        hms = pickle.load(fpx1)
+        fpx1.close()
+
+        fpx2 = open(fp_base + "/bi","rb")
+        bi = pickle.load(fpx2)
+        fpx2.close()
+
+        fpx3 = open(fp_base + "/extra","rb")
+        extra = pickle.load(fpx3)
+        fpx3.close()
+
+        c = Cracker(hms[0],bi,extra[0],extra[1])
+
+        c.cidn_counter = extra[2]
+        c.csoln = extra[3]
+        c.hyp_map_cache = hms[1] 
+
+        return c
+
 
     '''
     calculate the order of operations based on 

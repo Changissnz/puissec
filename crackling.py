@@ -42,12 +42,17 @@ class Crackling:
 
     """
     """
-    def next_TDirector(self,timespan=1.0):
+    def td_next(self,timespan=1.0):
 
         if self.td.obj_stat == "search for target":
+            print("---")
+            print("SEARCHING FOR TARGET")
             # check if <TDir> is still active.
             if not self.td.td.active_stat:
                 self.td.extloc_search__set_TDir(extf=max,rnd_struct=random)
+            print("path is ")
+            print(str(self.td.td.node_path))
+            print("------")
             self.td.td.scaled__next__(timespan)
             return
         elif self.td.obj_stat == "capture target":

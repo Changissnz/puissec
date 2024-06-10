@@ -38,5 +38,12 @@ class SecEnvClass(unittest.TestCase):
         se.instantiate_cracker_target()
         assert len(se.crck.cracklings) == 1
 
+        # demonstrating the scores of the 
+        # <Crackling>'s <TDirector> 
+        c = se.crck.cracklings[0]
+        assert c.loc() == 11
+        c.td_next(1.0)
+        assert c.loc() == 10
+
 if __name__ == '__main__':
     unittest.main()
