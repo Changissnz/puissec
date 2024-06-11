@@ -550,7 +550,9 @@ class Cracker:
                     continue
 
                 mp = dfsc.min_paths[loc][0] 
-                c.td.td.node_path = mp
+                mp_ = Cracker.intermediate_node(c,mp)
+
+                c.td.td.node_path = mp_
                 c.td.td.index = 0
                 updated = updated | {c.cidn}
         return updated
