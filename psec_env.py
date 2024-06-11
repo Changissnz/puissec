@@ -67,12 +67,21 @@ class SecEnv:
     ############### methods for instantiating and running
     ############### <Crackling> agents. 
 
+    def run(self,timespan=1.0):
+        self.run_agent(True)
+        self.run_agent(False)
+        return
+
     def run_agent(self,is_sn:bool=True):
         if is_sn:
             q = self.sn
         else: 
             q = self.crck
         return -1
+
+    
+
+
 
     """
     process that handles the instantiation

@@ -20,7 +20,6 @@ class SNGraphContainer:
         # set, node idn. for entry points
         self.entry_points = entry_points
         # 
-
         self.path_size = path_size
 
     @staticmethod

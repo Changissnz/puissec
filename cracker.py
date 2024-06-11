@@ -335,9 +335,7 @@ class CrackSoln:
         return
 
     def match_pr(self):
-        return -1 
-
-CRACKLING_STAT = {"stationary","mobile"}
+        return -1
 
 class Cracker:
 
@@ -359,9 +357,7 @@ class Cracker:
 
         self.calculate_oop()
         self.csoln = CrackSoln() 
-        ##self.td = None
         return
-
     
     # NOTE: pickle does not save crackling instances
     def pickle_thyself(self,fp_base):
@@ -429,6 +425,9 @@ class Cracker:
                 return c
         return None 
 
+    ######################## methods for loading 
+    ######################## <Crackling> instances
+
     """
     return:
     - set, idn of <Sec> to target
@@ -484,6 +483,106 @@ class Cracker:
         hs = self.hyp_map[sec_idn][sec_dim].pop(0)
         return hs
 
+    #### TODO: new section; needs to be tested. 
+    ########################## C2C communication methods
+
+    def target_secidn_set(self):
+        s = set()
+
+        for c in self.cracklings:
+            td = c.td
+            if type(td) == type(None): continue
+            tdx = td.td
+            if type(tdx) == type(None): continue
+            s = s | {tdx.target_node}
+        return s
+
+    def cracklings_by_targetsec(self,i):
+        cx = []
+
+        for c in self.cracklings:
+            td = c.td
+            if type(td) == type(None): continue
+            tdx = td.td
+            if type(tdx) == type(None): continue
+
+            if tdx.target_node == i:
+                cx.append(c)
+        return cx
+
+    def crackling_sg_supernodeset(self,targetsec_idn):
+        cx = self.cracklings_by_targetsec(targetsec_idn)
+        ns = set()
+        for c in cx:
+            if type(c.td.resource_sg) == type(None):
+                continue
+            ns = ns | set(c.td.resource_sg.d.keys())
+        return ns 
+
+    """
+    """
+    def supergraph_info_update_to_Cracklings(self,G,targetsec_idn):
+        assert type(G) == SNGraphContainer
+
+        cx = self.cracklings_by_targetsec(targetsec_idn)
+
+        # iterate through each <Crackling>; for each one
+        # that does not know the location of the target, 
+        # update info.
+        if targetsec_idn not in G.ring_locs:
+            return set() 
+
+        loc = G.ring_locs[targetsec_idn]
+
+        updated = set() 
+        for c in cx:
+            # check if 
+            sgx = c.td.resource_sg 
+            assert type(sgx) != type(None)
+            tdx = c.td.td
+            q = td.search_for_target_node(sgx)
+
+            if type(q) == type(None):
+                lx = c.loc()
+                dfsc = G.sp[lx]
+
+                if loc not in dfsc.min_paths:
+                    continue
+
+                mp = dfsc.min_paths[loc][0] 
+                c.td.td.node_path = mp
+                c.td.td.index = 0
+                updated = updated | {c.cidn}
+        return updated
+
+    """
+    calculates the intermediate node given a <NodePath>
+    starting from <Crackling> location, in which the 
+    <NodePath> may have an endpoint not included by 
+    <Crackling>'s <TDirector> variable <resource_sg>.
+    """
+    @staticmethod
+    def intermediate_node(crackling,nodepath):
+        q = nodepath.p
+        assert q[0] == crackling.loc()
+        assert type(crackling.td.resource_sg) != type(None)
+        
+        sx = crackling.td.resource_sg 
+        m = None
+        if q[-1] in sx.d:
+            m = q[-1]
+        else:
+            for q_ in q:
+                if q_ in sx.d:
+                    m_ = q_
+                    continue
+                break
+        return m 
+
+    ########################## performance feedback methods
+
+
+    ########################## network entry methods
     """
     return:
     - bool; response to accept <TDirector> given the 

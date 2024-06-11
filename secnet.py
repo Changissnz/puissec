@@ -406,16 +406,6 @@ class SecNet:
     map info passed to <SNGraphContainer>
     """
     def occ_crackl_map(self,ks):
-        #ks = set(sn.d.keys())
-
-        """
-        d = {}
-        for k in ks: 
-            x1 = self.occ_crackl[k][1]
-            target = self.occ_crackl[k][0].target_of_HypStruct()
-            d[k] = (x1,target)
-        return d 
-        """
         d = {} 
         for k,v in self.occ_crackl.items():
             if v[1] in ks:
@@ -436,10 +426,7 @@ class SecNet:
 
         sngc = self.subgraph_for_TDir(td.td)
         td.load_graph(sngc)
-
         return td
-        ##self.occ_crackl[cidn][0].load_TDirector(td)
-        ##return
 
     def isoringset_dim(self,ir_set):
         dx = {}
@@ -476,7 +463,7 @@ def pickled_SecNet_sample_Q():
     s.pickle_thyself("codename__ASS_SHIT")
 
 """
-sample tes
+sample for testing <TDirector> in 1v1 setting. 
 """
 def SecNet_sample_TDir1v1():
     random.seed(100)
@@ -520,7 +507,7 @@ def SecNet_sample_C3():
     return sn
 
 """
-sample tes
+sample for testing <TDirector> on Nv1.
 """
 def SecNet_sample_TDirNv1():
     random.seed(100734)
