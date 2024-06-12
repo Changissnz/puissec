@@ -420,12 +420,12 @@ additional argument `depconn_ratio`.
 """
 def SecSeq_sample_5(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
     num_conn=5000,min_components=4,max_nconn_ratio=0.4,drange_max=4,\
-    depconn_ratio=0.3):
+    depconn_ratio=0.3,conn_types=[1,2,3]):
 
     s = Sec_list_sample3(num_secs,singleton_range,random)
     sndg = SecNetDepGen(s,random,min_components,\
         max_nconn_ratio,[1,drange_max],depconn_ratio)
-    sndg.assign_conn(num_conn)
+    sndg.assign_conn(num_conn,l=conn_types)
     
     ss = SecSeq(sndg.sq)
     return ss,sndg

@@ -523,6 +523,7 @@ class SecNetDepGen:
 
     def assign_conn(self,size_limt=float('inf'),\
         l=[1,2,3]):
+        print("ASSIGNING! ",l)
         stat = True
         i = 0
         while stat: 
@@ -549,20 +550,22 @@ class SecNetDepGen:
 
     ###################### make conn. method. 
     def make_conn(self,options = [1,2,3]):
-        assert set(options).issubset({1,2,3})
+        ot = set(options)
+        assert ot.issubset({1,2,3}),"got set {}".format(options)
         if len(options) == 0:
             return False
-
+        ##print("OPTIONS: ",options)
         # choose a random element in options
         i = self.rnd_struct.randrange(0,len(options))
         o = options.pop(i)
-
+        
         stat = True
         # dependency conn.
         if o == 1:
             stat = self.make_dep_conn()
         # co-dep. conn. (b/t two components)
         elif o == 2: 
+            ##print("CODEP-MAKE")
             stat = self.make_codep_C2C_conn()
         # co-dep. conn. (in one component) 
         else:  
@@ -593,6 +596,7 @@ class SecNetDepGen:
 
     def dep_conn_process(self,pn):
         c = None
+        ##print("DEPCONN: ",self.depconn_ratio)
         if type(self.depconn_ratio) == type(None):
             c = 1
         else: 
@@ -600,8 +604,8 @@ class SecNetDepGen:
 
             x = len(self.sq[pn[0]].opm) * len(self.sq[pn[1]].opm)
             c = int(math.ceil(self.depconn_ratio * x)) 
-        
-        print("making {} dep. w/ ratio={}".format(c,self.depconn_ratio))
+
+        ##print("making {} dep. w/ ratio={}".format(c,self.depconn_ratio))
         
         stat = True
         for i in range(c):
