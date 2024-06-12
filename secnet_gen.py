@@ -484,9 +484,12 @@ class SecNetDepGen:
 
         self.rnd_struct = rnd_struct 
         self.min_components = min_components
+
+        # max co-dependent connectivity
         self.max_nconn_ratio = max_nconn_ratio
         # TODO: barely used, delete? 
         self.dlength_range = dlength_range 
+        # max dependency connectivity
         self.depconn_ratio = depconn_ratio
         # used to narrow the selection space 
         # for quicker processing of depconn. 
@@ -582,7 +585,10 @@ class SecNetDepGen:
         l = list(l)
         x = l[q]
 
-        self.dep_conn_process(x) 
+        stat = self.dep_conn_process(x) 
+        if not stat: 
+            return None
+
         return True
 
     def dep_conn_process(self,pn):
@@ -595,10 +601,16 @@ class SecNetDepGen:
             x = len(self.sq[pn[0]].opm) * len(self.sq[pn[1]].opm)
             c = int(math.ceil(self.depconn_ratio * x)) 
         
-        ##print("making {} dep.".format(c))
+        print("making {} dep. w/ ratio={}".format(c,self.depconn_ratio))
+        
+        stat = True
         for i in range(c):
             ##print("-- {}".format(i))
-            self.one_dep_conn(pn)
+            stat2 = self.one_dep_conn(pn)
+            if stat2 == False:
+                return False
+        return stat
+
 
     """
     adds an optimum-to-optimum dependency connection 
@@ -612,11 +624,15 @@ class SecNetDepGen:
         sz1 = len(self.sq[pn[0]].opm)
         l1_,l2_ = available_for_dep(dmx,pn[0],sz0,sz1)
 
+        if len(l1_) == 0 or len(l2_) == 0: 
+            return False
+
         # choose a local optima from each of the elements
         i1 = l1_[self.rnd_struct.randrange(0,len(l1_))]
         i2 = l2_[self.rnd_struct.randrange(0,len(l2_))]
         prv = round(self.rnd_struct.uniform(0.,1.),5)
         self.add_dependency(pn[0],pn[1],i1,i2,prv)
+        return True
 
     def make_codep_C2C_conn(self,attempts=10):
         if attempts <= 0: 
@@ -759,7 +775,8 @@ class SecNetDepGen:
         self.dep_map[ref].extend(q)
         self.dep_map[ref] = list(set(self.dep_map[ref]))
         for q_ in qx:
-            self.dep_map[q_].extend(q1)
+            q1x = list(set(q1) - {q_})
+            self.dep_map[q_].extend(q1x)
             self.dep_map[q_] = list(set(self.dep_map[q_]))
 
         if dependent not in self.dep: 

@@ -398,13 +398,34 @@ def SecSeq_sample_3():
     ss = SecSeq(sndg.sq) 
     return ss,sndg
 
+"""
+pre-requisite method for the following:
+- SecNet_sample_C3
+- SecNet_sample_TDirNv1
+"""
 def SecSeq_sample_4(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
-    num_conn=5000,min_components=4,dconn_ratio=0.4,drange_max=4):
+    num_conn=5000,min_components=4,max_nconn_ratio=0.4,drange_max=4):
 
     s = Sec_list_sample3(num_secs,singleton_range,random)
     sndg = SecNetDepGen(s,random,min_components,\
-            dconn_ratio,[1,drange_max])
+            max_nconn_ratio,[1,drange_max])
     sndg.assign_conn(num_conn)
 
     ss = SecSeq(sndg.sq)
     return ss,sndg 
+
+"""
+virtually identical to <SecSeq_sample_4> besides from 
+additional argument `depconn_ratio`. 
+"""
+def SecSeq_sample_5(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
+    num_conn=5000,min_components=4,max_nconn_ratio=0.4,drange_max=4,\
+    depconn_ratio=0.3):
+
+    s = Sec_list_sample3(num_secs,singleton_range,random)
+    sndg = SecNetDepGen(s,random,min_components,\
+        max_nconn_ratio,[1,drange_max],depconn_ratio)
+    sndg.assign_conn(num_conn)
+    
+    ss = SecSeq(sndg.sq)
+    return ss,sndg

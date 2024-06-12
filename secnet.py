@@ -491,7 +491,7 @@ def SecNet_sample_C3():
     random.seed(14324)
     np.random.seed(14324)
     ss,sndg = SecSeq_sample_4(num_secs=1,singleton_range=DEFAULT_SINGLETON_RANGE,\
-        num_conn=5000,min_components=1,dconn_ratio=0.4,drange_max=1)
+        num_conn=5000,min_components=1,max_nconn_ratio=0.4,drange_max=1)
 
     G = SecNet_graph_sample_C3()
     sec_nodeset = {3,6,9,14}
@@ -514,7 +514,7 @@ def SecNet_sample_TDirNv1():
     np.random.seed(371224)
     ##print("SS")
     ss,sndg = SecSeq_sample_4(num_secs=25,singleton_range=DEFAULT_SINGLETON_RANGE,\
-        num_conn=100,min_components=3,dconn_ratio=0.8,drange_max=4)
+        num_conn=100,min_components=3,max_nconn_ratio=0.8,drange_max=4)
 
     sec_node_count = 25
     nsec_node_count = 34

@@ -11,7 +11,7 @@ class Crackling:
         self.hs = None 
         self.td = None
         self.rss = None
-        self.set_cvec() 
+        self.set_cvec()
         self.astat = False
         self.cracked_dict = defaultdict(float)
         self.flagged_pts = []

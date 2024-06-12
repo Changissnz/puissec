@@ -105,11 +105,29 @@ class OrderOfCracknClass(unittest.TestCase):
 
         ans = [{1}, {0, 4}, {7}, {6}, {8}, {3}, {2}, {5}]
         assert soln == ans 
-
         return
 
+    def test__OrderOfCrackn__order_by_depchain_map__case2(self):
+        random.seed(243423)
+        np.random.seed(324252)
 
-    
+        ss,sndg = SecSeq_sample_5(num_secs=3,max_nconn_ratio=0.0,\
+        depconn_ratio=1.0,min_components=1,drange_max=3)
+
+        m1 = ss.sec_instances_to_supermap('l')
+        m2 = ss.sec_instances_to_supermap('d')
+        m3 = ss.sec_instances_to_supermap('c')
+        srm = SRefMap(m1,m2,m3,'c')
+
+        irc = IsoRingedChain(ss,DEFAULT_SINGLETON_RANGE,\
+        random,24153)
+        bi = BackgroundInfo.generate_instance(irc,srm)
+
+        ooc = OrderOfCrackn()
+        soln = ooc.order_by_depchain_map(bi.dm)
+
+        assert soln == [{2}, {0, 1}]
+        return
 
 if __name__ == '__main__':
     unittest.main()

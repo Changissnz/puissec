@@ -24,10 +24,19 @@ def even_bound_split(bs,sz):
 class OrderOfCrackn:
 
     def __init__(self):
-        self.seq = []
-        # index of set element -> & (for co-dep.) OR | (for non-duplicate choice in set)
-        self.set_operator_map = {}
         return
+
+    def order_by_codep_sets(self,ordering,cdm,dcm):
+
+        def index_in_ordering(i):
+            for (j,o) in enumerate(ordering):
+                if i in o: return j
+            return -1
+
+        for c in cdm:
+            #index_in_ordering()
+            return -1 
+        return -1
 
     # TODO: finish 
     def order_by_depchain_map(self,dcm):
@@ -62,7 +71,6 @@ class OrderOfCrackn:
                         return False
             return True
 
-        
         def sort_swap(key):
 
             vx = dcm[key][::-1]
@@ -138,7 +146,7 @@ class BackgroundInfo:
 
     # TODO: test this. 
     """
-    i2hm := dict, sec idn -> 
+    i2hm := dict, sec idn -> sequence of <HypStruct>
     """
     def apply_leakmap_on_IRC2HypStruct_map(self,i2hm):
 
@@ -520,6 +528,12 @@ class Cracker:
         return ns 
 
     """
+    Uses a supergraph `G` containing the cumulative nodes
+    and edges of <Crackling>s targetting the <IsoRing> with
+    identifier `targetsec_idn`.
+
+    return:
+    - set, sec idn. that have had their `node_path` updated.
     """
     def supergraph_info_update_to_Cracklings(self,G,targetsec_idn):
         assert type(G) == SNGraphContainer
