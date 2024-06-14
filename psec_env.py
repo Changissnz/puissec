@@ -9,11 +9,8 @@ class TDBridge:
         #tdr:TDirector,\):
         assert type(c) == Crackling
         assert type(g) == SecNet
-
         tdr = c.td.tdir
-
         G = g.subgraph_for_TDir(tdr)
-
         c.td.load_graph(G)
         return
 
@@ -31,7 +28,7 @@ class SecEnv:
         self.sn = sn
         self.crck = crck 
         self.rnd_struct = rnd_struct
-        self.td = TDBridge()
+        self.td = TDBridge() 
         return
 
     def pickle_thyself(self,cpath,spath):
@@ -79,7 +76,14 @@ class SecEnv:
             q = self.crck
         return -1
 
-    
+    def cproc(self):
+        # check status
+
+        # case: load new cracking targets
+
+        # proceed to run all <Crackling> instances
+        
+        return -1    
 
 
 

@@ -1,6 +1,7 @@
 from crackling import * 
 from secnet import * 
-from leakette import * 
+from leakette import *
+from nERg import *  
 
 """
 splits a bound `bs` by a constant 
@@ -348,7 +349,8 @@ class CrackSoln:
 class Cracker:
 
     def __init__(self,hyp_map,backgroundInfo,\
-        crackling_sz:int,radar_radius:int=4):
+        crackling_sz:int,radar_radius:int=4,\
+        energy=1000.0):
         assert type(hyp_map) in {dict,defaultdict,type(None)}
         assert type(backgroundInfo) == BackgroundInfo
         assert type(crackling_sz) == int and crackling_sz > 0
@@ -360,6 +362,7 @@ class Cracker:
         self.bi = backgroundInfo
         self.crackling_sz = crackling_sz
         self.radar_radius = radar_radius
+        self.energy = NerG(energy)
         self.cracklings = [] 
         self.cidn_counter = 0
 

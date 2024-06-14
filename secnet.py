@@ -131,7 +131,8 @@ class SecNet:
     def __init__(self,irc,G,sec_nodeset,\
         node_loc_assignment= None,entry_points=3,\
         bound=DEFAULT_SINGLETON_RANGE,\
-        rnd_struct=random,rnd_seed=9,path_size=10,sngc=None):
+        rnd_struct=random,rnd_seed=9,\
+        path_size=10,sngc=None,energy=1000.0):
         
         assert len(irc) > 0 and type(irc) == SecSeq
         assert len(sec_nodeset) >= len(irc) 
@@ -171,6 +172,7 @@ class SecNet:
         else:
             assert type(sngc) == SNGraphContainer
             self.sgc = sngc 
+        self.energy = NerG(energy)
         return
 
     @staticmethod
