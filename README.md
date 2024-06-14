@@ -21,3 +21,7 @@ TLDR; the project simulates security breaches
 on a network that is supposed to guard against
 3rd-party intrusion into sensitive data.
 
+### Update 06/14/2024
+The finalized paper for this project will not be 
+complete by 7/1/2024 due to continuing work on 
+technical issues. 
