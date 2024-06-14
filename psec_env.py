@@ -90,8 +90,8 @@ class SecEnv:
         return -1
 
     """
-    main process in <SecEnv> that is the decision-chain 
-    function that <Cracker> uses.
+    main process for the <Cracker> of <SecEnv>; it is 
+    the decision-chain function that <Cracker> uses.
     """
     def cproc(self):
         # check status
@@ -214,8 +214,13 @@ class SecEnv:
     ########################################################
 
     """
-    cidn := identifier for <CBridge> 
-    iidn := identifier for <IsoRing>
+    Instantiates a <CBridge> instance b/t <Crackling> 
+    of identifier `cidn` + <Isoring> of identifier `iidn`. 
+
+    arguments:
+    - cidn := identifier for <CBridge> 
+    - iidn := identifier for <IsoRing>
+    - ssih := hop value for <RSSI>.
     """
     def make_bridge(self,cidn,iidn,ssih=5):
         c = self.crck.fetch_crackling(cidn)
@@ -227,6 +232,13 @@ class SecEnv:
         self.cbs.append(cb) 
         return
 
+    """
+    Fetches the <CBridge> holding an agent of 
+    identifier `idn`. 
+
+    return:
+    - <CBridge>|None
+    """
     def fetch_bridge(self,idn,is_cidn:bool=True):
         index = 0 if is_cidn else 1 
         for cb in self.cbs:
@@ -234,6 +246,13 @@ class SecEnv:
             if idnx == idn: return cb 
         return None
 
+    """
+    conducts cracking operation on <CBridge> 
+    for `next_rate` iterations.
+
+    return:
+    - bool, ?is not early termination?
+    """
     def run_CBridge(self,next_rate,idn,\
         is_cidn:bool=True):
 

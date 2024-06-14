@@ -20,6 +20,8 @@ class Crackling:
         self.cstat = False
         # target has been ?interdicted?
         self.istat = False 
+        # ?<TDirector> path is coordinated by <Cracker>?
+        self.is_coordinated = False
 
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
@@ -122,6 +124,16 @@ class Crackling:
         s = matrix_methods.vector_to_string(v,float)
         self.cracked_dict[s] = prx 
         return
+
+    ################# methods for <Cracker> coordination
+
+    def assign_coordinated_path(self,p):
+        assert type(p) == NodePath
+        self.td.td.node_path = mp_
+        self.td.td.index = 0
+        self.is_coordinated = True
+        return
+
 
 """
 - return: 

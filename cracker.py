@@ -396,7 +396,6 @@ class Cracker:
         c.cidn_counter = extra[2]
         c.csoln = extra[3]
         c.hyp_map_cache = hms[1] 
-
         return c
 
 
@@ -514,6 +513,7 @@ class Cracker:
             ns = ns | set(c.td.resource_sg.d.keys())
         return ns 
 
+    # TODO: test. 
     """
     Uses a supergraph `G` containing the cumulative nodes
     and edges of <Crackling>s targetting the <IsoRing> with
@@ -551,10 +551,10 @@ class Cracker:
                     continue
 
                 mp = dfsc.min_paths[loc][0] 
-                mp_ = Cracker.intermediate_node(c,mp)
+                n2 = Cracker.intermediate_node(c,mp)
+                mp2 = deepcopy(dfsc.min_paths[n2][0])
+                c.assign_coordinated_path(mp2)
 
-                c.td.td.node_path = mp_
-                c.td.td.index = 0
                 updated = updated | {c.cidn}
         return updated
 
