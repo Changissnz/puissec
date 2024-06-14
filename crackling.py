@@ -12,9 +12,14 @@ class Crackling:
         self.td = None
         self.rss = None
         self.set_cvec()
+        # ?target has been cracked?
         self.astat = False
         self.cracked_dict = defaultdict(float)
         self.flagged_pts = []
+        # target has been ?captured?
+        self.cstat = False
+        # target has been ?interdicted?
+        self.istat = False 
 
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
@@ -61,10 +66,10 @@ class Crackling:
             assert False, "not programmed yet."
         return
 
-    # TODO: test 
     """
     used by <Crackling> instance to decide 
-    to accept an entry point as a point
+    to accept an entry point as a point based 
+    on radar status concerning target <IsoRing>.
     """
     def accept_TDirector_at_entry_point(self):
         assert type(self.td) == TDirector

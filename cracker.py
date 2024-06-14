@@ -27,19 +27,6 @@ class OrderOfCrackn:
     def __init__(self):
         return
 
-    def order_by_codep_sets(self,ordering,cdm,dcm):
-
-        def index_in_ordering(i):
-            for (j,o) in enumerate(ordering):
-                if i in o: return j
-            return -1
-
-        for c in cdm:
-            #index_in_ordering()
-            return -1 
-        return -1
-
-    # TODO: finish 
     def order_by_depchain_map(self,dcm):
         l = [(k,len(v)) for k,v in dcm.items()]
         l = sorted(l,key=lambda x:x[1])[::-1]
@@ -230,7 +217,6 @@ class BackgroundInfo:
             d[lx] = q 
         return d 
 
-    # TODO: test this.
     @staticmethod
     def generate_instance(irc,srm):
         assert type(irc) == IsoRingedChain
@@ -422,7 +408,6 @@ class Cracker:
     - dict, sec idn. -> integer index in ordered sequence OR 
                         np.nan for any location. 
     '''
-    # TODO: complete
     def calculate_oop(self): 
         ooc = OrderOfCrackn()
         soln = ooc.order_by_depchain_map(self.bi.dm)
@@ -461,7 +446,6 @@ class Cracker:
             self.load_crackling(nt_,d)
         return
 
-    # TODO: complete
     def load_crackling(self,sec_idn,sec_dim):
 
         hs = self.next_hypstruct(sec_idn,sec_dim)
@@ -621,7 +605,29 @@ class Cracker:
         assert type(c) != type(None)
         c.load_TDirector(td)
 
-    # TODO: complete
-    def crackling_stat(self,c_idn):
+    def cstat(self):
+        d = {}
+        for i in range(len(self.cracklings)):
+            q = self.cracklings[i].idn_tag
+            d[q] = self.crackling_stat(i)
+        return d
+
+    def crackling_stat(self,index):
+        # cracked
+        if self.cracklings[index].astat:
+            return 2
+        
+        # cracking
+        if self.cracklings[index].cstat:
+            return 1
+
+        # interdiction
+        if self.cracklings[index].istat:
+            return 0
+
+        # continue travelling
+        return -1 
+
+    def remove_spent_cracklings(self):
         return -1 
 

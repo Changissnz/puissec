@@ -275,7 +275,7 @@ class SecNet:
         return nla,oc 
         
     ######################## graph structure functions 
-    # TODO: write more tests! 
+
     def subgraph_for_TDir(self,tdir):
         assert type(self.sgc) != type(None)
         rx = tdir.radius 

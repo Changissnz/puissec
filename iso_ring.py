@@ -5,8 +5,6 @@ from tdir import *
 from nERg import * 
 import os 
 
-qxs = TDirector 
-
 class BoundedObjFunc:
 
     """
@@ -351,16 +349,6 @@ def SecSeq_sample_2(num_secs=80,num_conn=5000,\
     sndg = SecNetDepGen(s,random,min_components,0.5,[1,drange_max])
     print("assigning conn")
     sndg.assign_conn(num_conn)
-
-    # TODO: delesha
-    # make 100 random dependent conn
-    """
-    stat = True
-    i = 0  
-    while stat and i < 1000: 
-        stat = sndg.make_dep_conn()
-        i += 1 
-    """
     
     ss = SecSeq(sndg.sq)
     print("declared <SecSeq>")

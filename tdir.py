@@ -200,17 +200,6 @@ class TDir:
             return
         self.node_path = p
         self.index = 0
-
-        ## TODO: delete? 
-        ##print("LOC->TARGET")
-        ##print(G.d)
-        ##print("##")
-        """
-        dfsc = G.sp[self.location]
-        nodePath = dfsc.min_paths[target_loc][0]
-        self.node_path = nodePath.invert() 
-        self.index = 0
-        """ 
     
     def load_path_(self,G,loc):
         if loc not in G.sp:
@@ -241,7 +230,6 @@ class TDir:
         loc = G.ring_locs[self.target_node]
         return loc 
 
-    # TODO: test 
     def __next__(self):
         if not self.active_stat: return None 
 
@@ -346,7 +334,7 @@ class TDirector:
     def update_tdir(self):
         return -1
 
-    # TODO: 
+    # TODO: use this method to aid in agent decisions. 
     """
     return: 
     - bool, if `obj_stat` in {radar null,search for target},

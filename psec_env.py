@@ -21,14 +21,27 @@ and 1 <Cracker> instance.
 """
 class SecEnv:
 
-    def __init__(self,sn,crck,rnd_struct=random):
+    """
+    sn := SecNet
+    crck := Cracker
+    ct_ratio := (maximum number of cracking attempts by
+                <Crackling>) / (time := 1)
+    """
+    def __init__(self,sn,crck,rnd_struct=random,\
+        ct_ratio=5000.0):
         assert type(sn) == SecNet
         assert type(crck) == Cracker
+        assert ct_ratio >= 1
+        assert type(ct_ratio) == int 
 
         self.sn = sn
         self.crck = crck 
         self.rnd_struct = rnd_struct
+        self.ct_ratio = ct_ratio
         self.td = TDBridge() 
+        # active <CBridge> instances
+        self.cbs = [] 
+        self.cbs_idn_ctr = 0
         return
 
     def pickle_thyself(self,cpath,spath):
@@ -76,16 +89,45 @@ class SecEnv:
             q = self.crck
         return -1
 
+    """
+    main process in <SecEnv> that is the decision-chain 
+    function that <Cracker> uses.
+    """
     def cproc(self):
         # check status
+        cd = self.crck.cstat()
+        vs = set(cd.values())
 
         # case: load new cracking targets
+        if vs == {2}:
+            stat = self.instantiate_cracker_target()
+            if not stat: return False
+            return self.cproc()
 
         # proceed to run all <Crackling> instances
-        
-        return -1    
+        for i in range(len(self.crck.cracklings)):
+            self.cproc_(i)
+        return True
 
+    def cproc_(self,index,timespan=1.0):
+        c = self.crck.cracklings[index]
+        s = self.crck.crackling_stat(index) 
 
+        # done
+        if s == 2: 
+            return False
+
+        # continue cracking
+        if s == 1:
+            cidn = c.cidn 
+            return self.run_CBridge(self.ct_ratio,cidn,True)
+
+        # interdiction
+        if s == 0:
+            return True
+
+        # TODO: review dec.
+        c.td_next(timespan)
 
     """
     process that handles the instantiation
@@ -94,24 +136,15 @@ class SecEnv:
     """
     def instantiate_cracker_target(self):
         s = self.crck.next_target()
+        if len(s) == 0: return False
+
         d = self.sn.isoringset_dim(s)
         dx = [(k,v) for k,v in d.items()]
 
         # load the cracklings
         self.crck.load_cracklings_for_secset(dx)
         self.update_cracklings_to_SecNet()
-        return 
-
-    # TODO: 
-    def run_cracklings(self):
-
-        # iterate through each crackling in 
-        return -1
-
-    # TODO: 
-    def run_crackling(self,crackling_index):
-        crckl = self.crck.cracklings[crackling_index]
-        return -1 
+        return True
 
     """
     pass graph info to the Crackling tdirector
@@ -176,6 +209,41 @@ class SecEnv:
             self.crck.load_TDirector(cidn,tds[qi])
             self.sn.set_crackling(crcklng,tds[qi].loc()) 
         return True
+
+    ############ TODO: methods to handle <CBridge>s.
+    ########################################################
+
+    """
+    cidn := identifier for <CBridge> 
+    iidn := identifier for <IsoRing>
+    """
+    def make_bridge(self,cidn,iidn,ssih=5):
+        c = self.crck.fetch_crackling(cidn)
+        i = self.sn.irc.fetch_IsoRing(iidn)
+        hs = c.hs
+
+        cb = CBridge(c,i,hs,ssih,self.cbs_idn_ctr)
+        self.cbs_idn_ctr += 1
+        self.cbs.append(cb) 
+        return
+
+    def fetch_bridge(self,idn,is_cidn:bool=True):
+        index = 0 if is_cidn else 1 
+        for cb in self.cbs:
+            idnx = cb.agent_idns()[index]
+            if idnx == idn: return cb 
+        return None
+
+    def run_CBridge(self,next_rate,idn,\
+        is_cidn:bool=True):
+
+        cb = self.fetch_bridge(idn,is_cidn)
+
+        for i in range(next_rate):
+            qc = next(cb)
+            stat = type(qc) != type(None)
+            if not stat: return False
+        return True 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):
