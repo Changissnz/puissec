@@ -1,5 +1,8 @@
 from dfs_struct import *
 
+DEFAULT_TDIRECTOR_OBJ_FUNCTIONS = [np.min,\
+                    np.max,np.mean,std_iscaled_mean]
+
 """
 an <SNGraphContainer> (SN := SecNet) holds data of 
 type dict|defaultdict. 
@@ -649,9 +652,8 @@ class TDirector:
              as better than all previous, 0. signifies performance 
              as worse than all previous. 
     """
-    def reflect_on_target_performance(self,locset,f=min):
-        assert f in {min,'mean'}
-
+    def reflect_on_target_performance(self,locset,f=np.min):
+        assert f in DEFAULT_TDIRECTOR_OBJ_FUNCTIONS
         dfsc = self.resource_sg.sp[self.loc()]
 
         def fx():

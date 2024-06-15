@@ -45,6 +45,7 @@ DEFAULT_TDIRECTOR_TIMESTAMP_SIZE = 5
 idn_fx = lambda x: x 
 sqrt_fx = lambda x: math.sqrt(x)
 
+
 # DEFAULT_BLACKBOX_FUNCTIONS 
 blackbox_df1 = lambda x: (x + random.random()) % 1.0
 
@@ -63,7 +64,13 @@ def strsplit_float(f):
     q = dx.split(".") 
     return q[0],q[1] 
 
+def clear_existing_dir(d):
+    if os.path.exists(d):
+        shutil.rmtree(d) 
+
 # TODO: relocate
+##############################################################
+
 def all_multiples_decimal(i,rounding_depth=5):
     qi = round(i,rounding_depth)
     qi = str(qi)
@@ -77,8 +84,25 @@ def all_multiples_decimal(i,rounding_depth=5):
         multiples[i] = multiples[i] * 10 ** -l
     return multiples
 
-def clear_existing_dir(d):
-    if os.path.exists(d):
-        shutil.rmtree(d) 
+"""
+"""
+def std_index_weight_vec(l,is_ascending:bool=True,
+    s=1):
+    assert s in {0,1}
+    q = [i for i in range(s,l+s)]
+    if not is_ascending: return np.array(q[::-1])
+    return np.array(q)
 
-#all_mu
+def scaled_mean(M,S):
+    if min([len(M),len(S)]) == 0:
+        return None
+
+    assert matrix_methods.is_vector(M)
+    assert matrix_methods.is_vector(S)
+    assert len(M) == len(S)
+    M2 = M * S
+    return np.mean(M2)
+
+def std_iscaled_mean(M):
+    I = std_index_weight_vec(len(M))
+    return scaled_mean(M,I)
