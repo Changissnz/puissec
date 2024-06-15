@@ -6,7 +6,6 @@ class TDBridge:
         return 
 
     def pass_info__G(self,c:Crackling,g:SecNet):
-        #tdr:TDirector,\):
         assert type(c) == Crackling
         assert type(g) == SecNet
         tdr = c.td.tdir

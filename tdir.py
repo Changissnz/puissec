@@ -291,9 +291,11 @@ step that demands that information.
 class TDirector:
 
     def __init__(self,loc,target_node,\
-        vantage_point,vantage_idn,radius=4,velocity=1):
+        vantage_point,vantage_idn,radius=4,\
+        velocity=1,tdts=DEFAULT_TDIRECTOR_TIMESTAMP_SIZE):
         self.td = TDir(loc,target_node,vantage_point,\
             radius,velocity) 
+        self.tdts = tdts
         self.vantage_idn = vantage_idn
 
         self.ref_nodes = [deepcopy(self.td.location)]
