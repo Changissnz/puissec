@@ -29,7 +29,7 @@ class SecEnv:
                 <Crackling>) / (time := 1)
     """
     def __init__(self,sn,crck,rnd_struct=random,\
-        ct_ratio=5000.0):
+        ct_ratio=5000):
         assert type(sn) == SecNet
         assert type(crck) == Cracker
         assert ct_ratio >= 1

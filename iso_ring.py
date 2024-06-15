@@ -149,6 +149,7 @@ class IsoRing:
         self.cstat = False 
 
         # TODO: 
+        self.td = None
         self.sec_script = None
         self.leak_stage = 0
 
@@ -316,6 +317,18 @@ class IsoRing:
 
     def rep(self):
         return self.sec_cache[self.repi]
+
+    #######################################
+
+    def default_TDirector_instance(self,radius:int,\
+        tdts=DEFAULT_TDIRECTOR_TIMESTAMP_SIZE):
+        assert radius > 0
+        l = self.loc()
+        td = TDirector(l,l,"I",radius,1,tdts)
+        self.td = td
+
+
+################################################
 
 ### an example of an <IsoRing> instantiation
 def IsoRing_sample_1():

@@ -7,7 +7,7 @@ class NerG:
              energy level of associated agent.
     rf := str|None; reference file used by instance
     """
-    def __init__(self,value:float,rf:str):
+    def __init__(self,value:float,rf:str=None):
         assert value > 0.0
         self.v = value
         self.open_rf(rf)

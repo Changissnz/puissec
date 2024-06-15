@@ -553,14 +553,17 @@ class TDirector:
     """
     """
     def targetnode_analysis__VPC(self,tn,rnd_struct):
-
+        print()
         if tn not in self.resource_sg.sp:
+            print("not secure")
             return None
+
         dfsc = self.resource_sg.sp[tn]
 
         cs = self.check_radar()
 
         if len(cs) == 0: 
+            print("NONE-ZO")
             return None
 
 
@@ -663,10 +666,9 @@ class TDirector:
                     continue 
                 q = dfsc.min_paths[0].cost()
                 distances.append(q) 
-
-            if f == min:
-                return f(distances)
-            return round(sum(distances) / len(distances),5)
+            distances = np.array(distances)
+            if len(distances) == 0: return None
+            return f(distances)
 
         if self.vp() == "I":
             assert len(locset) >= 1
@@ -674,11 +676,10 @@ class TDirector:
             assert len(locset)  == 1
 
         sx = fx()
+        if type(sx) == None: return None 
         self.ps = np.append(self.px,sx)
-
         while len(self.ps) > self.tdts:
-            self.ps.pop(0)
-        
+            self.ps.pop(0)        
         return self.reflect_on_performance()
 
     """
@@ -692,6 +693,3 @@ class TDirector:
             if q > self.ps[i]:
                 r += 1
         return measures.zero_div(r,len(self.ps) - 1,0.0)
-
-
-# INDEX-SCALED MEAN 
