@@ -266,7 +266,7 @@ class TDir:
         return self.location,stat 
 
     """
-    on results. 
+    on NodePath performance
     """
     def reflect(self):
 
@@ -310,6 +310,9 @@ class TDirector:
             self.obj_stat = "radar null"
         else:
             self.obj_stat = "search for target"
+
+        # performance scores
+        self.ps = np.array([float('inf')])
         return
 
     def vp(self):
@@ -629,3 +632,64 @@ class TDirector:
             npath = dfsc.min_paths[s][0]
             d[s] = npath.cost()
         return d
+
+    ###################################################
+    ######## methods used in <TDir> nodepath deltas. 
+    
+    # TODO: test 
+    """
+    NOTE: class instances of <TDirector> do not remember
+          `locset` as destination nodes for navigation.
+
+    locset := set, node locations that may or may not
+              be in the `resource_sg`.
+
+    return:
+    - float, in [0.,1.] such that 1. signifies the performance 
+             as better than all previous, 0. signifies performance 
+             as worse than all previous. 
+    """
+    def reflect_on_target_performance(self,locset,f=min):
+        assert f in {min,'mean'}
+
+        dfsc = self.resource_sg.sp[self.loc()]
+
+        def fx():
+            distances = []
+            for l in locset:
+                if l not in dfsc.min_paths:
+                    continue 
+                q = dfsc.min_paths[0].cost()
+                distances.append(q) 
+
+            if f == min:
+                return f(distances)
+            return round(sum(distances) / len(distances),5)
+
+        if self.vp() == "I":
+            assert len(locset) >= 1
+        else: 
+            assert len(locset)  == 1
+
+        sx = fx()
+        self.ps = np.append(self.px,sx)
+
+        while len(self.ps) > self.tdts:
+            self.ps.pop(0)
+        
+        return self.reflect_on_performance()
+
+    """
+    required method of calculation by class 
+    method above. 
+    """
+    def reflect_on_performance(self):
+        q = self.ps[-1]
+        r = 0 
+        for i in range(len(self.ps) - 1): 
+            if q > self.ps[i]:
+                r += 1
+        return measures.zero_div(r,len(self.ps) - 1,0.0)
+
+
+# INDEX-SCALED MEAN 

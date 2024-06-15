@@ -13,6 +13,8 @@ class TDBridge:
         c.td.load_graph(G)
         return
 
+
+
 """
 environment for the dual-agent 
 activity of 1 <SecNet> instance 
