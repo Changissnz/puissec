@@ -320,10 +320,9 @@ class IsoRing:
 
     #######################################
 
-    def default_TDirector_instance(self,radius:int,\
+    def default_TDirector_instance(self,l,radius:int,\
         tdts=DEFAULT_TDIRECTOR_TIMESTAMP_SIZE):
         assert radius > 0
-        l = self.loc()
         td = TDirector(l,l,"I",radius,1,tdts)
         self.td = td
 

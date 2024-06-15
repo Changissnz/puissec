@@ -8,7 +8,7 @@ class IsoRingedChain:
         rnd_struct,rs_seed:int):
         self.ss = ss 
         self.irl = []
-        self.load_IsoRings(bound,rnd_struct,rs_seed)  
+        self.load_IsoRings(bound,rnd_struct,rs_seed)
 
     def fetch_IsoRing(self,sec_idn):
         for x in self.irl:
@@ -438,6 +438,33 @@ class SecNet:
             sx = irx.sec_cache[irx.repi]
             dx[ir] = sx.dim()
         return dx 
+
+    #################################################
+    ###### methods for routing <IsoRing>
+    #################################################
+
+    def load_TDirectors_for_IRC(self,rdict,tdict):
+        assert type(rdict) in {int,dict}
+        assert type(tdict) in {float,dict}
+
+        def fetch_rt(sec_idn):
+            if type(rdict) == dict:
+                x = rdict[sec_idn]
+            else: 
+                x = rdict
+
+            if type(tdict) == dict:
+                y = tdict[sec_idn]
+            else: 
+                y = tdict
+            return x,y 
+
+        for i in self.irc.irl:
+            q = i.sec.idn_tag
+            x,y = fetch_rt(q)
+            l = self.node_loc_assignment[q]
+            i.default_TDirector_instance(l,x,y)
+
 
 ############################################################
 ############################################################

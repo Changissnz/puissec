@@ -265,6 +265,12 @@ class SecEnv:
             if not stat: return False
         return True 
 
+    #####################################
+
+    def instantiate_td_for_IRC(self,rd,td):
+        self.sn.load_TDirectors_for_IRC(rd,td)
+        return
+
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):
         sn3 = SecNet_sample_C3()
