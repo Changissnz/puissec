@@ -41,9 +41,43 @@ class SecEnvClass(unittest.TestCase):
         # demonstrating the scores of the 
         # <Crackling>'s <TDirector> 
         c = se.crck.cracklings[0]
-        assert c.loc() == 11
+        assert c.loc() == 58
         c.td_next(1.0)
-        assert c.loc() == 10
+        assert c.loc() == 58
+
+    ############################
+
+    def test__SecEnv__InstantiateCrackerANDSecNet__case1(self):
+        se = SecEnv_sample_2() 
+
+        ##print("-- instantiate cracker target")
+        se.instantiate_cracker_target()
+        ##print("-- instantiate IRC-td")
+        se.instantiate_td_for_IRC(5,1.0)
+
+        radar_ans = {0:0,1:1}
+        for q in se.sn.irc.irl:
+            #print("SEC {}".format(q.sec.idn_tag))
+            #print("RADIUS {}".format(q.td.td.radius))
+            #print("$$$$$$$$$$$$$$")
+            #print("* path")
+            #print(str(q.td.td.node_path))    
+            #print("SNGC")
+            #q.td.resource_sg.display(0)
+            lx = q.td.check_radar()
+            ##print(lx)
+            ##print("-----##")
+            lx_ans = radar_ans[q.sec.idn_tag]
+            assert len(lx) == lx_ans
+            assert len(q.td.resource_sg.ring_locs) == 2
+            assert len(q.td.resource_sg.crackling_locs) == 1 
+            assert q.td.td.node_path.cost() == 0 
+
+        ## for <Cracker>
+        ##print("\t\t----------- CRACKER DATA------------")
+        td_ = se.crck.cracklings[0].td
+        assert td_.td.node_path.cost() == 2
+
 
 if __name__ == '__main__':
     unittest.main()

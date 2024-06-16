@@ -25,6 +25,28 @@ class SNGraphContainer:
         # 
         self.path_size = path_size
 
+    def display(self,verbose=1):
+        assert verbose in {0,1}
+
+        if verbose: 
+            print("DICTIONARY")
+            for k,v in self.d.items():
+                print("* {} --> {}".format(k,v))
+            print()
+
+        print("SEC NODESET")
+        print(self.sn)
+        print()
+        print("ISORING")
+        print(self.ring_locs)
+        print()
+        print("CRACKLING")
+        print(self.crackling_locs)
+        print()
+        print("ENTRY POINTS")
+        print(self.entry_points)
+
+
     @staticmethod
     def unpickle_thyself(fp): 
         fx = open(fp,"rb")
@@ -234,6 +256,7 @@ class TDir:
         return loc 
 
     def __next__(self):
+
         if not self.active_stat: return None 
 
         if self.index >= len(self.node_path):
@@ -252,6 +275,7 @@ class TDir:
 
     def scaled__next__(self,scale = 1.0):
         if not self.active_stat: 
+            print("NOT ACTIVE")
             return self.location,False
             
         tx = self.t + scale
@@ -403,15 +427,11 @@ class TDirector:
     searches for a target node to travel the agent I|C. 
     """
     def extloc_search__set_TDir(self,extf=max,rnd_struct=random): 
-    #(self,sgc:SNGraphContainer,extf=max,rnd_struct=random):#,check_completion=True):
-        print("INITIATE EXTLOC")
 
         assert type(self.resource_sg) == SNGraphContainer
         q = self.extloc_search_at_ref(self.resource_sg,rnd_struct,extf)
         if type(q) == type(None):
             return 
-
-        print("node EXTLOC: ",q)
 
         l = self.td.location
         tn = self.td.target_node
@@ -419,15 +439,12 @@ class TDirector:
         r = self.td.radius
         v = self.td.velocity
 
-        ##tn = q 
-        print("target <Sec>: {} node dest: {}".format(tn,q))
-
         tdx = TDir(l,tn,vp,r,v)
-        print("loading EXTLOC path")
         node_path = tdx.load_path_(self.resource_sg,q) 
         if type(node_path) != NodePath: 
             print("no node path")
             return
+
         tdx.node_path = node_path
         tdx.index = 0
 
@@ -467,7 +484,6 @@ class TDirector:
         if len(sgc.sp.keys()) == 0:
             return set()
         
-        ##self.sp = defaultdict(DFSCache)
         rkx = []
         for k,v in sgc.sp.items():
             if ref not in v.min_paths: 
@@ -476,8 +492,6 @@ class TDirector:
             q = v.min_paths[ref][0].cost()
             rkx.append((k,q))
 
-        #rkx = sorted([(k,sum(v.pweights)) for k,v in sgc.sp.items()],\
-        #    key=lambda x:x[1])
         if extf == max:
             rkx = rkx[::-1]
 
@@ -553,7 +567,6 @@ class TDirector:
     """
     """
     def targetnode_analysis__VPC(self,tn,rnd_struct):
-        print()
         if tn not in self.resource_sg.sp:
             print("not secure")
             return None

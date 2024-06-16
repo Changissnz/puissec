@@ -65,7 +65,9 @@ class Crackling:
         elif self.td.obj_stat == "capture target":
             if not self.td.td.active_stat:
                 isoring_loc = self.td.check_radar()
-            assert False, "not programmed yet."
+            self.td.td.scaled__next__(timespan)
+            return 
+            ##assert False, "not programmed yet."
         return
 
     """

@@ -271,7 +271,6 @@ class SecNet:
             if v_[1] in k:
                 q = v_[0].hs.seq_idn
                 oc[k_] = (v_[1],q)
-
         sgc.update_rc_agent_locs(nla,oc)
         return nla,oc 
         
@@ -280,6 +279,8 @@ class SecNet:
     def subgraph_for_TDir(self,tdir):
         assert type(self.sgc) != type(None)
         rx = tdir.radius 
+        v = tdir.velocity
+        ##print("RX: ",rx, v)
         sgc1 = self.sgc.subgraph_by_radius_at_refnode(tdir.\
             location,rx)
         self.rc_agent_locs_for_subgraph(sgc1)
@@ -463,6 +464,7 @@ class SecNet:
         for i in self.irc.irl:
             q = i.sec.idn_tag
             x,y = fetch_rt(q)
+            ##print("RT: ",x,y)
             l = self.node_loc_assignment[q]
             i.default_TDirector_instance(l,x,y)
 

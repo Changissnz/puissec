@@ -269,6 +269,15 @@ class SecEnv:
 
     def instantiate_td_for_IRC(self,rd,td):
         self.sn.load_TDirectors_for_IRC(rd,td)
+        self.load_subgraphs_for_IRC() 
+        return
+
+    def load_subgraphs_for_IRC(self):
+        for q in self.sn.irc.irl:
+            td = q.fetch_td()
+            assert type(td) == TDir 
+            sng = self.sn.subgraph_for_TDir(td)
+            q.td.load_graph(sng)
         return
 
 def SecEnv_sample_1(sn3=None):
@@ -282,3 +291,7 @@ def SecEnv_sample_1(sn3=None):
             naive_split=2)
     crck = Cracker(i2hm,bi,6)
     return SecEnv(sn3,crck) 
+
+def SecEnv_sample_2():
+    sn = SecNet_sample_CSmall()
+    return SecEnv_sample_1(sn)

@@ -323,8 +323,14 @@ class IsoRing:
     def default_TDirector_instance(self,l,radius:int,\
         tdts=DEFAULT_TDIRECTOR_TIMESTAMP_SIZE):
         assert radius > 0
-        td = TDirector(l,l,"I",radius,1,tdts)
+        td = TDirector(l,l,"I",self.sec.idn_tag,\
+            radius,1,tdts=tdts)
         self.td = td
+
+    def fetch_td(self):
+        if type(self.td) != TDirector:
+            return None
+        return self.td.td
 
 
 ################################################

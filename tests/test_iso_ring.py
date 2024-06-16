@@ -69,7 +69,7 @@ class IsoRingClass(unittest.TestCase):
 
         ss = SecSeq_sample_4(num_secs=1,\
                 singleton_range=DEFAULT_SINGLETON_RANGE,\
-                num_conn=1,min_components=1,dconn_ratio = 0.3,\
+                num_conn=1,min_components=1,max_nconn_ratio = 0.3,\
                 drange_max=1)
         ss = ss[0]
 
