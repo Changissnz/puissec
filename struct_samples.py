@@ -1,4 +1,5 @@
 from sec_seq import * 
+from secnet_gen import *
 
 def Sec_sample_1():
     sequence = np.array([0.4,1.8,2.0])
@@ -84,3 +85,15 @@ def SecNet_graph_sample_C3():
     D[16] = {14,17}
     D[17] = {16}
     return D
+
+def SecNet_graph_sample_CSmall():
+    snv = []
+    nsv = [0,1,2,3,4,5,6]
+    sngs = SecNetGenScheme("spine frame",228)
+    snfg = SecNetFrameGen(snv,nsv,sngs)
+
+    snfg.construct_frame()
+    D = defaultdict(set)
+    for k,v in snfg.d.items():
+        D[k] = set(v) 
+    return D 

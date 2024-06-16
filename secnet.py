@@ -135,7 +135,8 @@ class SecNet:
         path_size=10,sngc=None,energy=1000.0):
         
         assert len(irc) > 0 and type(irc) == SecSeq
-        assert len(sec_nodeset) >= len(irc) 
+        assert len(G) >= len(irc) 
+
         self.ss = irc
         ##print("RNDSTRUCT#1: ",rnd_struct)
         self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
@@ -469,7 +470,10 @@ class SecNet:
 ############################################################
 ############################################################
 
-def SecNet_sample1(ss=SecSeq_sample_1(1)):
+def SecNet_sample1(ss=None):
+    if type(ss) != SecSeq:
+        ss = SecSeq_sample_1(1)
+
     #ss = SecSeq_sample_1(1)
     sec_node_count = 12
     nsec_node_count = 23
@@ -535,6 +539,7 @@ def SecNet_sample_C3():
             bound,rnd_struct,rnd_seed)
     return sn
 
+# TODO: needs to be used in tests. 
 """
 sample for testing <TDirector> on Nv1.
 """
@@ -558,6 +563,23 @@ def SecNet_sample_TDirNv1():
     for s_ in sn.irc.irl:
         ##print("exploding {}".format(s_.sec.idn_tag))
         s_.explode_contents(num_blooms=2)
+    return sn 
+
+# TODO: needs to be used in tests. 
+def SecNet_sample_CSmall():
+    G = SecNet_graph_sample_CSmall()
+
+    random.seed(5721)
+    np.random.seed(935223)
+    ss,sndg = SecSeq_sample_4(num_secs=2,singleton_range=DEFAULT_SINGLETON_RANGE,\
+        num_conn=50,min_components=1,max_nconn_ratio=0.4,drange_max=1)
+
+    #irc = IsoRingedChain(ss,DEFAULT_SINGLETON_RANGE,random,23)
+    sec_nodeset = set()  
+    sn = SecNet(ss,G,sec_nodeset,{0:2,1:4},\
+        entry_points = 1,bound=DEFAULT_SINGLETON_RANGE,\
+        rnd_struct=random,rnd_seed=9,\
+        path_size=10,sngc=None,energy=1000.0)
     return sn 
 
 def SRefMap_sample1(): 
