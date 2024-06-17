@@ -121,7 +121,8 @@ class SecEnv:
         # continue cracking
         if s == 1:
             cidn = c.cidn 
-            return self.run_CBridge(self.ct_ratio,cidn,True)
+            iterations = int(round(self.ct_ratio * timespan))
+            return self.run_CBridge(iterations,cidn,True)
 
         # interdiction
         if s == 0:
@@ -193,6 +194,8 @@ class SecEnv:
             if stat_: 
                 tdirector.switch_obj_stat()
                 self.crck.load_TDirector(cidn,tdirector)
+                self.sn.set_crackling(crcklng,tdirector.loc()) 
+
                 break
             tds.append(tdirector)
 
@@ -266,6 +269,10 @@ class SecEnv:
         return True 
 
     #####################################
+    ############## <TDirector> instantiation for
+    ############## each <IsoRing>|<Crackling>
+    ############## agent. 
+    #####################################
 
     def instantiate_td_for_IRC(self,rd,td):
         self.sn.load_TDirectors_for_IRC(rd,td)
@@ -279,6 +286,21 @@ class SecEnv:
             sng = self.sn.subgraph_for_TDir(td)
             q.td.load_graph(sng)
         return
+
+    #####################################
+    ############### post-move update
+    #####################################
+
+    """
+    updates the locations of <Crackling>+<IsoRing>
+    agents onto the variables of <SecNet>, as well
+    as each agent's <TDirector> graph. 
+    """
+    def postmove_update(self):
+        self.sn.update_occ_crackl()
+        self.sn.update_nla() 
+        return
+
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

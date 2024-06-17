@@ -35,9 +35,4 @@ class NerG:
         return q
 
     def __sub__(self,v):
-        assert type(v) in {np.int32,np.float64,\
-            np.float32,int,float}
-
-        q = deepcopy(self)
-        q.v = q.v - v
-        return q
+        return self.__add__(-1 * v)

@@ -436,7 +436,9 @@ class Cracker:
     """
     loads the appropriate number of <Crackling> 
     instances for the target set of <Sec> instances, 
-    `targetdim_seq`. 
+    `targetdim_seq`.
+
+    targetdim_seq := list<(sec_idn,sec_dim)>
     """
     def load_cracklings_for_secset(self,targetdim_seq):
         self.cracklings.clear() 
@@ -444,6 +446,14 @@ class Cracker:
         for (nt_,d) in targetdim_seq: 
             self.load_crackling(nt_,d)
         return
+
+    # TODO: uses <NerG> 
+    """
+    load 
+    """
+    def load_cracklings_for_secset_(self,targetdim_seq):
+
+        return -1
 
     def load_crackling(self,sec_idn,sec_dim):
 

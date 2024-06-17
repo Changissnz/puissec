@@ -147,7 +147,7 @@ class SecNet:
 
         self.d = G 
         self.sec_nodeset = sec_nodeset
-        # sec index -> node location 
+        # sec idn -> node location 
         self.node_loc_assignment = node_loc_assignment
         self.assign_entry(entry_points)
         if type(self.node_loc_assignment) == type(None):
@@ -175,6 +175,37 @@ class SecNet:
             self.sgc = sngc 
         self.energy = NerG(energy)
         return
+
+    ######################## location update and
+    ######################## status 
+
+    def update_occ_crackl(self):
+        for k in self.occ_crackl.keys():
+            v = self.occ_crackl[k] 
+            self.occ_crackl[k][1] = v[0].loc()
+
+            # update TDirector if existing
+            if type(v[0].td) == type(None):
+                continue
+
+            tdx = v[0].td.td
+            sgx = self.subgraph_for_TDir(tdx)
+            v[0].td.load_graph(sgx)
+        return 
+
+    ## TODO: refactoradorii above function w/ this. 
+    def update_nla(self):
+        for k in self.node_loc_assignment.keys():
+            s = self.sn.fetch_IsoRing(k) 
+            self.node_loc_assignment[k] = s.loc() 
+            if type(s.td) == type(None):
+                continue
+            tdx = s.td.td
+            sgx = self.subgraph_for_TDir(tdx)
+            s.td.load_graph(sgx)
+        return
+    
+    ##############################################
 
     @staticmethod
     def alt_instantiate(irc,G,sec_nodeset,\

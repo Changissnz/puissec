@@ -153,6 +153,11 @@ class IsoRing:
         self.sec_script = None
         self.leak_stage = 0
 
+    def loc(self):
+        if type(self.td) == type(None):
+            return None
+        return self.td.loc() 
+
     def sec_of_dim(self,d):
         for x in self.sec_cache:
             if x.dim() == d: 

@@ -217,6 +217,8 @@ class TDir:
             self.active_stat = False 
             print("error: target node not found")
             return
+        
+        print("TARGET NODE FOUND! ",target_loc)
 
         p = self.load_path_(G,target_loc)
 
@@ -235,6 +237,7 @@ class TDir:
         if self.location not in dfsc.min_paths:
             print("no path in DFS")
             return
+        print("YESLOC, loc {} target {}".format(self.location,loc))
 
         nodePath = dfsc.min_paths[self.location][0]
         return nodePath
@@ -242,8 +245,9 @@ class TDir:
 
     def search_for_target_node(self,G):
         assert type(G) == SNGraphContainer
-        ##print("TARGET NODE: ",self.target_node)
-
+        print("LOCA: ",self.location)
+        print("TARGET NODE: ",self.target_node)
+        print("RING LOCS: ",G.ring_locs)
         # case: vp = I; literal node destination 
         if self.vantage_point == "I": 
             return self.target_node
@@ -420,9 +424,8 @@ class TDirector:
     ######### loc search mode: used by agent A to achieve its objective.
     #########               - <Crackling> to locate target <IsoRing>.
     #########               - <IsoRing> to distance itself from pursuing <Crackling> instances. 
-
-
     ########################## section: extremum locator
+    
     """
     searches for a target node to travel the agent I|C. 
     """
