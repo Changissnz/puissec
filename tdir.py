@@ -1,4 +1,5 @@
 from dfs_struct import *
+from morebs2 import measures
 
 DEFAULT_TDIRECTOR_OBJ_FUNCTIONS = [np.min,\
                     np.max,np.mean,std_iscaled_mean]
@@ -218,7 +219,7 @@ class TDir:
             print("error: target node not found")
             return
         
-        print("TARGET NODE FOUND! ",target_loc)
+        ##print("TARGET NODE FOUND! ",target_loc)
 
         p = self.load_path_(G,target_loc)
 
@@ -237,7 +238,7 @@ class TDir:
         if self.location not in dfsc.min_paths:
             print("no path in DFS")
             return
-        print("YESLOC, loc {} target {}".format(self.location,loc))
+        ##print("YESLOC, loc {} target {}".format(self.location,loc))
 
         nodePath = dfsc.min_paths[self.location][0]
         return nodePath
@@ -245,9 +246,10 @@ class TDir:
 
     def search_for_target_node(self,G):
         assert type(G) == SNGraphContainer
-        print("LOCA: ",self.location)
-        print("TARGET NODE: ",self.target_node)
-        print("RING LOCS: ",G.ring_locs)
+        ##print("LOCA: ",self.location)
+        ##print("TARGET NODE: ",self.target_node)
+        ##print("RING LOCS: ",G.ring_locs)
+
         # case: vp = I; literal node destination 
         if self.vantage_point == "I": 
             return self.target_node
@@ -520,7 +522,7 @@ class TDirector:
 
         if self.vp() == "C": 
             return self.targetnode_analysis__VPC(tn,rnd_struct)
-        return self.targetnode_analysis__VPI(tn,rnd_struct)
+        return self.targetnode_analysis__VPI(tn)
 
     """
     analysis of node `tn` as a destination node
@@ -534,6 +536,7 @@ class TDirector:
 
         # cracklings detected by radar
         sn = self.check_radar()
+        print("SN: ",sn)
 
         if len(sn) == 0: 
             return None
@@ -542,6 +545,10 @@ class TDirector:
         # to `tn`.
         d = {}
         dfsc = self.resource_sg.sp[tn]#self.td.location]
+        print("KEYS")
+        print(dfsc.min_paths.keys())
+        
+
         for sn_ in sn:
             if sn_ not in dfsc.min_paths:
                 continue
@@ -549,7 +556,8 @@ class TDirector:
 
         # get <Crackling> distance to SEC node
         # crackling -> mean distance to SEC node
-        
+        print("DD: ",d)
+        print("-------------------")
         ## MAYBE: min? 
         mean_distances = self.mean_mindistance_of_nodeset(deepcopy(sn))
         d2 = {}
@@ -639,7 +647,7 @@ class TDirector:
     """
     def secnode_distance_map(self,n,is_sec:bool=True):
 
-        if n not in self.resource_sg:
+        if n not in self.resource_sg.d:
             return {}
         
         sns = deepcopy(self.resource_sg.sn)

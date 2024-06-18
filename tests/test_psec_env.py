@@ -78,6 +78,35 @@ class SecEnvClass(unittest.TestCase):
         td_ = se.crck.cracklings[0].td
         assert td_.td.node_path.cost() == 2
 
+    def test__SecEnv__cproc__case1(self):
+        se = SecEnv_sample_1(sn3=SecNet_sample_TDirNv1())
+        se.instantiate_td_for_IRC(5,1.0)
+
+        se.instantiate_cracker_target()
+        #assert len(se.crck.cracklings) == 1
+        # demonstrating the scores of the 
+        # <Crackling>'s <TDirector> 
+        c = se.crck.cracklings[0]
+        random.seed(1543)
+
+        ir = se.sn.irc.fetch_IsoRing(18)
+        """
+        q = set(ir.td.resource_sg.d.keys())
+        print("ISORING")
+        for q_ in q: 
+            s = ir.td.targetnode_analysis(q_,None)
+            print("{}:{}".format(q_,s))
+        """
+        se.cproc()
+        """
+        print("[2] CRACKLING @ ",c.cidn)
+        for q_ in q: 
+            s = c.td.targetnode_analysis(q_,random)
+            print("{}:\n{}\n".format(q_,s))
+        """
+        q67 = se.coloc()
+        print("QQ: ",q67)
+        assert q67 == {'0,18,58'}
 
 if __name__ == '__main__':
     unittest.main()

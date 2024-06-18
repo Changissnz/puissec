@@ -618,7 +618,7 @@ class Cracker:
     def cstat(self):
         d = {}
         for i in range(len(self.cracklings)):
-            q = self.cracklings[i].idn_tag
+            q = self.cracklings[i].cidn
             d[q] = self.crackling_stat(i)
         return d
 

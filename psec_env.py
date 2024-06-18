@@ -114,6 +114,8 @@ class SecEnv:
         c = self.crck.cracklings[index]
         s = self.crck.crackling_stat(index) 
 
+        print("STATUS: ",s)
+
         # done
         if s == 2: 
             return False
@@ -127,7 +129,7 @@ class SecEnv:
         # interdiction
         if s == 0:
             return True
-
+        
         # TODO: review dec.
         c.td_next(timespan)
 
@@ -301,6 +303,30 @@ class SecEnv:
         self.sn.update_nla() 
         return
 
+    """
+    return:
+    - set::(crackling idn,isoring idn,node colocation)
+    """
+    def coloc(self):
+        # iterate through each <Crackling>
+        # and check status
+
+        # 
+        dx = set()
+        for c in self.crck.cracklings:
+            q = c.td.loc() 
+            target = c.target_of_HypStruct()
+            stat = target in c.td.resource_sg.ring_locs
+            q2 = None 
+            if stat:
+                q2 = c.td.resource_sg.ring_locs[target]
+
+            if q == q2: 
+                a = np.array([c.cidn,target,q2])
+                s = matrix_methods.vector_to_string(a,int)
+                dx = dx | {s}
+
+        return dx 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

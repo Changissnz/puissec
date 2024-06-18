@@ -50,12 +50,14 @@ class Crackling:
     """
     """
     def td_next(self,timespan=1.0):
+        print("OBJSTAT: ",self.td.obj_stat)
 
         if self.td.obj_stat == "search for target":
             print("---")
             print("SEARCHING FOR TARGET")
             # check if <TDir> is still active.
             if not self.td.td.active_stat:
+                print("NOT ACTIVE,SETTING EXTREME")
                 self.td.extloc_search__set_TDir(extf=max,rnd_struct=random)
             print("path is ")
             print(str(self.td.td.node_path))
@@ -63,8 +65,22 @@ class Crackling:
             self.td.td.scaled__next__(timespan)
             return
         elif self.td.obj_stat == "capture target":
+            print("RADAR!: ")
+            q = self.td.check_radar()
+            if len(q) == 0:
+                print("switching")
+                self.td.td.active_stat = False
+                self.td.switch_obj_stat()
+                return self.td_next(timespan)
+
+            print("Q")
+            print(q)
+            
             if not self.td.td.active_stat:
+                print('not active.')
                 isoring_loc = self.td.check_radar()
+            print("PATH")
+            print(self.td.td.node_path)
             self.td.td.scaled__next__(timespan)
             return 
             ##assert False, "not programmed yet."

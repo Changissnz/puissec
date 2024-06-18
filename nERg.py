@@ -1,5 +1,21 @@
 from cit import *
 
+"""
+NOTE: used for ML purposes. 
+"""
+class EWeight:
+
+    def __init__(self,v,df):
+        assert matrix_methods.is_vector(v)
+        self.v = v 
+        self.df = df
+        return 
+
+    def delta(self):
+        q = self.df(v)
+        self.v = q
+        return q
+
 class NerG:
 
     """
@@ -7,10 +23,12 @@ class NerG:
              energy level of associated agent.
     rf := str|None; reference file used by instance
     """
-    def __init__(self,value:float,rf:str=None):
+    def __init__(self,value:float,rf:str=None,\
+        ew:EWeight=None):
         assert value > 0.0
         self.v = value
         self.open_rf(rf)
+        self.ew = ew
         return
 
     def open_rf(self,rf):
