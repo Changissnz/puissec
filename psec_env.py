@@ -13,7 +13,57 @@ class TDBridge:
         c.td.load_graph(G)
         return
 
+# NOTE: no error-handling for arguments.
+class Colocks:
 
+    """
+    every element of sets `iset`,`cset` is a stringized
+    representation of a co-location instance in a <SecEnv>,
+    of the form 
+        [0] crackling idn
+        [1] isoring idn
+        [2] node colocation
+    """
+    def __init__(self,iset,cset):
+        self.iset = iset
+        self.cset = cset
+        return
+
+    def update_i(self,iset):
+        self.iset = iset
+        return
+
+    def update_c(self,cset):
+        self.cset = cset 
+        return
+
+
+    """
+    return:
+    - 0 for no co-loc with `agent_idn` OR
+      1 for co-loc (interdiction) with `agent_idn` OR
+      2 for co-loc (cracking) with `agent_idn`. 
+    """
+    def cstat(self,agent_idn,is_isoring:bool):
+        target_index = 0 if not is_isoring else 1 
+
+        for ix in self.iset:
+            q = Colocks.parse_coloc_str(ix)
+            if q[target_index] == agent_idn:
+                return 1
+
+        for ix in self.cset:
+            q = Colocks.parse_coloc_str(ix)
+            if q[target_index] == agent_idn:
+                return 2
+        return 0 
+    
+
+    @staticmethod
+    def parse_coloc_str(s):
+        s_ = matrix_methods.string_to_vector(np.array(s),int)
+        assert len(s_) == 3
+        return s 
 
 """
 environment for the dual-agent 
@@ -43,6 +93,10 @@ class SecEnv:
         # active <CBridge> instances
         self.cbs = [] 
         self.cbs_idn_ctr = 0
+
+        # coloc info
+        self.ci = Colocks(set(),set())
+        self.coloc_register()
         return
 
     def pickle_thyself(self,cpath,spath):
@@ -78,23 +132,17 @@ class SecEnv:
     ############### methods for instantiating and running
     ############### <Crackling> agents. 
 
+    # TODO: test 
     def run(self,timespan=1.0):
-        self.run_agent(True)
-        self.run_agent(False)
+        self.cproc(timespan)
+        self.iproc(timespan)
         return
-
-    def run_agent(self,is_sn:bool=True):
-        if is_sn:
-            q = self.sn
-        else: 
-            q = self.crck
-        return -1
 
     """
     main process for the <Cracker> of <SecEnv>; it is 
     the decision-chain function that <Cracker> uses.
     """
-    def cproc(self):
+    def cproc(self,timespan=1.0):
         # check status
         cd = self.crck.cstat()
         vs = set(cd.values())
@@ -107,7 +155,7 @@ class SecEnv:
 
         # proceed to run all <Crackling> instances
         for i in range(len(self.crck.cracklings)):
-            self.cproc_(i)
+            self.cproc_(i,timespan)
         return True
 
     def cproc_(self,index,timespan=1.0):
@@ -158,8 +206,6 @@ class SecEnv:
         tdr = crckl.fetch_tdir()
         sg = self.sn.subgraph_for_TDir(tdr)
         crckl.td.load_graph(sngc)
-
-    ########################################################
 
     """
     update the <Crackling> instances declared by 
@@ -215,6 +261,26 @@ class SecEnv:
             self.crck.load_TDirector(cidn,tds[qi])
             self.sn.set_crackling(crcklng,tds[qi].loc()) 
         return True
+
+    ##################### methods to handle <IsoRing> decisions
+
+
+    def iproc(self,timespan = 1.0):
+        q = len(self.sn.irc.irl)
+
+        for i in range(q):
+            self.iproc_(i,timespan)
+        return
+
+    # TODO: add more code and test. 
+    def iproc_(self,iindex,timespan = 1.0):
+        ir = self.sn.irc.irl[iindex]
+        cstat = self.ci.cstat(ir.sec.idn_tag,True)
+        # case: is being cracked --> immobilized.
+        if cstat == 2:
+            return None
+
+        ir.default_secproc(timespan) 
 
     ############ TODO: methods to handle <CBridge>s.
     ########################################################
@@ -303,6 +369,28 @@ class SecEnv:
         self.sn.update_nla() 
         return
 
+    # TODO: 
+    def coloc_register(self):
+
+        iset = set()
+        cset = set()
+
+        s = self.coloc() 
+
+        while len(s) > 0:
+            s_ = s.pop()
+            s2 = Colocks.parse_coloc_str(s_)
+            stat = self.sn.is_secnode(s2[2])
+
+            if stat:
+                cset = cset | {s_}
+            else:
+                iset = iset | {s_}
+
+        self.ci.update_c(cset)
+        self.ci.update_i(iset)
+        return
+
     """
     return:
     - set::(crackling idn,isoring idn,node colocation)
@@ -327,6 +415,10 @@ class SecEnv:
                 dx = dx | {s}
 
         return dx 
+
+    # TODO: 
+    def leak_by_str_idn(self,sidn):
+        return -1 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

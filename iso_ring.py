@@ -153,6 +153,7 @@ class IsoRing:
         self.sec_script = None
         self.leak_stage = 0
 
+
     def loc(self):
         if type(self.td) == type(None):
             return None
@@ -337,6 +338,36 @@ class IsoRing:
             return None
         return self.td.td
 
+    #########################################
+
+    def default_secproc(self,timespan:float):
+        assert timespan >= 0.0
+        assert type(self.td) == TDirector
+
+        stat = self.td.check_obj()
+
+        # switch obj.
+        if stat:
+            self.td.switch_obj_stat()
+
+        # decide how to proceed
+
+        ## case: change from `null radar`; fetch a 
+        ##       new and active path.
+        if stat and self.td.obj_stat == "avoid target":
+            pt = self.td.defsec_path(self.rnd_struct)
+            if type(pt) == type(None):
+                print("ERR! no secnode for path")  
+                return 
+            self.td.load_new_path(pt)
+
+        # set active stat of <TDir> to False
+        if stat and self.td.obj_stat == "null radar":
+            self.td.td.active_stat = False
+        
+        # travel by <TDir>
+        self.td.td.scaled__next__(timespan)
+        return
 
 ################################################
 

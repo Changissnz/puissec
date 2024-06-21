@@ -90,6 +90,7 @@ class SecEnvClass(unittest.TestCase):
         random.seed(1543)
 
         ir = se.sn.irc.fetch_IsoRing(18)
+        ####
         """
         q = set(ir.td.resource_sg.d.keys())
         print("ISORING")
@@ -97,16 +98,43 @@ class SecEnvClass(unittest.TestCase):
             s = ir.td.targetnode_analysis(q_,None)
             print("{}:{}".format(q_,s))
         """
+        ####
         se.cproc()
+        ####
         """
         print("[2] CRACKLING @ ",c.cidn)
         for q_ in q: 
             s = c.td.targetnode_analysis(q_,random)
             print("{}:\n{}\n".format(q_,s))
         """
+        ####
         q67 = se.coloc()
-        print("QQ: ",q67)
         assert q67 == {'0,18,58'}
+
+    def test__SecEnv__InstantiateCrackerANDSecNet__case2(self):
+
+        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+        se.instantiate_td_for_IRC(5,1.0)
+        se.instantiate_cracker_target()
+
+        #assert len(se.crck.cracklings) == 1
+        # demonstrating the scores of the 
+        # <Crackling>'s <TDirector> 
+        c = se.crck.cracklings[0]
+        iring = se.sn.irc.irl[0]
+
+        q = set(c.td.resource_sg.d.keys())
+        # targetnode_analysis
+        print("CRACKLING")
+        for q_ in q: 
+            s = c.td.targetnode_analysis(q_,random)
+            print("{}:\n{}\n".format(q_,s))
+            if q_ in {3,6}:
+                assert s.cost() == 1
+                continue
+            assert s.cost() == 0 
+        return
+
 
 if __name__ == '__main__':
     unittest.main()

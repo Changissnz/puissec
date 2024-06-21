@@ -204,6 +204,9 @@ class SecNet:
             sgx = self.subgraph_for_TDir(tdx)
             s.td.load_graph(sgx)
         return
+
+    def is_secnode(self,n):
+        return n in self.sec_nodeset
     
     ##############################################
 

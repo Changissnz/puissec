@@ -242,8 +242,7 @@ class TDir:
 
         nodePath = dfsc.min_paths[self.location][0]
         return nodePath
-
-
+        
     def search_for_target_node(self,G):
         assert type(G) == SNGraphContainer
         ##print("LOCA: ",self.location)
@@ -298,13 +297,6 @@ class TDir:
         self.t_ += r 
         return self.location,stat 
 
-    """
-    on NodePath performance
-    """
-    def reflect(self):
-
-        return -1
-
 TDIR_SETTINGS = {'I':{"avoid target",\
                     "radar null"},\
                 'C': {"search for target",\
@@ -356,6 +348,12 @@ class TDirector:
         self.resource_sg = G
         self.td.load_path(G) 
 
+    def load_new_path(self,npath:NodePath):
+        assert type(npath) == NodePath 
+        self.td.node_path = npath
+        self.td.index = 0 
+        self.td.active_stat = True 
+
     def loc(self):
         return self.td.location
 
@@ -368,6 +366,21 @@ class TDirector:
             self.obj_stat = "capture target"
         else:
             self.obj_stat = "search for target"
+        self.clear_data() 
+
+    """
+    clears the following variables: 
+    - ps (the performance scores by reflection)
+    - ref_nodes (collected during `search for target` by <Crackling>)
+    """
+    def clear_data(self):
+        if self.obj_stat in {"avoid target","capture target"}:
+            print("cannot delete data during avoid/capture ops.")
+            return
+
+        self.ps = np.array([])
+        self.ref_nodes = []
+        return
 
     def update_tdir(self):
         return -1
@@ -375,23 +388,17 @@ class TDirector:
     # TODO: use this method to aid in agent decisions. 
     """
     return: 
-    - bool, if `obj_stat` in {radar null,search for target},
-      otherwise <NodePath> instance to update the <TDir>
+    - bool, ?switch objective?
     """
     def check_obj(self):
         assert self.vp() in {"I","C"}
 
+        q = self.check_radar()
         if self.obj_stat in {"radar null",\
                 "search for target"}:
-            q = self.check_radar()
             return len(q) > 0
 
-        if self.obj_stat == "avoid target":
-            return -1
-
-        if self.obj_stat == "capture target": 
-            return -1
-        return
+        return len(q) == 0
 
     """
     checks for chaser <Crackling> if 
@@ -529,7 +536,7 @@ class TDirector:
     given vantage point <IsoRing>.
 
     return:
-    - dict, <Crackling> idn -> 
+    - dict, <Crackling> idn  -> 
         (distance to tn / mean distance to SEC nodes).
     """
     def targetnode_analysis__VPI(self,tn):
@@ -590,20 +597,22 @@ class TDirector:
             print("NONE-ZO")
             return None
 
-
         # find the shortest path to cs
         assert len(cs) == 1
 
+        ###################################
+        
         # spot the security of I's location
         cs = cs.pop()
+        
         stat = cs in self.resource_sg.sn 
 
+        print("STATUS: ",cs, stat)
         # decision: if location is SEC, then 
         #           travel to it. Otherwise,
         #           select an NSEC for site of 
         #           interception.
         if stat:
-
             if cs not in dfsc.min_paths:
                 return None
             return dfsc.min_paths[cs][0] 
@@ -633,6 +642,9 @@ class TDirector:
             if target not in dfsc.min_paths:
                 return None
             return dfsc.min_paths[target][0]
+        
+        ########################################
+        return -1 
 
     # TODO: future
     def load_predicted_travel_at_node(self,n,npath):
@@ -701,7 +713,7 @@ class TDirector:
 
         sx = fx()
         if type(sx) == None: return None 
-        self.ps = np.append(self.px,sx)
+        self.ps = np.append(self.ps,sx)
         while len(self.ps) > self.tdts:
             self.ps.pop(0)        
         return self.reflect_on_performance()
@@ -717,3 +729,43 @@ class TDirector:
             if q > self.ps[i]:
                 r += 1
         return measures.zero_div(r,len(self.ps) - 1,0.0)
+
+    ################################################
+    
+    """
+    if no sec node exists for path, outputs None, 
+    otherwise outputs the path to the nearest 
+    secnode. 
+
+    Uses `rnd_struct` as a selector in the
+    event of ties. 
+    """
+    def defsec_path(self,rnd_struct):
+        q = []
+        ##self.resource_sg = None
+        if type(self.resource_sg) != SNGraphContainer:
+            print("NADA")
+            return
+
+        for qs in self.resource_sg.sn:
+            if qs not in self.resource_sg.min_paths:
+                print("?missing path?")
+                continue
+            px = self.resource_sg.min_paths[qs][0]
+            ex = (qs,px)
+            q.append(ex)
+
+        if len(q) == 0: 
+            return None
+        
+        s = sorted(q,key=lambda xr:xr[1].cost())
+        q = [s.pop(0)]
+        stat = True
+        while stat:
+            if s[0][1].cost() == q[0][1].cost(): 
+                q.append(s.pop())
+            else:
+                stat = not stat
+        
+        qi = rnd_struct.randrange(0,len(q))
+        return (q[qi][0],deepcopy(q[qi][1]))
