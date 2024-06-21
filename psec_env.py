@@ -262,6 +262,15 @@ class SecEnv:
             self.sn.set_crackling(crcklng,tds[qi].loc()) 
         return True
 
+    # TODO: use or delete
+    def load_subgraphs_for_Cracklings(self):
+        for q in self.crck.cracklings:
+            td = q.fetch_td()
+            assert type(td) == TDir 
+            sng = self.sn.subgraph_for_TDir(td)
+            q.td.load_graph(sng)
+        return
+
     ##################### methods to handle <IsoRing> decisions
 
 
@@ -367,6 +376,8 @@ class SecEnv:
     def postmove_update(self):
         self.sn.update_occ_crackl()
         self.sn.update_nla() 
+
+        self.coloc_leak_update()
         return
 
     # TODO: 
@@ -415,6 +426,10 @@ class SecEnv:
                 dx = dx | {s}
 
         return dx 
+
+    # TODO: 
+    def coloc_leak_update(self):
+        return -1 
 
     # TODO: 
     def leak_by_str_idn(self,sidn):
