@@ -118,7 +118,7 @@ class BackgroundInfo:
     """
     def __init__(self,opm,depchain_map,codep_sets,\
         dec_map,leak_map):
-        # sec idn -> sec dim. -> opt. idn -> Pr. 
+        # sec idn -> opt. dim. -> opt. idn -> Pr. 
         self.opm = opm
         self.dm = depchain_map
         self.cdm = codep_sets
@@ -134,7 +134,7 @@ class BackgroundInfo:
 
     # TODO: test this. 
     """
-    i2hm := dict, sec idn -> sequence of <HypStruct>
+    i2hm := dict, sec idn -> opt. dim. -> sequence of <HypStruct>
     """
     def apply_leakmap_on_IRC2HypStruct_map(self,i2hm):
 
@@ -155,7 +155,7 @@ class BackgroundInfo:
                     for hs_ in hs: 
                         if hs_.seq_idn == d:
                     """
-                        ### all udpate
+                        ### all update
                     hsx = []
                     for hs_ in hs:
                         hs2 = HypInfer.infer_by_LeakInfo(hs_,v_)
@@ -468,12 +468,14 @@ class Cracker:
         self.cracklings.append(cr) 
         return cr
 
+    # TODO: wrong! 
     """
     return:
     - <HypStruct>, the next attempt given the variables
                    `sec_idn`,`sec_dim`. 
     """
     def next_hypstruct(self,sec_idn,sec_dim):
+        print("NEXT HYPSTRUCT")
 
         if sec_idn not in self.hyp_map:
             return None
@@ -484,7 +486,9 @@ class Cracker:
         if len(self.hyp_map[sec_idn][sec_dim]) == 0:
             return None
 
-        hs = self.hyp_map[sec_idn][sec_dim].pop(0)
+        hs = self.hyp_map[sec_idn][sec_dim][0].new_HypStruct_by_next_subbound()
+        if type(hs) == type(None):
+            self.hyp_map[sec_idn][sec_dim].pop(0)
         return hs
 
     #### TODO: new section; needs to be tested. 
@@ -641,3 +645,17 @@ class Cracker:
     def remove_spent_cracklings(self):
         return -1 
 
+    def bileak_update_hyp(self,crackling_idn):
+        cr = self.fetch_crackling(crackling_idn)
+        if type(cr) != Crackling:
+            print("no crackling to update.")
+            return 
+
+        si = cr.hs.seq_idn
+        sd = cr.hs.secdim() 
+
+        hx = [cr.hs]
+        d = {si:{sd:hx}} 
+
+        self.bi.apply_leakmap_on_IRC2HypStruct_map(d)
+        return

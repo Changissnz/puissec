@@ -135,6 +135,19 @@ class SecEnvClass(unittest.TestCase):
             assert s.cost() == 0 
         return
 
+    def test__SecEnv__load_IRCLD_into_SecNet__case1(self):
+
+        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+
+        for x in se.sn.irc.irl:
+            x.explode_contents() 
+
+        se.load_IRCLD_into_SecNet()
+        qx = se.sn.irc.ircld
+        rx = set(qx.d[0].keys())
+
+        assert rx == set(se.sn.irc.fetch_IsoRing(0).secdim_seq())
+        assert set(qx.d.keys()) == {0}
 
 if __name__ == '__main__':
     unittest.main()

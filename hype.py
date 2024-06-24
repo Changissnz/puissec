@@ -1,4 +1,5 @@
 from morebs2 import matrix_methods 
+import numpy as np 
 
 def any_intersecting_bounds(bounds_seq):
     for i in range(0,len(bounds_seq) - 1):
@@ -40,6 +41,25 @@ class HypStruct:
         assert len(sb_pr) == len(suspected_subbounds)
         self.sb_pr = sb_pr
         return
+
+    def new_HypStruct_by_next_subbound(self):
+        if len(self.suspected_subbounds) == 0:
+            return None
+
+        sb2 = [self.suspected_subbounds.pop(0)]
+        pr2 = np.array([self.sb_pr[0]])
+        self.sb_pr = self.sb_pr[1:] 
+
+        hs2 = HypStruct(self.seq_idn,self.target_index,\
+            sb2,pr2) 
+        return hs2
+
+    def secdim(self):
+        if not len(self.suspected_subbounds): 
+            return None 
+
+        q = self.suspected_subbounds[0].shape
+        return q[0] 
 
     def mark_subbound(self,i,v=0.0):
         assert i >= 0 and i < len(self.suspected_subbounds)

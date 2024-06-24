@@ -340,6 +340,7 @@ class IsoRing:
 
     #########################################
 
+    # TODO: test
     def default_secproc(self,timespan:float):
         assert timespan >= 0.0
         assert type(self.td) == TDirector

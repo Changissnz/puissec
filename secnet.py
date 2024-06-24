@@ -8,7 +8,9 @@ class IsoRingedChain:
         rnd_struct,rs_seed:int):
         self.ss = ss 
         self.irl = []
+        self.ircld = None 
         self.load_IsoRings(bound,rnd_struct,rs_seed)
+        self.rnd_struct = rnd_struct
 
     def fetch_IsoRing(self,sec_idn):
         for x in self.irl:
@@ -85,6 +87,15 @@ class IsoRingedChain:
                 bound_,rnd_struct,sd) 
             self.irl.append(ir) 
         self.ss = None 
+
+    # TODO: test
+    def load_default_IRCLD(self):
+        self.ircld = IRCLeakDict(DEFAULT_LEAKSZ_RANGE,\
+            self.rnd_struct)    
+
+        for i in self.irl:
+            self.ircld.load_default_Leak_for_IsoRing(i)
+        return
 
     """
     fp := folder path

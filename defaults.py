@@ -49,6 +49,7 @@ sqrt_fx = lambda x: math.sqrt(x)
 # DEFAULT_BLACKBOX_FUNCTIONS 
 blackbox_df1 = lambda x: (x + random.random()) % 1.0
 
+DEFAULT_LEAKSZ_RANGE = [1,5]
 
 ############## miscellaneous functions
 

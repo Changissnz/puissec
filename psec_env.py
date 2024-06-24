@@ -25,15 +25,20 @@ class Colocks:
         [2] node colocation
     """
     def __init__(self,iset,cset):
+        assert type(iset) == set
+        assert type(cset) == set
+
         self.iset = iset
         self.cset = cset
         return
 
     def update_i(self,iset):
+        assert type(iset) == set
         self.iset = iset
         return
 
     def update_c(self,cset):
+        assert type(cset) == set
         self.cset = cset 
         return
 
@@ -409,8 +414,6 @@ class SecEnv:
     def coloc(self):
         # iterate through each <Crackling>
         # and check status
-
-        # 
         dx = set()
         for c in self.crck.cracklings:
             q = c.td.loc() 
@@ -429,7 +432,15 @@ class SecEnv:
 
     # TODO: 
     def coloc_leak_update(self):
-        return -1 
+        for interdict in self.ci.iset:
+            self.leak_by_str_idn(interdict)
+        return
+
+    ################ methods for leaking
+
+    # TODO: 
+    def load_IRCLD_into_SecNet(self):
+        self.sn.irc.load_default_IRCLD()
 
     # TODO: 
     def leak_by_str_idn(self,sidn):

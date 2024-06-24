@@ -152,7 +152,6 @@ class Crackling:
         self.is_coordinated = True
         return
 
-
 """
 - return: 
 a <RChainHead> instance derived from a 
@@ -223,7 +222,9 @@ class HypInfer:
     def infer_by_LeakInfo(hypStruct,leak_info):
         assert type(hypStruct) == HypStruct
         assert type(leak_info) == LeakInfo
-
+        print("LEAK INFO")
+        print(leak_info.leak_info)
+        print("-------------------")
         for lk1,lk2 in leak_info.leak_info.items():
             for lk2_ in lk2:
                 hypStruct = HypInfer.infer_FX(\
