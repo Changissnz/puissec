@@ -645,6 +645,7 @@ class Cracker:
     def remove_spent_cracklings(self):
         return -1 
 
+    ## NOTE: ?? 
     def bileak_update_hyp(self,crackling_idn):
         cr = self.fetch_crackling(crackling_idn)
         if type(cr) != Crackling:
@@ -659,3 +660,5 @@ class Cracker:
 
         self.bi.apply_leakmap_on_IRC2HypStruct_map(d)
         return
+
+        

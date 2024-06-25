@@ -8,7 +8,10 @@ class Crackling:
     def __init__(self,cmp_deg=1.5,cidn=None):
         self.cmp_deg = cmp_deg 
         self.cidn = cidn
-        self.hs = None 
+        self.hs = None
+        # <HypStruct> instance from interdiction
+        # w/ `hs`+<LeakInfo>.
+        self.hsi = None
         self.td = None
         self.rss = None
         self.set_cvec()

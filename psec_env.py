@@ -66,9 +66,9 @@ class Colocks:
 
     @staticmethod
     def parse_coloc_str(s):
-        s_ = matrix_methods.string_to_vector(np.array(s),int)
+        s_ = matrix_methods.string_to_vector(s,int)
         assert len(s_) == 3
-        return s 
+        return s_
 
 """
 environment for the dual-agent 
@@ -438,13 +438,39 @@ class SecEnv:
 
     ################ methods for leaking
 
-    # TODO: 
+    # TODO: test 
     def load_IRCLD_into_SecNet(self):
         self.sn.irc.load_default_IRCLD()
 
-    # TODO: 
+    # TODO: test
     def leak_by_str_idn(self,sidn):
-        return -1 
+        psidn = Colocks.parse_coloc_str(sidn)
+        crckling = self.crck.fetch_crackling(psidn[0])
+        assert type(crckling) == Crackling
+        assert type(crckling.hs) == HypStruct
+
+        # fetch the appropriate leak
+        sec_idn = psidn[1]
+
+        ir = self.sn.irc.fetch_IsoRing(sec_idn)
+        opt_dim = ir.secdim_seq()[ir.repi]
+        L = self.sn.irc.ircld.fetch_Leak(sec_idn,opt_dim)
+        outp = L.leak_info(ir)
+
+        # case: no more leaks
+        if type(L.prev_li) == type(None):
+            return None
+
+        # case: update <HypStruct> by latest <LeakInfo>
+            # fetch the <HypStruct>
+
+            # retrieve the `leak_value` and `leak_idn`
+        lv = L.prev_li[2]
+        fidn = L.prev_li[1] 
+        
+        hs_ = HypInfer.infer_FX(crckling.hs,lv,fidn)
+        crckling.hsi = hs_ 
+        return hs_ 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

@@ -267,6 +267,17 @@ class LeakMem:
             self.d[ir_idn[0]] = LeakInfo(ir_idn[0])
         self.d[ir_idn[0]] = self.d[ir_idn[0]] + (ir_idn[1],ir_idn[2]) 
         return self
+
+    def fetch_LeakInfo(self,sec_idn,f_idn):
+
+        if sec_idn not in self.d:
+            return None
+
+        if f_idn not in self.d[sec_idn]:
+            return None
+
+        return self.d[sec_idn][f_idn]
+
 """
 procedure that leaks information about 
 an <IsoRing>. To be used w/ intersection.
@@ -301,6 +312,8 @@ class Leak:
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
         self.leakm = LeakMem()
+        # (sec idn, F idn,output)
+        self.prev_li = None
         return
 
     """
@@ -338,6 +351,7 @@ class Leak:
     def leak_info(self,ir:IsoRing):
         i = ir.leak_stage
         if i >= len(self.fd_seq):
+            self.prev_li = None
             return None
 
         x = self.fd_seq[i]
@@ -351,9 +365,9 @@ class Leak:
 
     def save_mem(self,ir,fx,outp):
         it = ir.sec.idn_tag
-        ##print("IT: ",it)
         fi = leakf_to_index(fx)
         self.leakm = self.leakm + (it,fi,outp)
+        self.prev_li = (it,fi,outp)
         return
 
 def Leak_sample1():
