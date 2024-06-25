@@ -446,6 +446,7 @@ class SecEnv:
     def leak_by_str_idn(self,sidn):
         psidn = Colocks.parse_coloc_str(sidn)
         crckling = self.crck.fetch_crackling(psidn[0])
+
         assert type(crckling) == Crackling
         assert type(crckling.hs) == HypStruct
 
@@ -468,7 +469,8 @@ class SecEnv:
         lv = L.prev_li[2]
         fidn = L.prev_li[1] 
         
-        hs_ = HypInfer.infer_FX(crckling.hs,lv,fidn)
+        hs_ = HypInfer.infer_FX(\
+            deepcopy(crckling.hs),lv,fidn)
         crckling.hsi = hs_ 
         return hs_ 
 

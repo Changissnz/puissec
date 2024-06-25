@@ -149,5 +149,42 @@ class SecEnvClass(unittest.TestCase):
         assert rx == set(se.sn.irc.fetch_IsoRing(0).secdim_seq())
         assert set(qx.d.keys()) == {0}
 
+    def test__SecEnv__leak_by_str_idn__case1(self):
+
+        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+
+        for x in se.sn.irc.irl:
+            x.explode_contents() 
+
+        se.load_IRCLD_into_SecNet()
+        ##
+        se.instantiate_td_for_IRC(5,1.0)
+        se.instantiate_cracker_target()
+        ##
+
+        sidn = "0,0,32"
+        lbsi = se.leak_by_str_idn(sidn)
+
+        lbsi_ = se.crck.fetch_crackling(0).hs
+
+        ans1 = np.array([\
+            [0.13057814,0.17970186],\
+            [0.,0.5],\
+            [0.,0.5]])
+
+        ans2 = np.array([\
+            [0.,0.5],\
+            [0.,0.5],\
+            [0.,0.5]])
+
+        assert matrix_methods.equal_iterables(\
+            lbsi.suspected_subbounds[0],ans1) 
+
+        assert matrix_methods.equal_iterables(\
+            lbsi_.suspected_subbounds[0],ans2) 
+
+
+
+
 if __name__ == '__main__':
     unittest.main()
