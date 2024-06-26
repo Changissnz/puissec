@@ -341,7 +341,8 @@ class IsoRing:
     #########################################
 
     # TODO: test
-    def default_secproc(self,timespan:float):
+    def default_secproc(self,timespan:float,\
+        rnd_struct):
         assert timespan >= 0.0
         assert type(self.td) == TDirector
 
@@ -356,7 +357,7 @@ class IsoRing:
         ## case: change from `null radar`; fetch a 
         ##       new and active path.
         if stat and self.td.obj_stat == "avoid target":
-            pt = self.td.defsec_path(self.rnd_struct)
+            pt = self.td.defsec_path(rnd_struct)
             if type(pt) == type(None):
                 print("ERR! no secnode for path")  
                 return 

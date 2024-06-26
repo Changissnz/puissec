@@ -193,7 +193,8 @@ class SecNet:
     def update_occ_crackl(self):
         for k in self.occ_crackl.keys():
             v = self.occ_crackl[k] 
-            self.occ_crackl[k][1] = v[0].loc()
+            qv = (v[0],v[0].loc())
+            self.occ_crackl[k] = qv 
 
             # update TDirector if existing
             if type(v[0].td) == type(None):
@@ -207,7 +208,7 @@ class SecNet:
     ## TODO: refactoradorii above function w/ this. 
     def update_nla(self):
         for k in self.node_loc_assignment.keys():
-            s = self.sn.fetch_IsoRing(k) 
+            s = self.irc.fetch_IsoRing(k) 
             self.node_loc_assignment[k] = s.loc() 
             if type(s.td) == type(None):
                 continue

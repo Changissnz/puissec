@@ -468,15 +468,12 @@ class Cracker:
         self.cracklings.append(cr) 
         return cr
 
-    # TODO: wrong! 
     """
     return:
     - <HypStruct>, the next attempt given the variables
                    `sec_idn`,`sec_dim`. 
     """
     def next_hypstruct(self,sec_idn,sec_dim):
-        print("NEXT HYPSTRUCT")
-
         if sec_idn not in self.hyp_map:
             return None
 
@@ -493,6 +490,18 @@ class Cracker:
 
     #### TODO: new section; needs to be tested. 
     ########################## C2C communication methods
+
+    ##### new section on C2C comm. 
+
+
+    def calculate_probable_node_destinations():
+        return -1 
+
+    def gauge_velocity():
+
+        return -1
+
+    #### TODO: make a running fit
 
     def target_secidn_set(self):
         s = set()
@@ -644,21 +653,4 @@ class Cracker:
 
     def remove_spent_cracklings(self):
         return -1 
-
-    ## NOTE: ?? 
-    def bileak_update_hyp(self,crackling_idn):
-        cr = self.fetch_crackling(crackling_idn)
-        if type(cr) != Crackling:
-            print("no crackling to update.")
-            return 
-
-        si = cr.hs.seq_idn
-        sd = cr.hs.secdim() 
-
-        hx = [cr.hs]
-        d = {si:{sd:hx}} 
-
-        self.bi.apply_leakmap_on_IRC2HypStruct_map(d)
-        return
-
-        
+    

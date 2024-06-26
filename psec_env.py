@@ -104,6 +104,11 @@ class SecEnv:
         self.coloc_register()
         return
 
+    def preprocess(self):
+        self.load_IRCLD_into_SecNet()
+        self.bi_update_to_cracker_hyp() 
+        return
+
     def pickle_thyself(self,cpath,spath):
         self.crck.pickle_thyself(cpath)
         self.sn.pickle_thyself(spath)
@@ -141,6 +146,7 @@ class SecEnv:
     def run(self,timespan=1.0):
         self.cproc(timespan)
         self.iproc(timespan)
+        self.postmove_update() 
         return
 
     """
@@ -294,7 +300,7 @@ class SecEnv:
         if cstat == 2:
             return None
 
-        ir.default_secproc(timespan) 
+        ir.default_secproc(timespan,self.rnd_struct) 
 
     ############ TODO: methods to handle <CBridge>s.
     ########################################################
@@ -439,6 +445,13 @@ class SecEnv:
     ################ methods for leaking
 
     # TODO: test 
+    def bi_update_to_cracker_hyp(self):
+        bi = self.crck.bi
+        assert type(bi) == BackgroundInfo
+        bi.apply_leakmap_on_IRC2HypStruct_map(\
+            self.crck.hyp_map) 
+
+    # TODO: test 
     def load_IRCLD_into_SecNet(self):
         self.sn.irc.load_default_IRCLD()
 
@@ -473,6 +486,8 @@ class SecEnv:
             deepcopy(crckling.hs),lv,fidn)
         crckling.hsi = hs_ 
         return hs_ 
+
+    ################ end-round update 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

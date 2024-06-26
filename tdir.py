@@ -519,53 +519,70 @@ class TDirector:
 
     ###################### section: SEC-node locator
 
+    # TODO: test 
     """
-    produces metrics for the choice of 
-    target node `tn` as a destination,
-    given the vantage point of the 
-    <TDirector>. 
+    return: 
+    - dict, node -> `targetnode_analysis_(node,objf)`
     """
-    def targetnode_analysis(self,tn,rnd_struct):
-
-        if self.vp() == "C": 
-            return self.targetnode_analysis__VPC(tn,rnd_struct)
-        return self.targetnode_analysis__VPI(tn)
-
-    """
-    analysis of node `tn` as a destination node
-    given vantage point <IsoRing>.
-
-    return:
-    - dict, <Crackling> idn  -> 
-        (distance to tn / mean distance to SEC nodes).
-    """
-    def targetnode_analysis__VPI(self,tn):
-
-        # cracklings detected by radar
-        sn = self.check_radar()
-        print("SN: ",sn)
-
-        if len(sn) == 0: 
-            return None
-
-        # get the distance of each crackling 
-        # to `tn`.
+    def targetnode_analysis(self,objf):
+        qn = set(self.resource_sg.d.keys())
         d = {}
-        dfsc = self.resource_sg.sp[tn]#self.td.location]
-        print("KEYS")
-        print(dfsc.min_paths.keys())
-        
+        for n in qn:
+            score = self.targetnode_analysis_(n,objf)
+            d[n] = score
+        return d
 
+    """
+    return:
+    - float, inf if no targets in sight, otherwise
+            `objf(distance vector)`. 
+    """
+    def targetnode_analysis_(self,n,objf):
+        assert objf in DEFAULT_TDIRECTOR_OBJ_FUNCTIONS
+
+        sn = self.check_radar()
+        self.
+
+        if len(sn) == 0: return float('inf') 
+
+        # TODO: refactor 
+        d = {}
+        dfsc = self.resource_sg.sp[n]
         for sn_ in sn:
             if sn_ not in dfsc.min_paths:
                 continue
             d[sn_] = dfsc.min_paths[sn_][0].cost()
 
-        # get <Crackling> distance to SEC node
-        # crackling -> mean distance to SEC node
-        print("DD: ",d)
-        print("-------------------")
-        ## MAYBE: min? 
+        vx = np.array(d.values())
+
+        return objf(vx) 
+ 
+    # TODO: test 
+    """
+    analysis of node `tn` as a destination node
+    given vantage point <IsoRing>.
+
+    return:
+    - dict, location of opponent -> 
+        (distance to tn / mean distance to SEC nodes).
+    """
+    def destnode_sec_analysis(self,tn):
+
+        # cracklings detected by radar
+        sn = self.check_radar()
+
+        if len(sn):
+            return None
+
+        # get the distance of each crackling 
+        # to `tn`.
+        d = {}
+        dfsc = self.resource_sg.sp[tn]
+        for sn_ in sn:
+            if sn_ not in dfsc.min_paths:
+                continue
+            d[sn_] = dfsc.min_paths[sn_][0].cost()
+
         mean_distances = self.mean_mindistance_of_nodeset(deepcopy(sn))
         d2 = {}
         for k,v in d.items():
@@ -577,74 +594,9 @@ class TDirector:
         d = {}
         for n in ns:
             dx = self.secnode_distance_map(n)
-            sx = measures.zero_div(sum(dx.values()),len(dx),0.0)
+            sx = measures.zero_div(sum(dx.values()),len(dx),float('inf')) 
             d[n] = sx
         return d 
-
-    # TODO: needs to be demonstrated. 
-    """
-    """
-    def targetnode_analysis__VPC(self,tn,rnd_struct):
-        if tn not in self.resource_sg.sp:
-            print("not secure")
-            return None
-
-        dfsc = self.resource_sg.sp[tn]
-
-        cs = self.check_radar()
-
-        if len(cs) == 0: 
-            print("NONE-ZO")
-            return None
-
-        # find the shortest path to cs
-        assert len(cs) == 1
-
-        ###################################
-        
-        # spot the security of I's location
-        cs = cs.pop()
-        
-        stat = cs in self.resource_sg.sn 
-
-        print("STATUS: ",cs, stat)
-        # decision: if location is SEC, then 
-        #           travel to it. Otherwise,
-        #           select an NSEC for site of 
-        #           interception.
-        if stat:
-            if cs not in dfsc.min_paths:
-                return None
-            return dfsc.min_paths[cs][0] 
-        else:
-            sndict = self.secnode_distance_map(tn,is_sec=False)
-            if len(sndict) == 0: return None
-
-            sndict_ = [(k,v) for k,v in sndict.items()] 
-            sndict_ = sorted(sndict_,key=lambda x: x[1])
-
-            qs = sndict_.pop(0)
-            sx = set([qs[0]])
-            sc = qs[1]
-            while len(sndict_) > 0:
-                snd = sndict_.pop(0)
-                if snd[1] != sc:
-                    break
-                else: 
-                    sx = sx | {snd[0]}
-
-            # choose a random nsec node of min distance to
-            # tn
-            sx = list(sx)
-            sxi = rnd_struct.randrange(0,len(sx))
-            target = sx[sxi]
-
-            if target not in dfsc.min_paths:
-                return None
-            return dfsc.min_paths[target][0]
-        
-        ########################################
-        return -1 
 
     # TODO: future
     def load_predicted_travel_at_node(self,n,npath):
@@ -733,9 +685,12 @@ class TDirector:
     ################################################
     
     """
-    if no sec node exists for path, outputs None, 
+
+    Default path selection to a SEC node. 
+
+    if no SEC node exists for path, outputs None, 
     otherwise outputs the path to the nearest 
-    secnode. 
+    SEC node. 
 
     Uses `rnd_struct` as a selector in the
     event of ties. 
@@ -745,13 +700,16 @@ class TDirector:
         ##self.resource_sg = None
         if type(self.resource_sg) != SNGraphContainer:
             print("NADA")
-            return
+            return None 
+
+        dfsc = self.resource_sg.sp[self.loc()]
+        assert type(dfsc) == DFSCache
 
         for qs in self.resource_sg.sn:
-            if qs not in self.resource_sg.min_paths:
+            if qs not in dfsc.min_paths:
                 print("?missing path?")
                 continue
-            px = self.resource_sg.min_paths[qs][0]
+            px = dfsc.min_paths[qs][0]
             ex = (qs,px)
             q.append(ex)
 
@@ -762,10 +720,58 @@ class TDirector:
         q = [s.pop(0)]
         stat = True
         while stat:
+            if len(s) == 0: 
+                stat = False
+                continue 
+
             if s[0][1].cost() == q[0][1].cost(): 
                 q.append(s.pop())
             else:
                 stat = not stat
         
         qi = rnd_struct.randrange(0,len(q))
-        return (q[qi][0],deepcopy(q[qi][1]))
+        return deepcopy(q[qi][1]) 
+
+    # TODO: test 
+    def default_crackling_pathdec(self,predicted_distance:int,\
+        rnd_struct,objf=np.min):
+        assert type(predicted_distance) == int and predicted_distance >= 0
+
+        cs = self.check_radar()
+        if len(cs) == 0: return None
+        assert len(cs) == 1
+
+        # spot the security of I's location
+        cs = cs.pop()
+        stat = cs in self.resource_sg.sn 
+
+        dfsc = self.resource_sg.sp[self.loc()]
+
+        # decision: if location is SEC, then 
+        #           travel to it. Otherwise,
+        #           select an NSEC for site of 
+        #           interception.
+        if stat:
+            if cs not in dfsc.min_paths:
+                return None
+            return dfsc.min_paths[cs][0]
+
+        # run analysis on all nodes
+        xs = self.targetnode_analysis(objf)
+        assert len(xs) > 0
+
+        xs = [(k,abs(v - predicted_distance)) for k,v in xs.items()]
+        q = sorted(xs,key=lambda y: y[1])
+        i,sx = 1,q[0][1]
+        stat = True
+        while stat and i < len(q):
+            stat = sx == q[0][1]
+            if stat:
+                i += 1
+
+        q = q[:i+1] 
+        qi = rnd_struct.randrange(0,len(q)) 
+        nx = q[qi][0]
+
+        if nx not in dfsc.min_paths: return None
+        return deepcopy(dfsc.min_paths[nx][0])
