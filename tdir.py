@@ -169,6 +169,67 @@ class SNGraphContainer:
         self.crackling_locs = clocs 
         return
 
+    #####################################
+    ############# methods for calculating boundary points
+    ############# of simple, undirected graphs
+
+    def eccentricity_map(self):
+        dx = {}
+
+        for k,v in self.sp.items():
+            qxs = [v2[0].cost() for v2 in v.min_paths.values()]
+            dx[k] = max(qxs)
+        return dx 
+
+    """
+    return: 
+    - list(set::(peripheral nodeset of i'th order)) 
+    """
+    def peripheral_nodes_by_order(self,orderionos=1):
+        assert type(orderionos) == int 
+        assert orderionos >= 1 
+
+        em = self.eccentricity_map()
+        if len(em) == 0: return None
+        dx = []
+        sv = sorted(list(em.values()))[::-1]
+        sv2 = [sv.pop(0)]
+
+        i = 1
+        stat = True 
+        candidates = list(em.keys())
+        while stat:
+            ixs = [] 
+            ns = [] 
+            for (i2,c) in enumerate(candidates):
+                v_ = em[c]
+
+                if round(abs(v_ - sv2[-1]),5) == 0.0:
+                    ixs.append(i2)
+                    ns.append(c)
+
+            ns2 = [c for (i2,c) in enumerate(candidates) if \
+                i2 not in ixs]
+            candidates = ns2
+            dx.append(set(ns)) 
+
+            sv2.append(sv.pop(0))
+            i += 1
+
+            if len(candidates) == 0:
+                stat = False
+                continue 
+
+            if len(sv) == 0: 
+                stat = False 
+                continue
+
+            if i > orderionos: 
+                stat = False 
+
+        return dx 
+
+    #####################################
 
 """
 Was supposed to be named Traversal Directing [Wang Fong Qhong].
