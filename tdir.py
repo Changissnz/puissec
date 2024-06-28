@@ -169,6 +169,29 @@ class SNGraphContainer:
         self.crackling_locs = clocs 
         return
 
+    """
+    return:
+    - set(other agents at same location as `aidn`)
+    """
+    def coloc_for_agent(self,aidn,is_crackling:bool):
+        l,q = None,None
+        if is_crackling:
+            if aidn not in self.crackling_locs: assert False
+            l = self.crackling_locs[aidn][0]
+            q = self.ring_locs 
+
+        else: 
+            if aidn not in self.ring_locs: assert False
+            l = self.ring_locs[aidn]
+            q = self.crackling_locs
+            
+        sx = set()
+        for k,v in q.items():
+            v2 = v if not is_crackling else v[0] 
+            if l == v2: sx = sx | {k}
+
+        return sx 
+
     #####################################
     ############# methods for calculating boundary points
     ############# of simple, undirected graphs
@@ -602,7 +625,6 @@ class TDirector:
         assert objf in DEFAULT_TDIRECTOR_OBJ_FUNCTIONS
 
         sn = self.check_radar()
-        self.
 
         if len(sn) == 0: return float('inf') 
 
@@ -614,7 +636,7 @@ class TDirector:
                 continue
             d[sn_] = dfsc.min_paths[sn_][0].cost()
 
-        vx = np.array(d.values())
+        vx = np.array(list(d.values()))
 
         return objf(vx) 
  
@@ -791,7 +813,7 @@ class TDirector:
                 stat = not stat
         
         qi = rnd_struct.randrange(0,len(q))
-        return deepcopy(q[qi][1]) 
+        return deepcopy(q[qi][1].invert()) 
 
     # TODO: test 
     def default_crackling_pathdec(self,predicted_distance:int,\
@@ -808,6 +830,7 @@ class TDirector:
 
         dfsc = self.resource_sg.sp[self.loc()]
 
+
         # decision: if location is SEC, then 
         #           travel to it. Otherwise,
         #           select an NSEC for site of 
@@ -815,7 +838,7 @@ class TDirector:
         if stat:
             if cs not in dfsc.min_paths:
                 return None
-            return dfsc.min_paths[cs][0]
+            return dfsc.min_paths[cs][0].invert()
 
         # run analysis on all nodes
         xs = self.targetnode_analysis(objf)
@@ -835,4 +858,4 @@ class TDirector:
         nx = q[qi][0]
 
         if nx not in dfsc.min_paths: return None
-        return deepcopy(dfsc.min_paths[nx][0])
+        return deepcopy(dfsc.min_paths[nx][0].invert())

@@ -84,11 +84,12 @@ class SecEnv:
                 <Crackling>) / (time := 1)
     """
     def __init__(self,sn,crck,rnd_struct=random,\
-        ct_ratio=5000):
+        ct_ratio=5000,vb=0):
         assert type(sn) == SecNet
         assert type(crck) == Cracker
         assert ct_ratio >= 1
         assert type(ct_ratio) == int 
+        assert vb >= 0
 
         self.sn = sn
         self.crck = crck 
@@ -102,6 +103,8 @@ class SecEnv:
         # coloc info
         self.ci = Colocks(set(),set())
         self.coloc_register()
+
+        self.verbose = vb
         return
 
     def preprocess(self):
@@ -144,9 +147,18 @@ class SecEnv:
 
     # TODO: test 
     def run(self,timespan=1.0):
+        if self.verbose: 
+            print("***************** ONE RUN,T={}".format(timespan))
+            print()
+
         self.cproc(timespan)
         self.iproc(timespan)
         self.postmove_update() 
+
+        if self.verbose: 
+            print("\n********************************")
+            print()
+
         return
 
     """
@@ -165,6 +177,9 @@ class SecEnv:
             return self.cproc()
 
         # proceed to run all <Crackling> instances
+        if self.verbose: 
+            print("------------ CPROC\n")
+
         for i in range(len(self.crck.cracklings)):
             self.cproc_(i,timespan)
         return True
@@ -173,7 +188,8 @@ class SecEnv:
         c = self.crck.cracklings[index]
         s = self.crck.crackling_stat(index) 
 
-        print("STATUS: ",s)
+        if self.verbose:
+            print("-- CSTAT: {}".format(s))
 
         # done
         if s == 2: 
@@ -181,16 +197,22 @@ class SecEnv:
 
         # continue cracking
         if s == 1:
+            if self.verbose: 
+                print("-- CRACKING VIA CBRIDGE")
+
             cidn = c.cidn 
             iterations = int(round(self.ct_ratio * timespan))
             return self.run_CBridge(iterations,cidn,True)
 
         # interdiction
         if s == 0:
+            print("INTERDICTION")
+
             return True
-        
+
         # TODO: review dec.
-        c.td_next(timespan)
+        c.td_next(timespan,set_roam=True,\
+            verbose=self.verbose)
 
     """
     process that handles the instantiation
@@ -300,7 +322,8 @@ class SecEnv:
         if cstat == 2:
             return None
 
-        ir.default_secproc(timespan,self.rnd_struct) 
+        v = bool(self.verbose)
+        ir.default_secproc(timespan,self.rnd_struct,v) 
 
     ############ TODO: methods to handle <CBridge>s.
     ########################################################
@@ -433,11 +456,11 @@ class SecEnv:
                 a = np.array([c.cidn,target,q2])
                 s = matrix_methods.vector_to_string(a,int)
                 dx = dx | {s}
-
-        return dx 
+        return dx
 
     # TODO: 
     def coloc_leak_update(self):
+        if self.verbose: print("--- PERFORMING LEAKS : ",len(self.ci.iset))
         for interdict in self.ci.iset:
             self.leak_by_str_idn(interdict)
         return

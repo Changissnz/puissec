@@ -52,12 +52,17 @@ class Crackling:
 
     """
     """
-    def td_next(self,timespan=1.0):
-        print("OBJSTAT: ",self.td.obj_stat)
+    def td_next(self,timespan=1.0,set_roam:bool=True,\
+        verbose:bool=False):
+
+        if verbose:
+            print("--> TD-NEXT FOR C={},N={}".format(self.cidn,\
+                self.td.loc()))
+                
+            print("\tOBJSTAT: ",self.td.obj_stat)
 
         if self.td.obj_stat == "search for target":
-            print("---")
-            print("SEARCHING FOR TARGET")
+            
             # check if <TDir> is still active.
             if not self.td.td.active_stat:
                 print("NOT ACTIVE,SETTING EXTREME")
@@ -68,23 +73,40 @@ class Crackling:
             self.td.td.scaled__next__(timespan)
             return
         elif self.td.obj_stat == "capture target":
-            print("RADAR!: ")
             q = self.td.check_radar()
+            if verbose:
+                print("RADAR: ",len(q))
+
             if len(q) == 0:
-                print("switching")
+                if verbose:
+                    print("SWITCHING OBJSTAT")
                 self.td.td.active_stat = False
                 self.td.switch_obj_stat()
                 return self.td_next(timespan)
-
-            print("Q")
-            print(q)
             
             if not self.td.td.active_stat:
-                print('not active.')
-                isoring_loc = self.td.check_radar()
-            print("PATH")
-            print(self.td.td.node_path)
+                ############### TODO: 
+                if verbose: 
+                    print("\t\tPATH NOT ACTIVE...DEFSET")
+                dpd = self.td.default_crackling_pathdec(\
+                    predicted_distance=1,rnd_struct=random)
+                try:
+                    self.td.load_new_path(dpd)
+                except: 
+                    if verbose:
+                        print("[!] FAILED TO SET NEW PATH.")
+    
+            if verbose: 
+                print("PATH")
+                print(self.td.td.node_path)
+                print("============")
+
+            l = self.td.loc()
             self.td.td.scaled__next__(timespan)
+            l2 = self.td.loc()
+
+            if verbose: 
+                print("-- TRAVEL {}->{}".format(l,l2))
             return 
             ##assert False, "not programmed yet."
         return

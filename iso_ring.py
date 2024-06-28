@@ -342,24 +342,38 @@ class IsoRing:
 
     # TODO: test
     def default_secproc(self,timespan:float,\
-        rnd_struct):
+        rnd_struct,verbose=False):
         assert timespan >= 0.0
         assert type(self.td) == TDirector
-
+        
         stat = self.td.check_obj()
+        if verbose:
+            print("---------- IPROC")
+            print("I={} DEFSECPROC,OBJ={},STAT={},LOC={}".format(self.sec.idn_tag,\
+                self.td.obj_stat,stat,self.td.loc()))
+            
 
         # switch obj.
         if stat:
+            s1 = self.td.obj_stat
             self.td.switch_obj_stat()
-
+            s2 = self.td.obj_stat 
+            if verbose:
+                print("SWITCH {}: {}->{}".format(\
+                    self.sec.idn_tag,s1,s2))
+                
         # decide how to proceed
 
         ## case: change from `null radar`; fetch a 
         ##       new and active path.
         if stat and self.td.obj_stat == "avoid target":
             pt = self.td.defsec_path(rnd_struct)
+
+            if verbose:
+                print("SET NEW PATH 2SEC @ LOC=",self.td.loc())
+                print(pt)
+
             if type(pt) == type(None):
-                print("ERR! no secnode for path")  
                 return 
             self.td.load_new_path(pt)
 
@@ -368,7 +382,12 @@ class IsoRing:
             self.td.td.active_stat = False
         
         # travel by <TDir>
+        q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)
+        q2 = self.td.loc()
+
+        if verbose: 
+            print("MOVELOC {}-->{}\n============".format(q1,q2)) 
         return
 
 ################################################
