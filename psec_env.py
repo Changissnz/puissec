@@ -308,6 +308,8 @@ class SecEnv:
 
 
     def iproc(self,timespan = 1.0):
+        if self.verbose:
+            print("------------ IPROC")
         q = len(self.sn.irc.irl)
 
         for i in range(q):
@@ -316,8 +318,17 @@ class SecEnv:
 
     # TODO: add more code and test. 
     def iproc_(self,iindex,timespan = 1.0):
+
         ir = self.sn.irc.irl[iindex]
         cstat = self.ci.cstat(ir.sec.idn_tag,True)
+        
+        if self.verbose:
+            print("I={},L={}".format(ir.sec.idn_tag,ir.td.loc()))
+            print("S.G. KEYS")
+            print(ir.td.resource_sg.d.keys())
+            print("CLOCS")
+            print(ir.td.resource_sg.crackling_locs)
+        
         # case: is being cracked --> immobilized.
         if cstat == 2:
             return None

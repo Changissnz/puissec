@@ -348,8 +348,7 @@ class IsoRing:
         
         stat = self.td.check_obj()
         if verbose:
-            print("---------- IPROC")
-            print("I={} DEFSECPROC,OBJ={},STAT={},LOC={}".format(self.sec.idn_tag,\
+            print("----------DEFSECPROC,\nI={},OBJ={},STAT={},LOC={}".format(self.sec.idn_tag,\
                 self.td.obj_stat,stat,self.td.loc()))
             
 

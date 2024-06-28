@@ -1,5 +1,8 @@
 from psec_env import *
+
 import unittest,time 
+import sys
+
 
 ### lone file test 
 """
@@ -183,8 +186,29 @@ class SecEnvClass(unittest.TestCase):
         assert matrix_methods.equal_iterables(\
             lbsi_.suspected_subbounds[0],ans2) 
 
+    # NOTE: print-test 
+    def test__SecEnv__run__case1(self):
 
+        orig_stdout = sys.stdout
+        f = open('out_se.txt', 'w')
+        sys.stdout = f
 
+        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+        se.verbose = 2 
+
+        for x in se.sn.irc.irl:
+            x.explode_contents()
+
+        se.load_IRCLD_into_SecNet()
+        se.bi_update_to_cracker_hyp()
+        ##
+        se.instantiate_cracker_target()
+        se.instantiate_td_for_IRC(5,1.0)
+        
+        for i in range(10):
+            se.run(1.0)
+
+        sys.stdout = orig_stdout
 
 if __name__ == '__main__':
     unittest.main()
