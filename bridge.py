@@ -12,13 +12,16 @@ class CBridge:
         self.isoring = isoring
         self.hs = hs 
         self.rssi = None 
+        self.verbose = False
+
         self.load_crackf(ssih)
         self.cidn = cidn
         return
 
     def load_crackf(self,h=5):
+        print("LOADING")
         self.rssi = default_base_RSSI(self.isoring,self.crackling,\
-            self.hs,h)
+            self.hs,h,self.verbose)
 
     """
     return:
@@ -29,6 +32,9 @@ class CBridge:
 
     def __next__(self):
         p = next(self.rssi)
+        if self.verbose:
+            print('next point on bridge {}:\n{}'.format(\
+                self.agent_idns(),p))
         return p
 
 ################ 

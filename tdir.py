@@ -187,7 +187,8 @@ class SNGraphContainer:
             
         sx = set()
         for k,v in q.items():
-            v2 = v if not is_crackling else v[0] 
+            print("CRACKLING: ",is_crackling,v)
+            v2 = v if is_crackling else v[0] 
             if l == v2: sx = sx | {k}
 
         return sx 
@@ -440,6 +441,14 @@ class TDirector:
 
     def loc(self):
         return self.td.location
+
+    def coloc(self):
+        if type(self.resource_sg) != SNGraphContainer:
+            return None
+
+        is_crackling = True if self.vp() == "C" else False
+        return self.resource_sg.coloc_for_agent(\
+            self.vantage_idn,is_crackling)
 
     def switch_obj_stat(self):
         if self.obj_stat == "avoid target":

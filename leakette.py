@@ -24,6 +24,22 @@ def subbound_for_decimal(decimal,degree,range2):
     ##print("D,S,E:",dr,s,e)
     return (s,e)
 
+# TODO: test this
+def subbound_for_decimal_with_hop(decimal,degree,\
+    range2,h:int,iter_eq=1):
+    assert type(h) == int
+    assert h > 0
+    assert iter_eq >= 0 and iter_eq < h 
+
+    sb = subbound_for_decimal(decimal,degree,range2)
+
+    # calibrate so that the i'th increment in sb
+    # equals the decimal
+    lx = sb[1] - sb[0]
+    q = lx / h * iter_eq
+    ns = decimal - q 
+    return (ns,ns + lx)
+
 LEAKF_MAP = {0:choose_multiple,\
             1:idn_decimal,\
             2:subbound_for_decimal}

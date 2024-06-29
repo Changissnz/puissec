@@ -42,6 +42,19 @@ class Colocks:
         self.cset = cset 
         return
 
+    def agent_coloc_by_seti(self,aidn,is_cidn,is_iset:bool):
+        s = set()
+        q = self.iset if is_iset else self.cset 
+        c = 0 if is_cidn else 1
+        c2 = (c + 1) % 2
+        for q_ in q:
+            q2 = Colocks.parse_coloc_str(q_)
+            if q2[c] == aidn:
+                s = s | {q2[c2]}
+        return s 
+
+# TODO: check Colocks
+
 
     """
     return:
@@ -95,6 +108,8 @@ class SecEnv:
         self.crck = crck 
         self.rnd_struct = rnd_struct
         self.ct_ratio = ct_ratio
+        self.verbose = vb
+
         self.td = TDBridge() 
         # active <CBridge> instances
         self.cbs = [] 
@@ -103,8 +118,7 @@ class SecEnv:
         # coloc info
         self.ci = Colocks(set(),set())
         self.coloc_register()
-
-        self.verbose = vb
+        self.coloc_leak_update()
         return
 
     def preprocess(self):
@@ -189,7 +203,7 @@ class SecEnv:
         s = self.crck.crackling_stat(index) 
 
         if self.verbose:
-            print("-- CSTAT: {}".format(s))
+            print("-- CSTAT ON {}: {}".format(c.cidn,s))
 
         # done
         if s == 2: 
@@ -201,13 +215,21 @@ class SecEnv:
                 print("-- CRACKING VIA CBRIDGE")
 
             cidn = c.cidn 
+            br = self.fetch_bridge(cidn,True)
+
+            # case: no existing bridge, declare new bridge
+            if type(br) == type(None): 
+                ai = self.ci.agent_coloc_by_seti(cidn,True,False)
+                assert len(ai) == 1
+                self.make_bridge(cidn,ai.pop(),ssih=5)
+
             iterations = int(round(self.ct_ratio * timespan))
-            return self.run_CBridge(iterations,cidn,True)
+            return self.run_CBridge(iterations,cidn)
 
         # interdiction
         if s == 0:
-            print("INTERDICTION")
-
+            if self.verbose:
+                print("-- INTERDICTION")
             return True
 
         # TODO: review dec.
@@ -323,7 +345,8 @@ class SecEnv:
         cstat = self.ci.cstat(ir.sec.idn_tag,True)
         
         if self.verbose:
-            print("I={},L={}".format(ir.sec.idn_tag,ir.td.loc()))
+            print("I={},L={},STAT={}".format(ir.sec.idn_tag,ir.td.loc(),\
+                cstat))
             print("S.G. KEYS")
             print(ir.td.resource_sg.d.keys())
             print("CLOCS")
@@ -331,7 +354,9 @@ class SecEnv:
         
         # case: is being cracked --> immobilized.
         if cstat == 2:
-            return None
+            if self.verbose: 
+                print("CRACKING")
+            return
 
         v = bool(self.verbose)
         ir.default_secproc(timespan,self.rnd_struct,v) 
@@ -354,6 +379,8 @@ class SecEnv:
         hs = c.hs
 
         cb = CBridge(c,i,hs,ssih,self.cbs_idn_ctr)
+        cb.verbose = self.verbose
+
         self.cbs_idn_ctr += 1
         self.cbs.append(cb) 
         return
@@ -365,11 +392,30 @@ class SecEnv:
     return:
     - <CBridge>|None
     """
-    def fetch_bridge(self,idn,is_cidn:bool=True):
+    def fetch_bridge(self,idn,is_cidn:bool=True,\
+        allb:bool=False):
         index = 0 if is_cidn else 1 
+        q = []
+        print("# BRIDGES: ",len(self.cbs))
         for cb in self.cbs:
             idnx = cb.agent_idns()[index]
-            if idnx == idn: return cb 
+            if idnx == idn: 
+                if not allb: return cb
+                q.append(cb)
+
+        if not allb:  
+            return None
+        return q 
+
+    def fetch_bridge_(self,cidn,iidn): 
+
+        for cb in self.cbs:
+            idnx = cb.agent_idns()
+            if idnx[0] != cidn:
+                continue
+            if idnx[1] != iidn:
+                continue
+            return cb 
         return None
 
     """
@@ -379,16 +425,32 @@ class SecEnv:
     return:
     - bool, ?is not early termination?
     """
-    def run_CBridge(self,next_rate,idn,\
-        is_cidn:bool=True):
+    def run_CBridge(self,next_rate,iidn):
 
-        cb = self.fetch_bridge(idn,is_cidn)
+        def rcb(cb_):
+            if self.verbose:
+                print("-- CBRIDGE OP: {}".format(cb_.agent_idns()))
+                print("\t-/-/-/-/")
+            for i in range(next_rate):
+                print("ITER=",i)
+                try:
+                    qc = next(cb_)
+                except:
+                    return False
 
-        for i in range(next_rate):
-            qc = next(cb)
-            stat = type(qc) != type(None)
-            if not stat: return False
-        return True 
+                stat = type(qc) != type(None)
+                if not stat: return False
+            return True 
+
+        cb = self.fetch_bridge(iidn,False,True)
+        print("FETCHING BRIDGE")
+        print(cb)
+
+        statvec = []
+        for cb_ in cb:
+            v = rcb(cb_)
+            statvec.append(v)
+        return statvec 
 
     #####################################
     ############## <TDirector> instantiation for
@@ -422,6 +484,7 @@ class SecEnv:
         self.sn.update_occ_crackl()
         self.sn.update_nla() 
 
+        self.coloc_register()
         self.coloc_leak_update()
         return
 
@@ -445,7 +508,40 @@ class SecEnv:
 
         self.ci.update_c(cset)
         self.ci.update_i(iset)
+
+        self.crackling_stat_update()
         return
+
+    """
+    def crackling_stat_update(self,is_cset:bool):
+        ws = self.ci.cset if is_cset else \
+                self.ci.iset
+
+        for ws_ in ws:
+            s2 = Colocks.parse_coloc_str(ws_)
+            cr = self.crck.fetch_crackling(s2[0]) 
+            assert type(cr) != type(None)
+
+            if is_cset:
+                cr.cstat = True
+            else:
+                cr.istat = True
+    """
+
+
+    def crackling_stat_update(self): 
+
+        for c in self.crck.cracklings:
+            q = c.td.coloc()
+            c.cstat,c.istat = False,False 
+            if len(q) > 0:
+                if self.sn.is_secnode(c.loc()):
+                    c.cstat = True
+                else:
+                    c.istat = True
+        return
+
+    #############
 
     """
     return:
@@ -471,10 +567,13 @@ class SecEnv:
 
     # TODO: 
     def coloc_leak_update(self):
-        if self.verbose: print("--- PERFORMING LEAKS : ",len(self.ci.iset))
+        if self.verbose: 
+            print("--- PERFORMING LEAKS : ",len(self.ci.iset))
+
         for interdict in self.ci.iset:
             self.leak_by_str_idn(interdict)
         return
+
 
     ################ methods for leaking
 

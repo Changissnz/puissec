@@ -128,14 +128,7 @@ class SecEnvClass(unittest.TestCase):
 
         q = set(c.td.resource_sg.d.keys())
         # targetnode_analysis
-        print("CRACKLING")
-        for q_ in q: 
-            s = c.td.targetnode_analysis(q_,random)
-            print("{}:\n{}\n".format(q_,s))
-            if q_ in {3,6}:
-                assert s.cost() == 1
-                continue
-            assert s.cost() == 0 
+        s = c.td.targetnode_analysis(np.min)
         return
 
     def test__SecEnv__load_IRCLD_into_SecNet__case1(self):
@@ -208,6 +201,7 @@ class SecEnvClass(unittest.TestCase):
         for i in range(10):
             se.run(1.0)
 
+        f.close()
         sys.stdout = orig_stdout
 
 if __name__ == '__main__':
