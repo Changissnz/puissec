@@ -59,6 +59,9 @@ def leakf_to_index(leakf):
         return 3
     return -1
 
+# in descending order
+DEFAULT_LEAKF_INDEX_RANKING = [1,0,3,2] 
+
 # TODO: future. 
 def leakf__type_gcd(ir): 
     return -1 
@@ -140,7 +143,6 @@ def leakf__type_MV(ir:IsoRing,rnd_struct,degree,\
         else: 
             mx = null_value()
         v.append(mx)
-    #v = np.array(v)
     return v 
 
 # TODO: test. 
@@ -163,13 +165,103 @@ class LeakInfo:
             s += str(k) + "\n" + str(v) + "\n\n"
         return s
 
-    ##########################################
     def __add__(self,px):
         assert len(px) == 2
         assert px[0] in {0,1,2,3}
         assert type(px[1]) in {np.ndarray,list,tuple}
         self.leak_info[px[0]].append(px[1])
         return self
+
+    ##########################################
+    ########## potency functions
+    ##########################################
+
+    # TODO: test 
+    def potency(self):
+        d = self.dim() 
+        if type(d) == type(None): 
+            return None
+
+        dx = defaultdict(float) 
+
+        for i in range(d):
+            qr = self.best_value_at_index(i)
+
+            if np.isnan(qr):
+                continue
+
+            rs = None
+            if qr[0] in {0,1}: 
+                rs = qr[1]
+            else:
+                rs = qr[1][1] - qr[1][0]
+            dx[qr[0]] += rs
+        return dx 
+
+    def best_value_at_index(self,i):
+
+        q = self.value_at_findex(0,i)
+        q2 = self.value_at_findex(1,i)
+        q3 = self.value_at_findex(2,i)
+        q4 = self.value_at_findex(3,i)
+        sx = [q2,q,q4,q3]
+
+        for (i,sx_) in enumerate(sx):
+            if type(sx_) == type(None):
+                continue
+            return DEFAULT_LEAKF_INDEX_RANKING[i],\
+                sx_
+
+        return np.nan
+
+    def value_at_findex(self,f,i):
+        q = self.valuelist_at_findex()
+        if len(q) == 0:
+            return None
+
+        if f == 0:
+            return max(vx)
+        
+        if f == 1:
+            return vx[0]
+
+        if f in {2,3}:
+            q = []
+            for (i,x) in enumerate(vx):
+                q.append((i,x[1] - x[0]))
+            j = min(q,key=lambda q_:q_[1])[0]
+            return vx[j] 
+
+        return None
+    
+    """
+    return:
+    - list, values pertaining to leakf `f` at index `i`
+            in the search space. 
+    """
+    def valuelist_at_findex(self,f,i):
+        q = self.leak_info[f]
+        v = float('inf')
+
+        def not_null(rx): 
+            if type(rx) in {np.float32,np.float64,float}:
+                return not np.isnan(rx) 
+            return (not np.isnan(rx[0]) and not np.isnan(rx[1]))
+        
+        q2 = []
+        for qx in q:
+            r = qx[i]
+            cn = not_null(r)
+            if cn:
+                q2.append(deepcopy(r)) 
+        return q2
+
+    def dim(self):
+        for i in [0,1,2,3]:
+            q = self.leak_info[f]
+            if len(q) == 0: continue
+            return len(q[0])
+        return None 
 
 """
 container to hold a <Leak> instance's extracted information
@@ -248,6 +340,17 @@ class Leak:
         # (sec idn, F idn,output)
         self.prev_li = None
         return
+
+    def potency_gauge(self):
+        d = defaultdict(float)
+        for f in self.fd_seq:
+            fi = leakf_to_index(f[0])
+            assert fi != -1 
+            if fi in {0,1}:
+                d[fi] += 1.0
+            else:
+                d[fi] += f[1][1]
+        return d 
 
     """
     pmap := dict, length is reference dimension d
