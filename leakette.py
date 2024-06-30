@@ -145,6 +145,26 @@ def leakf__type_MV(ir:IsoRing,rnd_struct,degree,\
         v.append(mx)
     return v 
 
+"""
+r2 := 2-tuple, oredered range
+"""
+def default_leak_potency_wf(r2=DEFAULT_SINGLETON_RANGE): 
+    assert len(r2) == 2 and r2[0] <= r2[1] 
+    rx = r2[1] - r2[0]
+
+    two = 1.0 / (rx * 2.0)
+    three = 1.0 / (rx * 1.2)
+    W = {0:1.0,1:5.0,2:two,3:three}
+
+    def fx(dx):
+        assert type(dx) in {dict,defaultdict}
+        s = 0.0
+        for (k,v) in dx.items():
+            s += (v * W[k])
+        return s 
+
+    return fx 
+
 # TODO: test. 
 """
 container structure holding the (function,value) 
@@ -187,16 +207,24 @@ class LeakInfo:
         for i in range(d):
             qr = self.best_value_at_index(i)
 
-            if np.isnan(qr):
+            if type(qr) != tuple:
                 continue
 
             rs = None
-            if qr[0] in {0,1}: 
+            if qr[0] == 0:
                 rs = qr[1]
+            elif qr[0] == 1:
+                rs = 1.0 
             else:
                 rs = qr[1][1] - qr[1][0]
             dx[qr[0]] += rs
         return dx 
+
+    def potency_single(self,r2=DEFAULT_SINGLETON_RANGE):
+        qx = self.potency()
+
+        wfx = default_leak_potency_wf(r2) 
+        return wfx(qx)
 
     def best_value_at_index(self,i):
 
@@ -215,8 +243,9 @@ class LeakInfo:
         return np.nan
 
     def value_at_findex(self,f,i):
-        q = self.valuelist_at_findex()
-        if len(q) == 0:
+        vx = self.valuelist_at_findex(f,i)
+        
+        if len(vx) == 0:
             return None
 
         if f == 0:
@@ -258,7 +287,7 @@ class LeakInfo:
 
     def dim(self):
         for i in [0,1,2,3]:
-            q = self.leak_info[f]
+            q = self.leak_info[i]
             if len(q) == 0: continue
             return len(q[0])
         return None 

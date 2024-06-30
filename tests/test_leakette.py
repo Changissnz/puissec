@@ -117,6 +117,72 @@ class LeaketteClass(unittest.TestCase):
         stat = matrix_methods.equal_iterables(qx,qx2)
         assert stat 
 
+    def test__Leakette__potencyfunctions__case1(self):
+        ## declare <IsoRing> instance
+        random.seed(2004)
+        np.random.seed(2004)
+
+        ss = SecSeq_sample_4(num_secs=1,\
+                singleton_range=DEFAULT_SINGLETON_RANGE,\
+                num_conn=1,min_components=1,max_nconn_ratio = 0.3,\
+                drange_max=1)
+
+        sc = ss[0] 
+
+        bound = [0.,1.]
+        irc = IsoRingedChain(sc,bound,random,71)
+
+        q = irc[0]
+
+        #################
+
+        ## generating a Leak instance
+        l = Leak.generate_Leak__type1(5,random)
+
+        stat = True 
+        ix = 1 
+        while stat:
+                ##print("IX: ",ix) 
+                ix += 1
+
+                o = l.leak_info(q) 
+                ##
+                """
+                print("OUTPUT")
+                print(o)
+                print("MEM")
+                print(l.leakm)
+                print("//============================//")
+                """
+                ##
+                
+                stat = not (type(o) == type(None))
+
+        # check the potency
+
+        pg = l.potency_gauge()
+        ans = {1: 1.0,\
+        2: 0.8691492114385108,\
+        3: 0.30534647724449127,\
+        0: 1.0}
+
+        assert set(pg.keys()) == set(ans.keys())
+        for k,v in pg.items():
+                assert round(abs(v-ans[k]),5) == 0.0
+
+        lq = l.leakm.d[0] 
+        pot = lq.potency()
+
+        ans2 = {3: 0.6106929544889825,\
+        2: 0.08161218271773318,\
+        0: 1.9464400000000002,\
+        1: 1.0}
+
+        for k,v in pot.items():
+                assert round(abs(v-ans2[k]),5) == 0.0 
+
+        return         
+
 
 if __name__ == '__main__':
     unittest.main()
