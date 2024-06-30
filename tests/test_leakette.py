@@ -1,4 +1,4 @@
-from leakette import * 
+from secnet import * 
 import unittest
 
 ### lone file test 
@@ -85,104 +85,37 @@ class LeaketteClass(unittest.TestCase):
         assert matrix_methods.equal_iterables(ans,q)
         return
 
-    def test__LeakInfo__is_more_potent__case1(self):
+    def test__leakf__type_MV__case1(self):
+        random.seed(2004)
+        np.random.seed(2004)
 
-        B = np.array([[0,1.],\
-                        [0.,1],\
-                        [0,1.],\
-                        [0.,1],\
-                        [0.,1.]])
+        ss = SecSeq_sample_4(num_secs=1,\
+                singleton_range=DEFAULT_SINGLETON_RANGE,\
+                num_conn=1,min_components=1,max_nconn_ratio = 0.3,\
+                drange_max=1)
 
-        SB = np.array([[0,0.5],\
-                [0,0.5],\
-                [0.,0.5],\
-                [0,0.5],\
-                [0.,1.]])
+        sc = ss[0] 
+        bound = [0.,1.]
+        irc = IsoRingedChain(sc,bound,random,71)
 
-        ir = IsoRing_sample_1()
-        ir.sec.idn_tag = 12 
+        q = irc[0]
+        degree = (1.,0.1,(0.,1.),2)
+        fx = subbound_for_decimal_with_hop
+        qx = leakf__type_MV(q,random,degree,fx)
 
-        ir2 = IsoRing_sample_1()
-        ir2.sec.idn_tag = 12 
+        qx2 = np.array([[ 0.48775,  0.68775],\
+        [ 0.70444,  0.90444],\
+        [ 0.37034,  0.57034],\
+        [ 0.3857 ,  0.5857 ],\
+        [ 0.65874,  0.85874],\
+        [ 0.69192,  0.89192],\
+        [ 0.48632,  0.68632],\
+        [ 0.90797,  1.03599],\
+        [ 0.4632 ,  0.6632 ],\
+        [-0.01441,  0.15677]])
 
-        lk1 = Leak_sample1()
-        for i in range(4):
-                lk1.leak_info(ir)
-
-        lk2 = Leak_sample2()
-        lk2.leak_info(ir2)
-
-        x = lk1.leakm.d[12]
-        q1 = x.potency(B,SB)
-
-        x2 = lk2.leakm.d[12]
-        q2 = x2.potency(B,SB)
-
-        t1 = LeakInfo.is_more_potent(q2,q1)
-        t2 = LeakInfo.is_more_potent(q1,q2)
-
-        assert t1 == (True,True)
-        assert t2 == (False,False)
-
-        lk3 = Leak.generate_Leak__type1(5,random)
-        ir3 = IsoRing_sample_1()
-        ir3.sec.idn_tag=12
-        lk3.leak_info(ir3)
-        x = lk3.leakm.d[12]
-        q3 = x.potency(B,SB)
-        assert q3 == (1.5, [1, 2, 3])
-
-        assert LeakInfo.is_more_potent_bool(q3,q1)
-        assert not LeakInfo.is_more_potent_bool(q3,q2)
-
-
-    def test__Leak__leak_info__case1(self):
-
-        l1 = (LEAKF_MAP[0],np.array((0.5,0.5)))
-        l2 = (LEAKF_MAP[2],(0.2,0.4,(0.0,1.0)))
-        l3 = (LEAKF_MAP[0],np.array((0.5,0.5)))
-
-        B = np.array([[0,1.],\
-                [0.,1],\
-                [0,1.],\
-                [0.,1],\
-                [0.,1.]])
-
-        SB = np.array([[0,0.5],\
-                [0,0.5],\
-                [0.,0.5],\
-                [0,0.5],\
-                [0.,1.]])
-
-        L = [l1,l2,l3]
-
-        random.seed(332)
-        l = Leak(random,L)
-
-        ir = IsoRing_sample_1() 
-        ir.sec.idn_tag = 12 
-
-        p = l.leak_info(ir)
-        p2 = l.leak_info(ir)
-        p3 = l.leak_info(ir)
-        p4 = l.leak_info(ir) 
-
-        assert type(p) != type(None)
-        assert type(p2) != type(None)
-        assert type(p3) != type(None)
-        assert type(p4) == type(None)
-
-        assert len(l.leakm.d[12].leak_info[0]) == 2 
-        assert len(l.leakm.d[12].leak_info[1]) == 0 
-        assert len(l.leakm.d[12].leak_info[2]) == 1
-
-        li = l.leakm.d[12]
-        q = li.potency(B,SB)
-        x = 141.1214318684255
-
-        assert round(abs(q[0] - x),5) == 0.0
-        assert q[1] == [1,2]
-
+        stat = matrix_methods.equal_iterables(qx,qx2)
+        assert stat 
 
 
 if __name__ == '__main__':
