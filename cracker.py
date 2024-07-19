@@ -120,8 +120,10 @@ class BackgroundInfo:
         dec_map,leak_map):
         # sec idn -> opt. dim. -> opt. idn -> Pr. 
         self.opm = opm
+        # sec idn -> (opt index,other sec idn, other opt index)
         self.dm = depchain_map
         self.cdm = codep_sets
+        # sec idn -> index 
         self.dec_map = dec_map 
         # sec idn -> opt. dim -> <LeakInfo>
         self.leak_map = leak_map

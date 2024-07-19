@@ -247,7 +247,8 @@ class IsoRing:
         return ir 
 
     def explode_contents(self,optima_size_limit=1000,\
-        num_blooms=float('inf')):
+        num_blooms=float('inf'),rnd_struct=random): 
+
         s = len(self.sec_cache[-1].opm)
         ##print("starting length for {}: {}".format\
         ##    (len(self.sec_cache[-1].seq),s))

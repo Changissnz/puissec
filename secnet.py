@@ -12,6 +12,18 @@ class IsoRingedChain:
         self.load_IsoRings(bound,rnd_struct,rs_seed)
         self.rnd_struct = rnd_struct
 
+    def explode(self,osl:int,num_blooms:int):
+        
+        for i in self.irl:
+            self.explode_IsoRing(i.sec.idn_tag,osl,num_blooms)
+        return
+
+    def explode_IsoRing(self,sec_idn,osl:int,num_blooms:int):
+        ir = self.fetch_IsoRing(sec_idn)
+        assert type(ir) != type(None)
+        ir.explode_contents(osl,num_blooms,self.rnd_struct)
+        return
+
     def fetch_IsoRing(self,sec_idn):
         for x in self.irl:
             if x.sec.idn_tag == sec_idn:
@@ -628,6 +640,14 @@ def SecNet_sample_CSmall():
         entry_points = 1,bound=DEFAULT_SINGLETON_RANGE,\
         rnd_struct=random,rnd_seed=9,\
         path_size=10,sngc=None,energy=1000.0)
+    return sn 
+
+def SecNet_sample_CallSia():
+    random.seed(25)
+    np.random.seed(25)
+    ss,sndg = SecSeq_sample_5(num_secs=3,max_nconn_ratio=0.0,\
+    depconn_ratio=1.0,min_components=1,drange_max=3)
+    sn = SecNet.generate(ss,6,10,3,4,random,"pairing frame",1015)
     return sn 
 
 def SRefMap_sample1(): 

@@ -3,7 +3,7 @@ from crackling import *
 class CBridge:
 
     def __init__(self,crackling,isoring,hs,ssih=5,\
-        cidn=None):
+        cidn=None,batch_size=1000):
         assert type(crackling) == Crackling
         assert type(isoring) == IsoRing 
         assert type(hs) == HypStruct
@@ -16,12 +16,20 @@ class CBridge:
 
         self.load_crackf(ssih)
         self.cidn = cidn
+        self.bs = batch_size
+        self.batch = None
+
+        self.load_rssi_batch() 
         return
 
     def load_crackf(self,h=5):
         print("LOADING")
         self.rssi = default_base_RSSI(self.isoring,self.crackling,\
             self.hs,h,self.verbose)
+
+    def load_rssi_batch(self):
+        self.batch = rssi.ResplattingSearchSpaceIterator.\
+            iterate_one_batch(self.rssi,self.bs)
 
     """
     return:
@@ -31,7 +39,11 @@ class CBridge:
         return (self.crackling.cidn,self.isoring.sec.idn_tag)
 
     def __next__(self):
-        p = next(self.rssi)
+        p = next(self.batch)
+
+        if type(p) == None: 
+            print("FINISHED!!")
+
         if self.verbose:
             print('next point on bridge {}:\n{}'.format(\
                 self.agent_idns(),p))

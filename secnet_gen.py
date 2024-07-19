@@ -718,6 +718,10 @@ class SecNetDepGen:
         l = len(self.cd_comp_sets)
         return l > self.min_components
 
+    """
+    return:
+    - list(set of available co-dependent nodes)
+    """
     def available_CInC_conn(self):
         # first, get each node's codep conn.
         # measure 
