@@ -648,7 +648,7 @@ class TDirector:
         vx = np.array(list(d.values()))
 
         return objf(vx) 
- 
+
     # TODO: test 
     """
     analysis of node `tn` as a destination node
@@ -663,7 +663,7 @@ class TDirector:
         # cracklings detected by radar
         sn = self.check_radar()
 
-        if len(sn):
+        if len(sn) == 0:
             return None
 
         # get the distance of each crackling 
