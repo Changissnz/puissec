@@ -25,3 +25,7 @@ on a network that is supposed to guard against
 The finalized paper for this project will not be 
 complete by 7/1/2024 due to continuing work on 
 technical issues. 
+
+### Update 08/01/2024
+An incomplete draft of the paper is found in 
+`paper`. Also added MIT license.
