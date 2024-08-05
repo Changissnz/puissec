@@ -3,7 +3,7 @@ from crackling import *
 class CBridge:
 
     def __init__(self,crackling,isoring,hs,ssih=5,\
-        cidn=None,batch_size=1000):
+        cidn=None,batch_size=1000,verbose=False):
         assert type(crackling) == Crackling
         assert type(isoring) == IsoRing 
         assert type(hs) == HypStruct
@@ -12,7 +12,7 @@ class CBridge:
         self.isoring = isoring
         self.hs = hs 
         self.rssi = None 
-        self.verbose = False
+        self.verbose = verbose 
 
         self.load_crackf(ssih)
         self.cidn = cidn
@@ -39,7 +39,11 @@ class CBridge:
         return (self.crackling.cidn,self.isoring.sec.idn_tag)
 
     def __next__(self):
-        p = next(self.batch)
+        try:
+            p = next(self.batch)
+        except: 
+            print("FINISHED!")
+            return 
 
         if type(p) == None: 
             print("FINISHED!!")

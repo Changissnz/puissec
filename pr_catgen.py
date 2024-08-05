@@ -531,6 +531,11 @@ def generate_pr_dist_for_seq(optima,best_index,countermeasure,\
     vpr = variance_vec__pr(eq_value,optima.shape[0] - 1,countermeasure[1],\
             rnd_struct=random)
     
+    '''
+def variance_vec__pr(eq_value,size,variance,\
+    rnd_struct=random):
+    '''
+
     j = 0
     for (i,x) in enumerate(optima):
         so = matrix_methods.vector_to_string(np.round(optima[i],5),float)

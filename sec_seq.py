@@ -246,6 +246,12 @@ class Sec:
 
     """
     bare instances do not have any dep. or co-dep. 
+
+    singleton_range :=
+    dimension :=
+    num_optima := 
+    optima_countermeasure := 
+    rnd_struct := random number generator
     """
     @staticmethod
     def generate_bare_instance(singleton_range,dimension,num_optima,\

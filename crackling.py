@@ -5,7 +5,8 @@ from tdir import *
 
 class Crackling:
 
-    def __init__(self,cmp_deg=1.5,cidn=None):
+    def __init__(self,cmp_deg=1.5,cidn=None,\
+        cvsz=200):
         self.cmp_deg = cmp_deg 
         self.cidn = cidn
         self.hs = None
@@ -14,7 +15,7 @@ class Crackling:
         self.hsi = None
         self.td = None
         self.rss = None
-        self.set_cvec()
+        self.set_cvec(cvsz)
         # ?target has been cracked?
         self.astat = False
         self.cracked_dict = defaultdict(float)
@@ -121,9 +122,9 @@ class Crackling:
         q = self.td.check_radar()
         return len(q) > 0
 
-    def set_cvec(self):
+    def set_cvec(self,cvsz):
         ciseq = default_cvec_iselector_seq()
-        cvec = CVec(cvis=ciseq)
+        cvec = CVec(cvis=ciseq,sz_limit=cvsz)
         self.cvec = cvec 
 
     """
@@ -182,31 +183,38 @@ class Crackling:
 a <RChainHead> instance derived from a 
 <IsoRing>. 
 """
-def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling):
+def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbose):
     assert type(ir) == IsoRing
 
     def outputf1(p):
-        ##print("IR registers attempt")
-        ##print(p)
+        if verbose:
+            print("IR registers attempt")
+            print(p)
+
         q,stat = ir.register_attempt(p)
         ##
-        """
-        print("-- register")
-        print("scorevec: ",q)
-        print("stat: ",stat)
-        """
+        if verbose: 
+            print("-- register")
+            print("scorevec: ",q)
+            print("stat: ",stat)
+        
         ##
-        """
         if stat:
             return None
-        """
-        ##print("cracking resp: ")
+        
+        if verbose:
+            print("cracking resp: ")
+        
         d = cracklng.register_response(p,q,stat)
         if stat:
             prx = ir.response_to_prompt(cracklng.hs.target_index)
-            ##print("PRXXX: ",prx)
+            if verbose: 
+                print("pr. output: ",prx)
             cracklng.register_lo_pr(prx) 
-        ##print("response: ",d)
+        if verbose: 
+            print("response: ",d)
+            print("----------------------")
+            
         return d
 
     rch = relevance_functions.RChainHead()
@@ -223,7 +231,7 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih,\
     assert type(hs) == HypStruct
 
     ##print("\t-- converting to RCH")
-    rch = IsoRing_and_Crackling_to_base_RChainHead(ir,cracklng)
+    rch = IsoRing_and_Crackling_to_base_RChainHead(ir,cracklng,verbose)
     ##print("\t-- CONVERTED")
     resplattingMode = ("relevance zoom",rch)
 
