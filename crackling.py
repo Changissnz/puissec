@@ -6,7 +6,7 @@ from tdir import *
 class Crackling:
 
     def __init__(self,cmp_deg=1.5,cidn=None,\
-        cvsz=200):
+        cvsz=float('inf')):
         self.cmp_deg = cmp_deg 
         self.cidn = cidn
         self.hs = None
@@ -159,7 +159,8 @@ class Crackling:
             0.4,True)
         """
         if d: 
-            self.flagged_pts.append(len(self.cvec) - 1)
+            self.flagged_pts.append(np.copy(self.cvec.input_samples[-1]))#np.copy(self.cvec[-1]))
+            #self.flagged_pts.append(len(self.cvec) - 1)
         return d
 
     def register_lo_pr(self,prx):
@@ -199,8 +200,10 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
             print("stat: ",stat)
         
         ##
+        """
         if stat:
             return None
+        """
         
         if verbose:
             print("cracking resp: ")
@@ -214,7 +217,7 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
         if verbose: 
             print("response: ",d)
             print("----------------------")
-            
+
         return d
 
     rch = relevance_functions.RChainHead()

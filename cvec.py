@@ -190,7 +190,8 @@ class CVec:
 
     """
     def __init__(self,input_samples = [],start_vec=np.array([]),\
-        cvis=[],sz_limit=float('inf')):
+        cvis=[],sz_limit=20):#float('inf')):
+        print("setting sz_limit: ",sz_limit)
         assert matrix_methods.is_vector(start_vec)
         assert len(start_vec) == len(input_samples)
         assert type(cvis) == list
@@ -211,7 +212,8 @@ class CVec:
 
         self.v = np.append(self.v,v)
         self.input_samples.append(sample) 
-
+        ##print("len: ", len(self.v))
+        ##print("sz limit: ",self.sz_limit)
         lx = len(self.v) - self.sz_limit
         if lx > 0:
             self.v = self.v[lx:]
