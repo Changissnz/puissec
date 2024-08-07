@@ -1,6 +1,48 @@
 from secnet import * 
 import unittest
 
+def CBridge_case_X(guess_index=3):
+
+
+    bound = np.zeros((5,2),dtype=float)
+    bound[:,1] = 2.0
+    spacing_ratio_range = [0.5,0.6]
+    outlier_pr_ratio = 0.3
+    num_bounds = 10
+    rs_seed = 1225 
+    
+    bof = BoundedObjFunc.generate_BoundedObjFunc(\
+        deepcopy(bound),spacing_ratio_range,\
+        outlier_pr_ratio,num_bounds,rs_seed)
+
+        # make the <Sec>
+    np.random.seed(1229)
+    singleton_range = [0.,2.]
+    dimension = 5
+    num_optima = 4
+    optima_countermeasure = (0.6,0.8)
+    s1 = Sec.generate_bare_instance(singleton_range,\
+        dimension,num_optima,optima_countermeasure,\
+        rnd_struct=np.random)
+    s1.idn_tag = 2
+    
+    
+    bs = np.array([s1.seq - 0.2,s1.seq + 0.2]).T
+    
+    ir = IsoRing(s1,bof,bound,None)
+    
+    # make a HypStruct and a Crackling
+    suspected_subbounds = [deepcopy(bs)]
+    hs = HypStruct(s1.idn_tag,guess_index,\
+        suspected_subbounds,sb_pr=np.array([1.0]))
+        
+    c = Crackling(cidn=1,cvsz=100)
+    c.load_HypStruct(hs)
+    
+    cb = CBridge(c,ir,hs,ssih=2,cidn=1,\
+        batch_size=2000,verbose=True)
+    return cb 
+
 ### lone file test 
 """
 python3 -m tests.test_bridge
@@ -138,10 +180,6 @@ class CBridgeClass(unittest.TestCase):
         assert i == 732 
         assert len(c.flagged_pts) == 260 
 
-
-
-
-
     def test__CBridge__next__case4(self):
         ss = SecSeq_sample_2(40,200)
         bound = [0.,1.]
@@ -176,8 +214,25 @@ class CBridgeClass(unittest.TestCase):
                 #print("Q: ",q)
         assert len(c.flagged_pts) == 46 
 
+    def test__CBridge__next__case6(self):
+        cb = CBridge_case_X(guess_index=3)
+        
+        i = 0 
+        while i < 35:
+            print("I: ",i)
+            cbx = next(cb)
+            if type(cbx) == type(None):
+                print("NO MORE")
+                break 
+            i += 1 
 
-
+        s = cb.isoring.sec
+        prm = s.optima_points_to_index_pr_map()
+        crackling = cb.crackling 
+        assert len(crackling.cracked_dict) == 1
+        assert set(crackling.cracked_dict.values()) == \
+                {prm[3]} 
+        return 
 
 if __name__ == '__main__':
     unittest.main()

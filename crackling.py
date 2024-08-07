@@ -196,7 +196,7 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
         ##
         if verbose: 
             print("-- register")
-            print("scorevec: ",q)
+            print("score: ",q[cracklng.hs.target_index])
             print("stat: ",stat)
         
         ##
@@ -204,7 +204,7 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
         if stat:
             return None
         """
-        
+
         if verbose:
             print("cracking resp: ")
         

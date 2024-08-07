@@ -39,11 +39,14 @@ class CBridge:
         return (self.crackling.cidn,self.isoring.sec.idn_tag)
 
     def __next__(self):
+        
         try:
             p = next(self.batch)
         except: 
             print("FINISHED!")
             return 
+        
+        #p = next(self.batch)
 
         if type(p) == None: 
             print("FINISHED!!")
