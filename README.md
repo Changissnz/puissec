@@ -29,3 +29,10 @@ technical issues.
 ### Update 08/01/2024
 An incomplete draft of the paper is found in 
 `paper`. Also added MIT license.
+
+### Update 08/11/2024
+There are no plans to implement elaborate 
+data poisoning features to Puissec. Data 
+poisoning would be relatively easy for 
+those educated in data science and programming
+to implement.
