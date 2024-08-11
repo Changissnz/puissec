@@ -228,8 +228,10 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
 
 """
 """
-def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih,\
-    verbose=False):
+def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
+    hs:HypStruct,verbose=False): 
+
+    #ssih,\verbose=False):
     assert type(ir) == IsoRing
     assert type(hs) == HypStruct
 
@@ -238,8 +240,10 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,hs:HypStruct,ssih,\
     ##print("\t-- CONVERTED")
     resplattingMode = ("relevance zoom",rch)
 
-    mpsb = hs.most_probable_subbound()
-
+    ix = hs.most_probable_subbound_i()
+    mpsb = deepcopy(hs.suspected_subbounds[ix])
+    ##mpsb = hs.most_probable_subbound()
+    ssih = self.hs_vec[ix] 
     if verbose: 
         print("[X] declarationes de RSSI aufbund")
         print(mpsb)

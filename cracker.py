@@ -195,7 +195,7 @@ class BackgroundInfo:
     '''
     @staticmethod 
     def naive_IsoRing2HypStruct_map(ir:IsoRing,full_hypseq,\
-        naive_split=1):
+        naive_split=1,hop_size=5):
 
         d = defaultdict(list)  
         for s in ir.sec_cache:
@@ -204,10 +204,12 @@ class BackgroundInfo:
             z[:,1] = 1.0
             sb = even_bound_split(z,naive_split)
             sb_pr = np.ones((naive_split,)) * 1.0/naive_split
+            hs_vec = np.ones((naive_split,)) * hop_size
             if not full_hypseq: 
                 si = s.seq_index()
                 hs = HypStruct(ir.sec.idn_tag,\
-                    si,deepcopy(sb),deepcopy(sb_pr))
+                    si,deepcopy(sb),deepcopy(sb_pr),\
+                    deepcopy(hs_vec))
                 d[lx] = [hs] 
                 continue 
 

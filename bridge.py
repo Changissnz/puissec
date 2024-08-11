@@ -22,10 +22,10 @@ class CBridge:
         self.load_rssi_batch() 
         return
 
-    def load_crackf(self,h=5):
+    def load_crackf(self):#,h=5):
         print("LOADING")
         self.rssi = default_base_RSSI(self.isoring,self.crackling,\
-            self.hs,h,self.verbose)
+            self.hs,self.verbose)
 
     def load_rssi_batch(self):
         self.batch = rssi.ResplattingSearchSpaceIterator.\
@@ -89,6 +89,7 @@ class IRCLeakDict:
         return self.d[sec_idn][opt_dim] 
 
 
+###################################################################
         
 def one_correct_HypStruct_for_IsoRing(ir:IsoRing):
     ti = ir.sec.seq_index()
