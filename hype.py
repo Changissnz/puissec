@@ -40,7 +40,7 @@ class HypStruct:
             sb_pr = np.ones((len(suspected_subbounds),),dtype=float)
             sb_pr = sb_pr * 1.0 / len(suspected_subbounds)
         if type(hs_vec) == type(None):
-            hs_vec = np.ones(len(suspected_subbounds),),dtype=int)
+            hs_vec = np.ones((len(suspected_subbounds),),dtype=int)
             hs_vec = hs_vec * 5
 
         assert len(sb_pr) == len(suspected_subbounds)
