@@ -243,7 +243,7 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
     ix = hs.most_probable_subbound_i()
     mpsb = deepcopy(hs.suspected_subbounds[ix])
     ##mpsb = hs.most_probable_subbound()
-    ssih = self.hs_vec[ix] 
+    ssih = hs.hs_vec[ix] 
     if verbose: 
         print("[X] declarationes de RSSI aufbund")
         print(mpsb)

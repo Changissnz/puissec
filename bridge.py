@@ -14,7 +14,7 @@ class CBridge:
         self.rssi = None 
         self.verbose = verbose 
 
-        self.load_crackf(ssih)
+        self.load_crackf()#ssih)
         self.cidn = cidn
         self.bs = batch_size
         self.batch = None
@@ -23,7 +23,7 @@ class CBridge:
         return
 
     def load_crackf(self):#,h=5):
-        print("LOADING")
+        print("LOADING ",self.verbose)
         self.rssi = default_base_RSSI(self.isoring,self.crackling,\
             self.hs,self.verbose)
 
@@ -39,17 +39,23 @@ class CBridge:
         return (self.crackling.cidn,self.isoring.sec.idn_tag)
 
     def __next__(self):
-        
+        if self.rssi.terminated: 
+            print("DONE")
         try:
             p = next(self.batch)
         except: 
-            print("FINISHED!")
+            print("LOAD BATCH")
+            self.load_rssi_batch()
             return 
         
-        #p = next(self.batch)
 
+        #p = next(self.batch)
         if type(p) == None: 
             print("FINISHED!!")
+            self.load_rssi_batch()
+            p = next(self.batch)
+            if type(p) == type(None):
+                return None
 
         if self.verbose:
             print('next point on bridge {}:\n{}'.format(\

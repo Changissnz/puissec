@@ -178,13 +178,13 @@ class BackgroundInfo:
     """
     @staticmethod
     def naive_IRC2HypStruct_map(irc,full_hypseq=True,\
-        naive_split=2):
+        naive_split=2,hop_size=5):
         assert type(irc) == IsoRingedChain
 
         l = defaultdict(None)
         for irl_ in irc.irl:
             m = BackgroundInfo.naive_IsoRing2HypStruct_map(irl_,\
-                full_hypseq,naive_split)
+                full_hypseq,naive_split,hop_size)
             l[irl_.sec.idn_tag] = m 
         return l 
 
@@ -216,7 +216,7 @@ class BackgroundInfo:
             q = [] 
             for i in range(len(s.opm)):
                 hs = HypStruct(ir.sec.idn_tag,\
-                    i,deepcopy(sb),deepcopy(sb_pr))
+                    i,deepcopy(sb),deepcopy(sb_pr),deepcopy(hs_vec))
                 q.append(hs)
             d[lx] = q 
         return d 
