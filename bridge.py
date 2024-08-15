@@ -41,6 +41,7 @@ class CBridge:
     def __next__(self):
         if self.rssi.terminated: 
             print("DONE")
+            return 
         try:
             p = next(self.batch)
         except: 
@@ -114,3 +115,98 @@ def one_dummy_HypStruct_for_IsoRing(ir:IsoRing):
     sbs = [b]
     sb_pr = np.array([1.0])
     return HypStruct(ir.sec.idn_tag,ti,sbs,sb_pr)
+
+
+def round_ratio_to_closest_hop(r,h,round_depth=5):
+    assert r >= 0.0 and r <= 1.0
+    assert h > 0
+
+    q = 1.0 / h 
+    x = math.floor(r / q) 
+    if type(round_depth) != type(None): 
+        return round(x * q,5)
+    return x * q
+
+def round_length_to_closest_hop(l,h,round_depth=5):
+    assert h > 0
+    q = float(l) / h
+
+    if type(round_depth) != type(None):
+        return round(q * h,5)
+    return q * h 
+
+"""
+EX: h = 3.
+    b = [0,1]*4
+    r = <0.33,0.66, 1.0>
+
+"""
+def calibrate_boundloc_values(bound_length,location_ratio,hop_size,lx):
+    if type(bound_length) == float:
+        bound_length = np.ones((lx,)) * bound_length
+    assert len(bound_length) == lx
+    bound_length = np.array([round_length_to_closest_hop(bl,hop_size) \
+        for bl in bound_length]) 
+
+    if type(location_ratio) == float:
+        location_ratio = np.ones((lx,)) * location_ratio
+    assert len(location_ratio) == lx
+    location_ratio = np.array([round_ratio_to_closest_hop(lr,hop_size) \
+        for lr in location_ratio]) 
+    return bound_length,location_ratio 
+
+"""
+For the <IsoRing> `ir`, declares a <HypStruct> H on 
+its `seci`'th <Sec> S. H has one bound B, with each 
+j'th dimension of length equal to `bound_length` 
+(type float) or `bound_length[j]` (type np.ndarray). 
+
+The `location_ratio` specifies the location of S.seq 
+in B. And the hop 
+
+"""
+def one_approximate_HypStruct_for_IsoRing(ir:IsoRing,seci:int,\
+    bound_length,location_ratio,hop_size):
+    assert type(bound_length) in {float,np.ndarray} 
+    assert type(location_ratio) in {float,np.ndarray} 
+
+    # make the bounds
+    ir.set_isorep(seci) 
+    lx = ir.sec.dim()
+
+    bound_length,location_ratio = calibrate_boundloc_values(\
+        bound_length,location_ratio,hop_size,lx) 
+
+    v = ir.sec.seq
+    v_ = []
+    bxs = []
+    for (i,v2) in enumerate(v):
+        qx = location_ratio[i] % 1.0
+        blx = bound_length[i] * qx
+        npx1 = round(v2 - blx,5)
+        npx2 = npx1 + bound_length[i]
+     
+        bxs.append([npx1,npx2]) 
+    bxs = np.array(bxs) 
+
+    # declare the HypStruct
+    ti = ir.sec.seq_index()
+
+    # case: make only one. 
+    hsx = HypStruct(ir.sec.idn_tag,ti,[bxs],\
+        sb_pr=np.array([1.0]),\
+        hs_vec=np.array([hop_size]))
+
+    return hsx 
+
+
+
+
+
+
+ 
+
+
+
+
+

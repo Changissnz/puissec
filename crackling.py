@@ -137,7 +137,9 @@ class Crackling:
     """
     def register_response(self,p,q,astat:bool): 
         assert type(self.hs) != type(None)
-        self.astat = astat 
+        if not self.astat:
+            self.astat = astat 
+
         ##print("PP: {}\nQQ: {}".format(p,q))
         x = q[self.hs.target_index] 
         self.cvec.append(x,p)
@@ -191,6 +193,10 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
         if verbose:
             print("IR registers attempt")
             print(p)
+
+        if cracklng.astat:
+            print("TERMINATED")
+            return 
 
         q,stat = ir.register_attempt(p)
         ##
@@ -286,7 +292,7 @@ class HypInfer:
     # TODO: test 
     @staticmethod
     def infer_FX(hypStruct,leak_value,leak_idn):
-        assert leak_idn in {0,1,2}
+        assert leak_idn in {0,1,2,3}
 
         def exec_fn(sx):
             if leak_idn == 0:
@@ -359,6 +365,8 @@ def adjust_bounds__F1(b,V_f):
 
 def adjust_bounds__F2(b,V_f):
     ##assert matrix_methods.is_proper_bounds_vector(V_f) 
+    print("V_F: ",V_f)
+    V_f = np.array(V_f)
     assert V_f.shape[1] == 2 and V_f.shape[0] > 0 
     b2 = deepcopy(b)
 

@@ -654,3 +654,29 @@ def SRefMap_sample1():
     sn = SecNet_sample1()
     return sn.srm 
     
+
+
+###################
+
+
+def SecNet_sample_approxhyp():
+
+    random.seed(2004)
+    np.random.seed(2004)
+
+    ss = SecSeq_sample_4(num_secs=1,\
+            singleton_range=DEFAULT_SINGLETON_RANGE,\
+            num_conn=1,min_components=1,max_nconn_ratio = 0.3,\
+            drange_max=1)
+
+    sc = ss[0] 
+    print(sc[0]) 
+
+    bound = [0.,1.]
+    irc = IsoRingedChain(sc,bound,random,71)
+    for x in irc.irl:
+        x.explode_contents()
+
+    
+
+

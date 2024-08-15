@@ -397,7 +397,7 @@ class Sec:
         sm = sum(q[0])
         sm = 1.0 if sm == 0.0 else sm 
         for i,q_ in enumerate(q[0]):
-            vs = matrix_methods.vector_to_string(bps[i],float)
+            vs = matrix_methods.vector_to_string(np.round(bps[i],5),float)
             optima_pr_map[vs] = np.round(q_ / sm,5)
         ##print("-- fetching correlation maps")
 
@@ -410,7 +410,7 @@ class Sec:
         # Pr. in optima_pr_map
         qx = max([(k,v) for (k,v) in optima_pr_map.items()],key=lambda x:x[1])
         nu_pt = matrix_methods.string_to_vector(qx[0],float)
-
+        nu_pt = np.round(nu_pt,5)
         ##print("-- size of opt. map: ",len(optima_pr_map))
         s = Sec(nu_pt,deepcopy(self.singleton_range),\
             optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)

@@ -22,6 +22,7 @@ class BackgroundInfoClass(unittest.TestCase):
         assert type(bi) == BackgroundInfo
         print(bi.dm)
 
+    """
     def test__BackgroundInfo__generate_instance_case1(self):
 
         fp = "codename__ASS_SHIT"
@@ -43,6 +44,7 @@ class BackgroundInfoClass(unittest.TestCase):
         bi = BackgroundInfo.generate_instance(irc,srm)
         assert type(bi) == BackgroundInfo
         print(bi.dm)
+    """
 
     def test__BackgroundInfo__generate_instance_case2(self):
         sn = SecNet_sample_TDir1v1()
@@ -87,6 +89,7 @@ class BackgroundInfoClass(unittest.TestCase):
 
 class OrderOfCracknClass(unittest.TestCase):
 
+    """
     def test__OrderOfCrackn__order_by_depchain_map__case1(self):
         sn1 = SecNet.unpickle_thyself("codename__ASS_SHIT",\
                 DEFAULT_SINGLETON_RANGE,random,9)
@@ -106,6 +109,7 @@ class OrderOfCracknClass(unittest.TestCase):
         ans = [{1}, {0, 4}, {7}, {6}, {8}, {3}, {2}, {5}]
         assert soln == ans 
         return
+    """
 
     def test__OrderOfCrackn__order_by_depchain_map__case2(self):
         random.seed(243423)

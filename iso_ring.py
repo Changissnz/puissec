@@ -139,6 +139,8 @@ class IsoRing:
         self.sec_cache = [self.sec] 
 
         self.ofunc = ofunc 
+        self.ofunc_cache = [self.ofunc]
+
         self.bounds = bounds 
         # bloom stat 
         self.bstat = True
@@ -153,6 +155,13 @@ class IsoRing:
         self.sec_script = None
         self.leak_stage = 0
 
+    def bounds_of_dim(self,d):
+        bds = np.empty((d,2),dtype=float)
+        q0 = min(self.bounds[:,0])
+        q1 = max(self.bounds[:,1])
+        bds[:,0] = q0
+        bds[:,1] = q1
+        return bds
 
     def loc(self):
         if type(self.td) == type(None):
@@ -266,10 +275,29 @@ class IsoRing:
             s = len(s2.opm)
             self.sec_cache.append(sc)
             self.sec_cache.append(s2)
+
+            bof = self.next_bof(s2.dim(),rnd_struct)
+            self.ofunc_cache.append(bof)
             if type(ts2) == type(None):
                 break
         self.bstat = False
         return
+
+    def next_bof(self,d,rnd_struct=random):
+        qx = self.bounds_of_dim(d)
+
+        spacing_ratio_range = rnd_struct.uniform(0.,1.)
+        spacing_ratio_range = [spacing_ratio_range,\
+            rnd_struct.uniform(spacing_ratio_range,1.)]
+        outlier_pr_ratio = rnd_struct.random()
+        num_bounds = rnd_struct.randrange(1,6)
+
+        rs = rnd_struct.randrange(200)
+        bof = BoundedObjFunc.generate_BoundedObjFunc(qx,\
+        spacing_ratio_range,outlier_pr_ratio,\
+        num_bounds,rs)
+        return bof 
+
 
     def secdim_seq(self):
         l = []
@@ -320,6 +348,7 @@ class IsoRing:
         assert len(self.sec_cache) > i and i > -1
         self.repi = i 
         self.sec = self.sec_cache[self.repi]
+        self.ofunc = self.ofunc_cache[self.repi]
         return
 
     def rep(self):
