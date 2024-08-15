@@ -194,10 +194,12 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
             print("IR registers attempt")
             print(p)
 
+        # NOTE: uncomment in real simulations.
+        """
         if cracklng.astat:
             print("TERMINATED")
             return 
-
+        """
         q,stat = ir.register_attempt(p)
         ##
         if verbose: 
