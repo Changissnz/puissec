@@ -45,7 +45,8 @@ def CBridge_case_X(guess_index=3):
     return cb 
 ###############################################
 
-def CBridge_case_ApproximateHypStruct_num0():
+def CBridge_case_ApproximateHypStruct_num0(is_approx_hypstruct:bool,\
+    hop_size=5):
 
     random.seed(2004)
     np.random.seed(2004)
@@ -68,10 +69,13 @@ def CBridge_case_ApproximateHypStruct_num0():
     seci = 2
     bound_length = np.array([0.4,0.8,0.5])
     location_ratio = np.array([0.1,0.2,0.6])
-    hop_size = 5
-    hs = one_approximate_HypStruct_for_IsoRing(q,seci,\
-        bound_length,location_ratio,hop_size)
 
+    if is_approx_hypstruct:
+        hs = one_approximate_HypStruct_for_IsoRing(q,seci,\
+            bound_length,location_ratio,hop_size)
+    else: 
+        q.set_isorep(seci)
+        hs = one_correct_HypStruct_for_IsoRing(q)
 
     # run a <CRridge> cracking session
     cr = Crackling(cidn=2,cvsz=200)
@@ -113,11 +117,12 @@ class CBridgeClass(unittest.TestCase):
                 ##print("q: ",qc)
                 stat = type(qc) != type(None)
                 stat = stat and (i < 100)
-                i += 1 
+                i += 1
+        assert not c.astat
 
-    def test__CBridge__next__ApproximateHypStruct__num0(self):
+    def test__CBridge__next__ApproximateHypStruct__num0__case1(self):
 
-        cb = CBridge_case_ApproximateHypStruct_num0() 
+        cb = CBridge_case_ApproximateHypStruct_num0(True) 
         cr = cb.crackling 
         q = cb.isoring 
         i = 0 
@@ -152,6 +157,37 @@ class CBridgeClass(unittest.TestCase):
         qr1 = matrix_methods.string_to_vector(sx,float)
         qr1 = np.round(qr1,5) 
         assert (q.sec.seq == qr1).all() 
+
+    def test__CBridge__next__ApproximateHypStruct__num0__case2(self):
+        cb = CBridge_case_ApproximateHypStruct_num0(True,hop_size=10)
+        cr = cb.crackling
+
+        i = 0 
+        il = 3000
+        while i < il and not cr.astat: 
+            print("i: ",i)
+            next(cb)
+            i += 1
+
+        assert i == 127
+        assert len(cr.flagged_pts) == 91
+        assert len(cr.cracked_dict) == 1
+
+    def test__CBridge__next__ApproximateHypStruct__num0__case3(self):
+        cb = CBridge_case_ApproximateHypStruct_num0(False,hop_size=7)
+        cr = cb.crackling
+
+        i = 0 
+        il = 3000
+        while i < il and not cr.astat: 
+            print("i: ",i)
+            next(cb)
+            i += 1
+
+        assert i == 1
+        assert len(cr.cracked_dict) == 1
+
+    ###################################################
 
     """
     demonstration w/ the perfect hypothesis
