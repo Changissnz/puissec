@@ -259,6 +259,10 @@ class CVec:
         ##print()
         return metric_2dboolmat_to_bool(m)
 
+    """
+    - return: 
+    np.ndarray 
+    """
     def cmp_by_selector(self,selector_index:int,output_type): 
         cvis = self.cvis[selector_index]
         prev,ref = cvis.output(len(self.v))
