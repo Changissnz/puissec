@@ -56,7 +56,7 @@ def example__node_analysis_1():
     print("DESTNODE ANALYSIS")
 
 def example__CBridge__naive_hyp(num_attempts=5000,\
-    hop_size:int=2, default_obj_index=None):
+    hop_size:int=5, default_obj_index=None):
 
     random.seed(2004)
     np.random.seed(2004)
@@ -75,27 +75,35 @@ def example__CBridge__naive_hyp(num_attempts=5000,\
         x.explode_contents()
     q = irc[0]
 
-        ######## edit dobjf
-    if type((default_obj_index) != type(None): 
-        assert default_obj_index < 0
-        q.ofunc.dobjf = q.ofunc.corr_objf[default_obj_index]
+    # [10, 6, 3, 2, 8, 9]
+    seci = 2
+    bound_length = np.array([0.4,0.8,0.5])
+    location_ratio = np.array([0.1,0.2,0.6])
+    hop_size = 5
 
+    #### NOTE: 
+    ## case 1
+    hs = one_approximate_HypStruct_for_IsoRing(q,seci,\
+        bound_length,location_ratio,hop_size)
+    ## case 2
+    """
+    q.set_isorep(seci)
+    hs = one_correct_HypStruct_for_IsoRing(q) 
+    """
 
-    # make a naive HypStruct
-    im = BackgroundInfo.naive_IRC2HypStruct_map(irc,True,naive_split=1,hop_size=2)
-    hsx = im[0][10]
-    hs = hsx[2]
 
     # run a <CRridge> cracking session
+    hs.hs_vec = np.array([hop_size for x in hs.hs_vec])
     cr = Crackling(cidn=2,cvsz=200)
     cr.load_HypStruct(hs) 
 
     cb  = CBridge(cr,q,hs,ssih=5,cidn=12,batch_size=100,verbose=True)
-    ##cb.verbose = True#False#True
-
-    for i in range(5000):
+    i = 0 
+    il = 800 
+    while i < il:# and not cr.astat: 
         print("i: ",i)
         next(cb)
+        i += 1
 
     l = len(cr.flagged_pts)
 
