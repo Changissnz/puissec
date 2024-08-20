@@ -36,3 +36,6 @@ data poisoning features to Puissec. Data
 poisoning would be relatively easy for 
 those educated in data science and programming
 to implement.
+
+### Update 08/20/2024
+The paper has two sections remaining to be written.
