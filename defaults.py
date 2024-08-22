@@ -107,3 +107,14 @@ def scaled_mean(M,S):
 def std_iscaled_mean(M):
     I = std_index_weight_vec(len(M))
     return scaled_mean(M,I)
+
+def std_invert_map(m,value_is_list:bool=False):
+    assert type(m) in {dict,defaultdict}
+
+    q = {}
+    for k,v in m.items():
+        if v in q:
+            q[v].append(k)
+        else:
+            q[v] = [k]
+    return q

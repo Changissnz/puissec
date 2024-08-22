@@ -168,6 +168,10 @@ class Sec:
         if type(self.obfsr) == type(None):
             self.declare_obf()
         
+        # D2 -> D1; used for storing direct
+        # correlations from 
+        self.child_exact_opt2opt_map = None
+
         self.declared_dir = []
         self.next_sz = None 
 
@@ -403,7 +407,10 @@ class Sec:
 
         # get the dep.,codep. map
         dep_map = exact_correlation_DMap_key_delta(self.dm,deepcopy(q[1]))
-        codep_map = exact_correlation_DMap_key_delta(self.cdm,q[1])
+        codep_map = exact_correlation_DMap_key_delta(self.cdm,deepcopy(q[1]))
+
+        # store the pred_exact_corrmap
+        self.child_exact_opt2opt_map = deepcopy(q[1])
 
         ##print("-- fetching new seq.")
         # get the new seq, which has the highest
