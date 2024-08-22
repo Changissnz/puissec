@@ -370,6 +370,12 @@ class Leak:
         self.prev_li = None
         return
 
+    def fd_subseq(self,f):
+        q = []
+        for fd in self.fd_seq:
+            if fd[0] == f: q.append(fd)
+        return q 
+
     def potency_gauge(self):
         d = defaultdict(float)
         for f in self.fd_seq:
