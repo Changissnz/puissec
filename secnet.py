@@ -672,11 +672,10 @@ def SecNet_sample_approxhyp():
     sc = ss[0] 
     print(sc[0]) 
 
-    bound = [0.,1.]
-    irc = IsoRingedChain(sc,bound,random,71)
-    for x in irc.irl:
-        x.explode_contents()
+    sn = SecNet.generate(ss,0,\
+            1,1,10,random,"pairing frame",223) 
 
-    
+    for s_ in sn.irc.irl:
+        s_.explode_contents()
 
-
+    return sn 

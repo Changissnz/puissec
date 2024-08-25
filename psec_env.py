@@ -1,5 +1,6 @@
 from cracker import * 
 
+# TODO: unused, possibly delete. 
 class TDBridge:
 
     def __init__(self):
