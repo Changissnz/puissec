@@ -22,6 +22,10 @@ def even_bound_split(bs,sz):
         q = bs_
     return bsx
 
+DEFAULT_HYPSTRUCT_GENSCHEMES = {0:one_dummy_HypStruct_for_IsoRing,
+                1: one_approximate_HypStruct_for_IsoRing,\
+                2: one_correct_HypStruct_for_IsoRing}
+
 class OrderOfCrackn:
 
     def __init__(self):
@@ -220,6 +224,56 @@ class BackgroundInfo:
                 q.append(hs)
             d[lx] = q 
         return d 
+
+    # TODO: test this. 
+    """
+
+    `full_hypseq` var from the previous method is set to TRUE in this 
+    method.
+
+    r_d := ratio of dummy <HypStruct>s
+    r_a := ratio of approximate <HypStruct>s
+    """
+    @staticmethod 
+    def partially_naive_IsoRing2HypStruct_map(ir:IsoRing,\
+        bound_length,r_d,r_a,rnd_struct):#,naive_split=1,hop_size=3):
+        assert min([r_d,r_a]) >= 0.0
+        assert r_d + r_a <= 1.0 
+
+        sds = ir.secdim_seq()
+
+        def op_fx(fxid,seci):
+            fgx = DEFAULT_HYPSTRUCT_GENSCHEMES[fxid]
+            if fxid in {0,2}:
+                ir.set_isorep(seci)
+                return fgx(ir),None
+
+            d = sds[seci]
+            lr = [rnd_struct.random() for _ in range(d)]
+            hs = rnd_struct.randrange(2,13)
+            return fgx(ir,seci,bound_length,lr,hs),hs 
+
+        # choose the dim 
+        qx = [[],[],[]]
+        i = 0
+
+        # start w/ dummy
+        l0 = int(round(r_d * len(sds))) 
+        l1 = int(round(r_a * len(sds))) 
+        l2 = len(sds) - (l0 + l1) 
+        lx = [l0,l1,l2]
+
+        sds = [vxx for vxx in enumerate(sds)]
+        outp1,outp2 = {},{}
+        while i < 3:
+            for _ in range(lx[i]):
+                # choose an index
+                ix = rnd_struct.randrange(0,len(sds))
+                elmnt = sds.pop(ix)
+                hs,hs2 = op_fx(i,elmnt[0]) 
+                outp1[elmnt[1]] = hs
+                outp2[elmnt[1]] = [i,hs2]
+        return outp1,outp2
 
     @staticmethod
     def generate_instance(irc,srm):

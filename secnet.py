@@ -158,7 +158,7 @@ class SecNet:
         path_size=10,sngc=None,energy=1000.0):
         
         assert len(irc) > 0 and type(irc) == SecSeq
-        assert len(G) >= len(irc) 
+        assert len(G) >= len(irc), "len G {} len IRC {}".format(len(G),len(irc))
 
         self.ss = irc
         ##print("RNDSTRUCT#1: ",rnd_struct)
@@ -389,6 +389,10 @@ class SecNet:
         i = len(self.irc)
         i2 = 0
         while i > 0:
+            if len(s) == 0: 
+                s = list(set(self.d.keys()) - self.sec_nodeset)
+                if len(s) == 0: raise ValueError 
+            
             j = self.rnd_struct.randrange(0,len(s))
             q = s.pop(j)
             self.node_loc_assignment[i2] = q 
@@ -402,7 +406,7 @@ class SecNet:
 
         # choose random values
         if type(entry_points) == int:
-            assert entry_points > 0 and entry_points < len(q)
+            assert entry_points > 0 and entry_points <= len(q)
             eps = [] 
             while entry_points > 0: 
                 i = self.rnd_struct.randrange(0,len(q))
@@ -425,7 +429,7 @@ class SecNet:
     def generate(irc,sec_node_count,\
         nsec_node_count,num_entry,path_size,rnd_struct,*sngs_args):
         q = sec_node_count + nsec_node_count
-        assert q >= len(irc) 
+        assert q >= len(irc), "got {} want {}".format(q,len(irc))
         assert num_entry <= q and num_entry > 0 
 
         q_ = [i for i in range(q)] 
@@ -434,11 +438,15 @@ class SecNet:
         print("make frame")
         snv = q_[:sec_node_count]
         nsnv = q_[sec_node_count:]
+        print("SNV: ", snv)
+        print("NSNV: ", nsnv)
+
         sngs = SecNetGenScheme(*sngs_args)
         snfg = SecNetFrameGen(snv,nsnv,sngs)
         snfg.construct_frame()
         print("after frame")
-
+        print("graph")
+        print(snfg.d)
         node_loc_assignment = None
         sn = SecNet(irc,snfg.d,set(snfg.sec_nodevec),\
             node_loc_assignment,entry_points=num_entry,\
@@ -664,16 +672,15 @@ def SecNet_sample_approxhyp():
     random.seed(2004)
     np.random.seed(2004)
 
-    ss = SecSeq_sample_4(num_secs=1,\
+    ss,_ = SecSeq_sample_4(num_secs=1,\
             singleton_range=DEFAULT_SINGLETON_RANGE,\
             num_conn=1,min_components=1,max_nconn_ratio = 0.3,\
             drange_max=1)
 
-    sc = ss[0] 
-    print(sc[0]) 
+    print("LEN: ",len(ss))
 
     sn = SecNet.generate(ss,0,\
-            1,1,10,random,"pairing frame",223) 
+            1,1,10,random,"spine frame",223) 
 
     for s_ in sn.irc.irl:
         s_.explode_contents()

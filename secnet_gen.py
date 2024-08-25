@@ -149,6 +149,17 @@ class SecNetFrameGen:
         return
 
     def next_conn(self):
+        # base case: only 1 node
+        if len(self.sec_nodevec) == 1 and \
+            len(self.nsec_nodevec) == 0:
+            self.d[next(iter(self.sec_nodevec))] = []
+            return False
+
+        if len(self.nsec_nodevec) == 1 and \
+            len(self.sec_nodevec) == 0:
+            self.d[next(iter(self.nsec_nodevec))] = []
+            return False
+
         if self.sngs.description == "spine frame":
             return self.next_conn_sf() 
 

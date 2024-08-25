@@ -500,6 +500,7 @@ def SecSeq_sample_4(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
     num_conn=5000,min_components=4,max_nconn_ratio=0.4,drange_max=4):
 
     s = Sec_list_sample3(num_secs,singleton_range,random)
+    print("SECLIST: ",len(s))
     sndg = SecNetDepGen(s,random,min_components,\
             max_nconn_ratio,[1,drange_max])
     sndg.assign_conn(num_conn)

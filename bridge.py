@@ -198,15 +198,3 @@ def one_approximate_HypStruct_for_IsoRing(ir:IsoRing,seci:int,\
         hs_vec=np.array([hop_size]))
 
     return hsx 
-
-
-
-
-
-
- 
-
-
-
-
-
