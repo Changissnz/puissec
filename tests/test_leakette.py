@@ -181,7 +181,40 @@ class LeaketteClass(unittest.TestCase):
         for k,v in pot.items():
                 assert round(abs(v-ans2[k]),5) == 0.0 
 
-        return         
+        return      
+
+class LeakClass(unittest.TestCase):
+
+    def test__Leak__leak_info__case1(self):
+
+        Q = SecNet_sample_CallSia()
+        ir = Q.irc.fetch_IsoRing(1)
+
+        random.seed(2345632)
+
+        lk = Leak.generate_Leak__type1(5,random)
+
+        qs = []
+        rx = -1 
+        for i in range(7):
+                
+            q = lk.leak_info(ir)
+            if type(q) == type(None):
+                rx = i
+                break 
+            qs.append(q)
+        assert len(qs) == 5
+
+        qx = lk.leakm.d[1]
+        qxli = qx.leak_info
+
+        assert len(qxli[0]) == 1
+        assert len(qxli[2]) == 2
+        assert len(qxli[3]) == 2
+
+        return
+        
+
 
 
 if __name__ == '__main__':
