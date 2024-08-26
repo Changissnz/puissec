@@ -41,6 +41,18 @@ class BackgroundInfoClass(unittest.TestCase):
         cx = Counter({1:4,0:2})
         assert cx == c
 
+        ############### CASE: entire <IsoRingedChain> map 
+
+        ph1,ph2 = BackgroundInfo.partially_naive_IRC2HypStruct_map(sn.irc,\
+                1.0, [0.,1.],[0.,1.],random)
+
+        assert len(ph1) == 1
+        assert len(ph2) == 1 
+        assert len(ph1[0]) == len(ph2[0])
+        assert len(ph1[0]) == 6 
+        return
+
+
     """
     def test__BackgroundInfo__generate_instance_case1(self):
 
@@ -104,7 +116,8 @@ class BackgroundInfoClass(unittest.TestCase):
 
         assert len(ircm[0][5]) == 12
         assert len(ircm2[0][5]) == 1
-        return
+
+        ######################################################
 
 class OrderOfCracknClass(unittest.TestCase):
 

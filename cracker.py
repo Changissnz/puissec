@@ -236,14 +236,52 @@ class BackgroundInfo:
             d[lx] = q 
         return d 
 
-    # TODO: test this. 
     """
 
+    - return: 
+    Sec idn. -> Sec dim. -> HypStruct
+    """
+    @staticmethod
+    def partially_naive_IRC2HypStruct_map(irc,\
+        bound_length, rd_range,ra_range,rnd_struct):
+        
+        assert type(irc) == IsoRingedChain
+        assert min(rd_range) >= 0.0 and max(rd_range) <= 1.0
+        assert rd_range[1] >= rd_range[0]
+        assert min(ra_range) >= 0.0 and max(ra_range) <= 1.0
+        assert ra_range[1] >= ra_range[0]
+
+        bx1,bx2 = {},{}
+        for ir in irc.irl:
+            r_d = rnd_struct.uniform(rd_range[0],rd_range[1])
+            max_diff = 1.0 - r_d
+            rg1 = min([ra_range[1],max_diff])
+
+            if rg1 < ra_range[0]:
+                mx = 0.0 
+            else:
+                mx = ra_range[0]                
+            r_a = rnd_struct.uniform(mx,rg1) 
+
+            b1,b2 = BackgroundInfo.partially_naive_IsoRing2HypStruct_map(\
+                ir,bound_length,r_d,r_a,rnd_struct)
+
+            bx1[ir.sec.idn_tag] = b1
+            bx2[ir.sec.idn_tag] = b2 
+        return bx1,bx2 
+
+
+    """
     `full_hypseq` var from the previous method is set to TRUE in this 
     method.
 
+    - arguments: 
     r_d := ratio of dummy <HypStruct>s
     r_a := ratio of approximate <HypStruct>s
+
+    - return: 
+    M1 := map, sec dim -> <HypStruct>
+    M2 := map, sec dim -> (HypStruct gen-scheme,*args for scheme)
     """
     @staticmethod 
     def partially_naive_IsoRing2HypStruct_map(ir:IsoRing,\
@@ -252,8 +290,6 @@ class BackgroundInfo:
         assert r_d + r_a <= 1.0 
 
         sds__ = ir.secdim_seq()
-        print("SDS")
-        print(sds__)
         def op_fx(fxid,seci):
             fgx = DEFAULT_HYPSTRUCT_GENSCHEMES[fxid]
             if fxid in {0,2}:
@@ -261,7 +297,6 @@ class BackgroundInfo:
                 return fgx(ir),None
 
             d = sds__[seci]
-            print("DD: ",d)
             lr = [rnd_struct.random() for d__ in range(d)]
             lr = np.array(lr)
             hs = rnd_struct.randrange(2,13)
