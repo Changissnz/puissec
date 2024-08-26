@@ -22,6 +22,25 @@ class BackgroundInfoClass(unittest.TestCase):
         assert type(bi) == BackgroundInfo
         print(bi.dm)
 
+    def test__BackgroundInfo__partially_naive_IsoRing2HypStruct_map_case1(self):
+
+        sn = SecNet_sample_approxhyp()
+
+        ## declare a <BackgroundInfo> 
+        ir = sn.irc[0]
+
+        b1,b2 = BackgroundInfo.partially_naive_IsoRing2HypStruct_map(\
+                ir,1.0,0.3,0.7,random)
+
+        ks = list(b2.values())
+
+        c = Counter()
+        for k in ks:
+            c[k[0]] += 1
+
+        cx = Counter({1:4,0:2})
+        assert cx == c
+
     """
     def test__BackgroundInfo__generate_instance_case1(self):
 

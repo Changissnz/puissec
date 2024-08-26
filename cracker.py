@@ -26,6 +26,17 @@ DEFAULT_HYPSTRUCT_GENSCHEMES = {0:one_dummy_HypStruct_for_IsoRing,
                 1: one_approximate_HypStruct_for_IsoRing,\
                 2: one_correct_HypStruct_for_IsoRing}
 
+def generated_HypStruct__int_idn(fx,is_forward:bool=True):
+    if is_forward: 
+        assert fx in DEFAULT_HYPSTRUCT_GENSCHEMES
+        return DEFAULT_HYPSTRUCT_GENSCHEMES[fx]
+    
+    dh = std_invert_map(DEFAULT_HYPSTRUCT_GENSCHEMES)
+    assert fx in dh
+    return dh[fx] 
+     
+
+
 class OrderOfCrackn:
 
     def __init__(self):
@@ -240,16 +251,19 @@ class BackgroundInfo:
         assert min([r_d,r_a]) >= 0.0
         assert r_d + r_a <= 1.0 
 
-        sds = ir.secdim_seq()
-
+        sds__ = ir.secdim_seq()
+        print("SDS")
+        print(sds__)
         def op_fx(fxid,seci):
             fgx = DEFAULT_HYPSTRUCT_GENSCHEMES[fxid]
             if fxid in {0,2}:
                 ir.set_isorep(seci)
                 return fgx(ir),None
 
-            d = sds[seci]
-            lr = [rnd_struct.random() for _ in range(d)]
+            d = sds__[seci]
+            print("DD: ",d)
+            lr = [rnd_struct.random() for d__ in range(d)]
+            lr = np.array(lr)
             hs = rnd_struct.randrange(2,13)
             return fgx(ir,seci,bound_length,lr,hs),hs 
 
@@ -258,12 +272,12 @@ class BackgroundInfo:
         i = 0
 
         # start w/ dummy
-        l0 = int(round(r_d * len(sds))) 
-        l1 = int(round(r_a * len(sds))) 
-        l2 = len(sds) - (l0 + l1) 
+        l0 = int(round(r_d * len(sds__))) 
+        l1 = int(round(r_a * len(sds__))) 
+        l2 = len(sds__) - (l0 + l1) 
         lx = [l0,l1,l2]
 
-        sds = [vxx for vxx in enumerate(sds)]
+        sds = [vxx for vxx in enumerate(sds__)]
         outp1,outp2 = {},{}
         while i < 3:
             for _ in range(lx[i]):
@@ -273,6 +287,7 @@ class BackgroundInfo:
                 hs,hs2 = op_fx(i,elmnt[0]) 
                 outp1[elmnt[1]] = hs
                 outp2[elmnt[1]] = [i,hs2]
+            i += 1 
         return outp1,outp2
 
     @staticmethod
