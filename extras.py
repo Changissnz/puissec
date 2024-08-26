@@ -97,7 +97,7 @@ def example__CBridge__naive_hyp(num_attempts=5000,\
     cr = Crackling(cidn=2,cvsz=200)
     cr.load_HypStruct(hs) 
 
-    cb  = CBridge(cr,q,hs,ssih=5,cidn=12,batch_size=100,verbose=True)
+    cb  = CBridge(cr,q,cidn=12,batch_size=100,verbose=True)
     i = 0 
     il = 800 
     while i < il:# and not cr.astat: 

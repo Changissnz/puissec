@@ -2,19 +2,17 @@ from crackling import *
 
 class CBridge:
 
-    def __init__(self,crackling,isoring,hs,ssih=5,\
+    def __init__(self,crackling,isoring,\
         cidn=None,batch_size=1000,verbose=False):
         assert type(crackling) == Crackling
         assert type(isoring) == IsoRing 
-        assert type(hs) == HypStruct
 
         self.crackling = crackling 
         self.isoring = isoring
-        self.hs = hs 
         self.rssi = None 
         self.verbose = verbose 
 
-        self.load_crackf()#ssih)
+        self.load_crackf()
         self.cidn = cidn
         self.bs = batch_size
         self.batch = None
@@ -22,10 +20,10 @@ class CBridge:
         self.load_rssi_batch() 
         return
 
-    def load_crackf(self):#,h=5):
+    def load_crackf(self):
         print("LOADING ",self.verbose)
         self.rssi = default_base_RSSI(self.isoring,self.crackling,\
-            self.hs,self.verbose)
+            self.crackling.hs,self.verbose)
 
     def load_rssi_batch(self):
         self.batch = rssi.ResplattingSearchSpaceIterator.\

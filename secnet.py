@@ -165,19 +165,15 @@ class SecNet:
         self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
         self.rnd_struct = rnd_struct 
         self.path_size = path_size 
-
-        print("made IRC")
-
         self.d = G 
         self.sec_nodeset = sec_nodeset
+        
         # sec idn -> node location 
         self.node_loc_assignment = node_loc_assignment
         self.assign_entry(entry_points)
         if type(self.node_loc_assignment) == type(None):
             self.assign_loc()
-        else: 
-            print("ASS ERTIA")
-            
+        else:             
             assert type(self.node_loc_assignment) == dict
             assert max(self.node_loc_assignment.keys()) == len(self.irc) - 1 
             assert min(self.node_loc_assignment.keys()) == 0 

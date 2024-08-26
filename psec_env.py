@@ -379,7 +379,7 @@ class SecEnv:
         i = self.sn.irc.fetch_IsoRing(iidn)
         hs = c.hs
 
-        cb = CBridge(c,i,hs,ssih,self.cbs_idn_ctr)
+        cb = CBridge(c,i,ssih,self.cbs_idn_ctr)
         cb.verbose = self.verbose
 
         self.cbs_idn_ctr += 1
