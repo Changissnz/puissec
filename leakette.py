@@ -232,7 +232,7 @@ class LeakInfo:
         q2 = self.value_at_findex(1,i)
         q3 = self.value_at_findex(2,i)
         q4 = self.value_at_findex(3,i)
-        sx = [q2,q,q4,q3]
+        sx = [q2,q4,q,q3]
 
         for (i,sx_) in enumerate(sx):
             if type(sx_) == type(None):
@@ -254,10 +254,15 @@ class LeakInfo:
         if f == 1:
             return vx[0]
 
-        if f in {2,3}:
+        if f == 2: 
             q = []
             for (i,x) in enumerate(vx):
                 q.append((i,x[1] - x[0]))
+            j = min(q,key=lambda q_:q_[1])[0]
+            return vx[j] 
+
+        if f == 3: 
+            q = [(i,x[2]) for (i,x) in enumerate(vx)] 
             j = min(q,key=lambda q_:q_[1])[0]
             return vx[j] 
 
