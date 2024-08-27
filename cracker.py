@@ -320,7 +320,7 @@ class BackgroundInfo:
                 ix = rnd_struct.randrange(0,len(sds))
                 elmnt = sds.pop(ix)
                 hs,hs2 = op_fx(i,elmnt[0]) 
-                outp1[elmnt[1]] = hs
+                outp1[elmnt[1]] = [hs]
                 outp2[elmnt[1]] = [i,hs2]
             i += 1 
         return outp1,outp2
@@ -430,12 +430,12 @@ class CrackSoln:
     def __add__(self,t:tuple):
         assert type(t) == tuple
         assert len(t) == 4
-
+        qx = deepcopy(self) 
         # case: update soln
-        if t[0] in self.d:
-            self.prev_soln[t[0]].append(self.d[t[0]])
-        self.d[t[0]] = (t[1],t[2],t[3])
-        return
+        if t[0] in qx.d:
+            qx.prev_soln[t[0]].append(qx.d[t[0]])
+        qx.d[t[0]] = (t[1],t[2],t[3])
+        return qx
 
     def match_pr(self):
         return -1
@@ -462,6 +462,8 @@ class Cracker:
 
         self.calculate_oop()
         self.csoln = CrackSoln() 
+
+        self.initiated = False 
         return
     
     # NOTE: pickle does not save crackling instances
@@ -550,7 +552,7 @@ class Cracker:
     """
     def load_cracklings_for_secset(self,targetdim_seq):
         self.cracklings.clear() 
-
+        print("TARGETDIMSEQ: ",targetdim_seq)
         for (nt_,d) in targetdim_seq: 
             self.load_crackling(nt_,d)
         return
@@ -566,7 +568,8 @@ class Cracker:
     def load_crackling(self,sec_idn,sec_dim):
 
         hs = self.next_hypstruct(sec_idn,sec_dim)
-
+        print("HSSSS")
+        print(hs) 
         if type(hs) == type(None):
             return False
 
@@ -584,7 +587,7 @@ class Cracker:
     def next_hypstruct(self,sec_idn,sec_dim):
         if sec_idn not in self.hyp_map:
             return None
-
+        print("FAIL")
         if sec_dim not in self.hyp_map[sec_idn]:
             return None
 

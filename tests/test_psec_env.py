@@ -112,7 +112,7 @@ class SecEnvClass(unittest.TestCase):
         """
         ####
         q67 = se.coloc()
-        assert q67 == {'0,18,58'}
+        assert q67 == {'1,18,58'},"GOT {}".format(q67)
 
     def test__SecEnv__InstantiateCrackerANDSecNet__case2(self):
 
@@ -207,6 +207,37 @@ class SecEnvClass(unittest.TestCase):
 
         f.close()
         sys.stdout = orig_stdout
+
+    def test__SecEnv__run__case2__SingleNodeInterdictionTest(self):
+
+        sn = SecNet_sample_approxhyp()
+
+        irc = sn.irc
+        srm = sn.srm
+        bi = BackgroundInfo.generate_instance(irc,srm)
+
+        ###
+
+        ph1,ph2 = BackgroundInfo.partially_naive_IRC2HypStruct_map(sn.irc,\
+                1.0, [0.,1.],[0.,1.],random)
+
+        for x in sn.irc.irl:
+            x.set_isorep(0)
+
+        crck = Cracker(ph1,bi,6) 
+
+        se = SecEnv(sn,crck,vb=2)
+
+        se.load_IRCLD_into_SecNet()
+        #se.instantiate_cracker_target()
+        se.instantiate_td_for_IRC(5,1.0)
+
+        for _ in range(2):
+            se.run(1.0)
+
+        for _ in range(3):
+            se.run(1.0)
+            assert len(se.icrack) == 1
 
 if __name__ == '__main__':
     unittest.main()

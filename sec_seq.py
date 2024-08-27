@@ -285,6 +285,11 @@ class Sec:
             if stat: return i 
         return -1
 
+    def seq_pr(self):
+        qx = self.optima_points_to_index_pr_map()
+        si = self.seq_index()
+        return qx[si] 
+
     """
     return: 
     - np.array,rows ordered by alphanumeric order. 

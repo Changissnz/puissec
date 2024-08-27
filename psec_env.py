@@ -33,6 +33,12 @@ class Colocks:
         self.cset = cset
         return
 
+    def __str__(self):
+        s1 = str(self.iset) + "\n"
+        s1 += str(self.cset) + "\n\n"
+        s1 += "----------------------"
+        return s1 
+
     def update_i(self,iset):
         assert type(iset) == set
         self.iset = iset
@@ -54,7 +60,7 @@ class Colocks:
                 s = s | {q2[c2]}
         return s 
 
-# TODO: check Colocks
+    # TODO: check Colocks
 
 
     """
@@ -115,6 +121,8 @@ class SecEnv:
         # active <CBridge> instances
         self.cbs = [] 
         self.cbs_idn_ctr = 0
+
+        self.icrack = {}
 
         # coloc info
         self.ci = Colocks(set(),set())
@@ -185,8 +193,12 @@ class SecEnv:
         cd = self.crck.cstat()
         vs = set(cd.values())
 
+        print("CSTAT: ",cd) 
+
         # case: load new cracking targets
-        if vs == {2}:
+        if vs == {2} or not self.crck.initiated:
+            print("NEW TARGET")
+            self.crck.initiated = True 
             stat = self.instantiate_cracker_target()
             if not stat: return False
             return self.cproc()
@@ -195,6 +207,7 @@ class SecEnv:
         if self.verbose: 
             print("------------ CPROC\n")
 
+        print("RUNNING ALL {} CRACKLINGS".format(len(self.crck.cracklings)))
         for i in range(len(self.crck.cracklings)):
             self.cproc_(i,timespan)
         return True
@@ -206,6 +219,7 @@ class SecEnv:
         if self.verbose:
             print("-- CSTAT ON {}: {}".format(c.cidn,s))
 
+        print()
         # done
         if s == 2: 
             return False
@@ -269,19 +283,21 @@ class SecEnv:
     """
     def update_cracklings_to_SecNet(self):
         stat = True
+        print("\n\nUPDATING CRACKLINGS ",len(self.crck.cracklings))
         for i in range(len(self.crck.cracklings)):
             stat2 = self.update_crackling_to_SecNet(i)
 
             if not stat: continue
-            stat = stat and stat2
+            stat = stat and stat2  
         return stat
 
     """
     pre-requisite method for above method. 
     """
     def update_crackling_to_SecNet(self,crackling_index):
+        print("\n\nUPDATING")
         crcklng = self.crck.cracklings[crackling_index]
-    
+        
         # find an entry point that crcklng accepts
         tds = []
         cidn = crcklng.cidn
@@ -295,6 +311,7 @@ class SecEnv:
             print(tdirector.loc())
             print()
             stat_ = self.crck.accept_TDirector_at_entry_point(cidn,tdirector)
+            print("ACCEPTING @ ENTRY POINT: ",stat_)
             if stat_: 
                 tdirector.switch_obj_stat()
                 self.crck.load_TDirector(cidn,tdirector)
@@ -572,9 +589,38 @@ class SecEnv:
             print("--- PERFORMING LEAKS : ",len(self.ci.iset))
 
         for interdict in self.ci.iset:
-            self.leak_by_str_idn(interdict)
+            q = self.leak_by_str_idn(interdict)
+
+            # case: cracked 
+            if type(q) == tuple:
+                if self.verbose: 
+                    print("\t\t** CRACK BY INTERDICTION")
+                assert len(q) == 2
+
+                psidn = Colocks.parse_coloc_str(interdict)
+                # check to see if already cracked
+                ir = self.sn.irc.fetch_IsoRing(psidn[1])
+                if ir.sec.idn_tag in self.icrack:
+                    d = ir.sec.dim() 
+                    if d in self.icrack[ir.sec.idn_tag]:
+                        if self.verbose == 2:
+                            print("ALREADY CRACKED.")
+                        continue 
+
+                crckling = self.crck.fetch_crackling(psidn[0])
+                ti = crckling.hs.target_index
+                self.transfer_V(interdict,ti,q[0],q[1])                
         return
 
+    def transfer_V(self,sidn,opt_index,svec,pr_score):
+        psidn = Colocks.parse_coloc_str(sidn)
+        sec_idn = psidn[1]
+        ir = self.sn.irc.fetch_IsoRing(sec_idn)
+        opt_dim = ir.secdim_seq()[ir.repi]
+        self.crck.csoln = self.crck.csoln + (sec_idn,opt_index,svec,pr_score)
+        if psidn[0] not in self.icrack:
+            self.icrack[psidn[0]] = {}
+        self.icrack[psidn[0]][opt_dim] = True 
 
     ################ methods for leaking
 
@@ -605,9 +651,14 @@ class SecEnv:
         L = self.sn.irc.ircld.fetch_Leak(sec_idn,opt_dim)
         outp = L.leak_info(ir)
 
+        if self.verbose == 2:
+            print("OUTP: ",outp)
+
         # case: no more leaks
         if type(L.prev_li) == type(None):
-            return None
+            print("------ NO MORE.")
+            prv = ir.sec.seq_pr() 
+            return (ir.sec.seq,prv) 
 
         # case: update <HypStruct> by latest <LeakInfo>
             # fetch the <HypStruct>
