@@ -458,6 +458,7 @@ class Cracker:
         self.radar_radius = radar_radius
         self.energy = NerG(energy)
         self.cracklings = [] 
+        self.spent = [] 
         self.cidn_counter = 0
 
         self.calculate_oop()
@@ -525,10 +526,15 @@ class Cracker:
         return
 
     def fetch_crackling(self,cidn):
-        for c in self.cracklings: 
+        i = self.fetch_crackling_index(cidn)
+        if i == -1: return None
+        return self.cracklings[i]
+
+    def fetch_crackling_index(self,cidn):
+        for (i,c) in enumerate(self.cracklings):
             if c.cidn == cidn:
-                return c
-        return None 
+                return i
+        return -1
 
     ######################## methods for loading 
     ######################## <Crackling> instances
@@ -762,6 +768,10 @@ class Cracker:
         # continue travelling
         return -1 
 
-    def remove_spent_cracklings(self):
-        return -1 
+    def remove_spent_crackling(self,cidn):
+        i = self.fetch_crackling_index(cidn)
+        if i == -1: return
+        q = self.cracklings.pop(i)
+        self.spent.append(q) 
+        return
     

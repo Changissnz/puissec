@@ -301,8 +301,10 @@ class HypInfer:
                 return adjust_bounds__F0(sx,leak_value)
             elif leak_idn == 1:
                 return adjust_bounds__F1(sx,leak_value)
-            else: 
+            elif leak_idn == 2: 
                 return adjust_bounds__F2(sx,leak_value)
+            else: 
+                return adjust_bounds__F3(hs,sx,leak_value)
 
         for (i,s) in enumerate(hypStruct.suspected_subbounds):
             s_ = exec_fn(s)
@@ -379,5 +381,82 @@ def adjust_bounds__F2(b,V_f):
 
         if stat: continue
         b2[i] = deepcopy(bx)
-
     return b2 
+
+# TODO: relocate
+"""
+
+"""
+def custom_lcm(i1,i2):
+    assert type(i1) == type(i2)
+    assert type(i1) == int
+
+    def lcm_increment(mx1,mx2,fx1,fx2,is_mx1:bool):
+        if not is_mx1:
+            mx1,mx2 = mx2,mx1
+            fx1,fx2 = fx2,fx1
+
+        lcm_ = None 
+        if mx1 < mx2:
+            while mx1 < mx2:
+                mx1 += fx1
+                if mx1 == mx2:
+                    lcm_ = mx1
+
+        if not is_mx1:
+            return mx2,mx1,lcm_
+
+    if i1 // i2 == i1 / i2:
+        return i1
+    
+    if i2 // i1 == i2 / i1:
+        return i2
+
+    stat = True 
+    f1,f2 = None,None
+    if i1 > i2:
+        f1 = i2
+        f2 = i1
+    else:
+        f1 = i1 
+        f2 = i2
+
+    m1,m2 = f1,f2
+    lcm = None
+    while stat:
+        m1,m2,lcm = lcm_increment(m1,m2,f1,f2,True)
+        stat = type(lcm) == type(None)
+        if not stat: continue
+        m1,m2,lcm = lcm_increment(m1,m2,f1,f2,False)
+        stat = type(lcm) == type(None)
+    return lcm 
+
+# NOTE: caution, different hop sizes not accounted for.
+def adjust_bounds__F3(hs,b,V_f):
+    print("V_F: ",V_f) 
+    b2 = deepcopy(b)
+    mlist = []
+
+    hs_counter = Counter() 
+    for (i,bx) in enumerate(V_f):
+        stat1 = np.isnan(bx[0]) 
+        stat2 = np.isnan(bx[1])
+        stat = stat1 or stat2 
+        if stat: continue
+        hs_counter[bx[2]] += 1
+
+
+    for (i,bx) in enumerate(V_f):
+        stat1 = np.isnan(bx[0]) 
+        stat2 = np.isnan(bx[1])
+        stat = stat1 or stat2 
+        if stat: continue
+        b2[i] = np.array([bx[0],bx[1]])
+        mlist.append(bx[2])
+
+
+
+    return b2, 
+
+    assert False
+

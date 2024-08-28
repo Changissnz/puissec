@@ -207,7 +207,6 @@ class SecEnv:
         if self.verbose: 
             print("------------ CPROC\n")
 
-        print("RUNNING ALL {} CRACKLINGS".format(len(self.crck.cracklings)))
         for i in range(len(self.crck.cracklings)):
             self.cproc_(i,timespan)
         return True
@@ -598,13 +597,15 @@ class SecEnv:
                 assert len(q) == 2
 
                 psidn = Colocks.parse_coloc_str(interdict)
+
                 # check to see if already cracked
                 ir = self.sn.irc.fetch_IsoRing(psidn[1])
                 if ir.sec.idn_tag in self.icrack:
                     d = ir.sec.dim() 
                     if d in self.icrack[ir.sec.idn_tag]:
                         if self.verbose == 2:
-                            print("ALREADY CRACKED.")
+                            print("ALREADY CRACKED. REMOVING SPENT.")
+                        self.crck.remove_spent_crackling(psidn[0])
                         continue 
 
                 crckling = self.crck.fetch_crackling(psidn[0])
@@ -656,7 +657,6 @@ class SecEnv:
 
         # case: no more leaks
         if type(L.prev_li) == type(None):
-            print("------ NO MORE.")
             prv = ir.sec.seq_pr() 
             return (ir.sec.seq,prv) 
 

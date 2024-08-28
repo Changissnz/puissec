@@ -106,6 +106,10 @@ class HypStruct:
         q += "\n"
         q += "\n" + "sub-bound pr."
         q += str(self.sb_pr)
+        q += "\n"
+        q += "\n" + "hop vec"
+        q += str(self.hs_vec)
+        q += "\n"
         return q 
 
 

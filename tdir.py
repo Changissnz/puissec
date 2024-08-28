@@ -187,7 +187,6 @@ class SNGraphContainer:
             
         sx = set()
         for k,v in q.items():
-            print("CRACKLING: ",is_crackling,v)
             v2 = v if is_crackling else v[0] 
             if l == v2: sx = sx | {k}
 
