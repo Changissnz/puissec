@@ -48,5 +48,17 @@ class Index2DModClass(unittest.TestCase):
             #print("next: ", q)
         assert tindex == 26 
 
+class IndexVecPermuterClass(unittest.TestCase):
+
+    def test__IndexVecPermuter__next__case1(self):
+        vx = [3,4,2]
+        ivp = IndexVecPermuter(vx)
+        for i in range(24):
+            assert not ivp.finished 
+            next(ivp)
+        assert ivp.finished 
+
+    
+
 if __name__ == '__main__':
     unittest.main()

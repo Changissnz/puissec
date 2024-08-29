@@ -48,6 +48,22 @@ class HypStruct:
         self.hs_vec= hs_vec 
         return
 
+    """
+
+    """
+    def sort(self):
+        qi = [(i,sbpr) for (i,sbpr) in enumerate(self.sb_pr)] 
+        qi = sorted(qi,key=lambda x:x[1],reverse=True)
+
+        self.suspected_subbounds = [self.suspected_subbounds[j[0]] for j in qi] 
+        self.sb_pr = [self.sb_pr[j[0]] for j in qi] 
+        self.hs_vec = [self.hs_vec[j[0]] for j in qi] 
+        return
+
+    """
+    - return: 
+    <HypStruct> 
+    """
     def new_HypStruct_by_next_subbound(self):
         if len(self.suspected_subbounds) == 0:
             return None
@@ -84,18 +100,26 @@ class HypStruct:
         qi = max(q,key=lambda x:x[1])
         return qi[0]
 
-    def add_subbound(self,sb,sbpr,zero_other_pr=False):
+    def add_subbound(self,sb,sbpr,hs,zero_other_pr=False):
         assert matrix_methods.is_proper_bounds_vector(sb)
+        
+        j = -1
+        for (i,sbpr_) in enumerate(self.sb_pr):
+            if sbpr >= sbpr_: 
+                j = i
+                break
+        if j == -1: 
+            j = len(self.sb_pr)
 
         if zero_other_pr:
             self.sb_pr = np.zeros((len(self.suspected_subbounds),),dtype=float)
-        
-        self.suspected_subbounds.append(sb)
-        self.sb_pr = np.append(self.sb_pr,sbpr)
 
+        self.suspected_subbounds.insert(j,sb) 
+        self.sb_pr = np.insert(self.sb_pr,j,sbpr) 
         s = np.sum(self.sb_pr) 
         sx = np.array([measures.zero_div(s_,s,0.0) for s_ in self.sb_pr])
         self.sb_pr = sx
+        self.hs_vec.insert(j,hs) 
         return 
 
     def __str__(self):

@@ -38,7 +38,7 @@ def subbound_for_decimal_with_hop(decimal,degree,\
     lx = sb[1] - sb[0]
     q = lx / h * iter_eq
     ns = decimal - q 
-    return (ns,ns + lx)
+    return (ns,ns + lx,h)
 
 LEAKF_MAP = {0:choose_multiple,\
             1:idn_decimal,\
@@ -60,7 +60,7 @@ def leakf_to_index(leakf):
     return -1
 
 # in descending order
-DEFAULT_LEAKF_INDEX_RANKING = [1,0,3,2] 
+DEFAULT_LEAKF_INDEX_RANKING = [1,3,0,2] 
 
 # TODO: future. 
 def leakf__type_gcd(ir): 

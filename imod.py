@@ -217,3 +217,60 @@ class Index2DMod:
         q2_ = [roundian(q2[0],self.dim2d[0]),\
             roundian(q2[1],self.dim2d[1])]
         return q2_ 
+
+
+class IndexVecPermuter:
+
+    def __init__(self,vecsize_seq,head=0):
+        assert head in {0,-1}
+
+        self.vss = vecsize_seq
+        self.head = head 
+        self.p = [0 for _ in range(len(self.vss))]
+        self.initialized = False
+        self.finished = False
+
+    def __next__(self):
+        if self.finished:
+            return None
+
+        """
+        if set(self.p) == {0} and self.initialized:
+            self.finished = True
+            return None
+        """
+        
+        px = deepcopy(self.p)
+
+
+        index = 0 if self.head == 0 else len(self.p) - 1
+        index_delta = 1 if self.head == 0 else -1
+        px = self.next__(px,index,index_delta)
+        
+        px2 = deepcopy(self.p)
+        self.p = px
+        return px2
+
+    def next__(self,px,index,index_delta):
+        """
+        if index == -1: 
+            index = len(px) - 1
+        elif index >= len(self.p):
+            index = 0
+        """
+        if index == -1 or index >= len(self.p): 
+            self.finished = True
+            return None
+
+        px[index] += 1
+
+        if px[index] >= self.vss[index]:
+            px[index] = 0
+            index = index + index_delta
+            return self.next__(px,index,index_delta)
+        return px
+
+
+
+
+

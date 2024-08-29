@@ -1,5 +1,5 @@
 from leakette import * 
-from morebs2 import relevance_functions
+from morebs2 import relevance_functions,hop_pattern
 from hype import * 
 from tdir import * 
 
@@ -305,11 +305,30 @@ class HypInfer:
                 return adjust_bounds__F2(sx,leak_value)
             else: 
                 return adjust_bounds__F3(hs,sx,leak_value)
-
+        
+        ### NOTE: algorithm type: replacement scheme
+        """
         for (i,s) in enumerate(hypStruct.suspected_subbounds):
             s_ = exec_fn(s)
             hypStruct.suspected_subbounds[i] = s_ 
         return hypStruct
+        """
+
+        ### NOTE: algorithm type: new single scheme
+        hs = hypStruct.new_HypStruct_by_next_subbound()
+        outp = exec_fn(hs.suspected_subbounds[0])
+
+        if leak_idn != 3:
+            hs.suspected_subbounds[0] = outp
+        else:
+            if type(outp) == type(None):
+                return hs
+
+            hs.suspected_subbounds = outp[0]
+            hs.hs_vec = [outp[1] for _ in range(len(hs.suspected_subbounds))]
+            hs.sb_pr = [1.0/len(hs.suspected_subbounds) for _ \
+                in range(len(hs.suspected_subbounds))]
+        return hs 
 
 def closest_reference_to_bound_start(b,V_f):
 
@@ -332,12 +351,14 @@ def closest_reference_to_bound_start(b,V_f):
     return start_vec + null_vec 
 
 def adjust_bounds__F0(b,V_f):
-
+    ############### TODO: delete
+    ############### OLD VERSION
+    """
     r = closest_reference_to_bound_start(b,V_f)
     bx = deepcopy(b[:,1])
 
-    ##print("ADJUSTING ",bx) 
-    ##print("UNIT ",V_f)
+    print("\t\tADJUSTING ",b) 
+    print("\t\tUNIT ",V_f)
 
     qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
     V_f = np.array(qi) 
@@ -350,12 +371,28 @@ def adjust_bounds__F0(b,V_f):
 
     if type(q) in {type(None),tuple}: 
         print("k-mult search failed.")
-        return b 
+        return b  
 
-    ##print("V_F: ",V_f)
-    ##print("Q: ",q)
+    print("\t\tV_F: ",V_f)
+    print("\t\tQ: ",q)
     nb = np.array([r,r+ V_f*q]).T
     print("UPDATED:\n\t",nb)
+
+    for (i,x) in enumerate(nb): 
+        if abs(x[0] - x[1]) < 10 **-5:
+            x[1] = b[i,1]
+    return nb
+    """
+
+    ########## NOTE: new version
+
+    qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
+    
+    nb = deepcopy(b)
+
+    for (i,vf) in enumerate(V_f):
+        if np.any(np.isnan(vf)): continue
+        nb[i] = [vf,vf * 5] 
     return nb 
 
 def adjust_bounds__F1(b,V_f):
@@ -431,6 +468,31 @@ def custom_lcm(i1,i2):
         stat = type(lcm) == type(None)
     return lcm 
 
+def adjust_range__F3(r,h_prev,h_ref):
+    assert len(r) == 2 and r[0] <= r[1]
+    hp_prev = hop_pattern.HopPattern(r[0], r[0], r[1], cycleLog = True, DIR = 1.0/h_prev)
+    prev_set = set(hop_pattern.cycle_hop_pattern(hp_prev))
+
+    hp_ref = hop_pattern.HopPattern(r[0], r[0], r[1], cycleLog = True, DIR = 1.0/h_ref)
+    ref_set = set(hop_pattern.cycle_hop_pattern(hp_ref))
+
+    qx = ref_set.intersection(prev_set)
+    prev_set = prev_set - qx
+    range_seq = [deepcopy(r)]
+
+    while len(prev_set) > 0:
+        mprev = min(prev)
+        r1 = np.array([mprev,mprev + (r[1] - r[0])])
+
+        hp_ref = hop_pattern.HopPattern(r1[0], r1[0], r1[1], cycleLog = True, DIR = 1.0/h_ref)
+        ref_set = set(hop_pattern.cycle_hop_pattern(hp_ref))
+
+        qx = ref_set.intersection(prev_set)
+        prev_set = prev_set - qx
+        range_seq.append(r1) 
+
+    return range_seq 
+
 # NOTE: caution, different hop sizes not accounted for.
 def adjust_bounds__F3(hs,b,V_f):
     print("V_F: ",V_f) 
@@ -439,24 +501,36 @@ def adjust_bounds__F3(hs,b,V_f):
 
     hs_counter = Counter() 
     for (i,bx) in enumerate(V_f):
-        stat1 = np.isnan(bx[0]) 
-        stat2 = np.isnan(bx[1])
-        stat = stat1 or stat2 
+        stat = np.any(np.isnan(bx))
         if stat: continue
+        print("BXX: ",bx)
         hs_counter[bx[2]] += 1
 
+    if len(hs_counter) == 0:
+        return None 
 
+    m = max([(k,v) for k,v in hs_counter.items()],key=lambda x:x[1])
+    fmax = m[0] 
+    hs_counter.pop(m[0]) 
+
+    b2 = [[b__] for b__ in b]
     for (i,bx) in enumerate(V_f):
-        stat1 = np.isnan(bx[0]) 
-        stat2 = np.isnan(bx[1])
-        stat = stat1 or stat2 
+        stat = np.any(np.isnan(bx))
         if stat: continue
-        b2[i] = np.array([bx[0],bx[1]])
-        mlist.append(bx[2])
 
+        if bx[2] == fmax:
+            b2[i] = [np.array([bx[0],bx[1]])]
+        else:
+            rxs = adjust_range__F3([bx[0],bx[1]],bx[2],fmax) 
+            b2[i] = rxs
 
-
-    return b2, 
-
-    assert False
+    # select all bounds by permutation
+    b2i = [len(b2_) for b2_ in b2] 
+    ivp = IndexVecPermuter(b2i)
+    all_bounds = []
+    while not ivp.finished:
+        ix = next(ivp)
+        bx = np.array([deepcopy(b2[j][ix_]) for (j,ix_) in enumerate(ix)])
+        all_bounds.append(bx)
+    return all_bounds,fmax 
 

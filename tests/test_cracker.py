@@ -48,8 +48,9 @@ class BackgroundInfoClass(unittest.TestCase):
 
         assert len(ph1) == 1
         assert len(ph2) == 1 
-        assert len(ph1[0][0]) == len(ph2[0])
-        assert len(ph1[0][0]) == 6 
+        assert len(ph1[0]) == len(ph2[0])
+        #assert False,"PH1\n{}\PH2\n{}".format(ph1,ph2)
+        assert len(ph1[0]) == 6 
         return
 
 
