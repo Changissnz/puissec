@@ -332,10 +332,8 @@ class IsoRing:
                 ops.shape[1]))
             return None 
         
-        ##print("number of ops:",len(ops))
         # get scores for each of the optima 
         q = list(map(lambda x: self.ofunc.output(x,p),ops))
-        ##print("-- reg: ",q)
         return np.array(q)
 
     def response_to_prompt(self,index):

@@ -62,9 +62,6 @@ def leakf_to_index(leakf):
 # in descending order
 DEFAULT_LEAKF_INDEX_RANKING = [1,3,0,2] 
 
-# TODO: future. 
-def leakf__type_gcd(ir): 
-    return -1 
 
 """
 rnd_struct := .

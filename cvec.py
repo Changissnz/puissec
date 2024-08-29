@@ -314,7 +314,7 @@ def cmp_seq_with_cvec(cvec,seq):
 
 
 def kmult_diffvec(V_m,V_f,k):
-        return np.abs(V_m - V_f * k)
+    return np.abs(V_m - V_f * k)
 
 def CVec__scan_in_range(V_m,V_f,mrange,increment=0.1):
     cvec = CVec(cvis=basic_cvec_iselector_seq())

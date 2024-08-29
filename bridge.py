@@ -1,5 +1,8 @@
 from crackling import * 
 
+"""
+Connector b/t <Cracking> and its target <IsoRing>.
+"""
 class CBridge:
 
     def __init__(self,crackling,isoring,\
@@ -63,6 +66,10 @@ class CBridge:
 
 ################ 
 
+"""
+container for holding the leaks corresponding 
+to <IsoRing> instances of an <IsoRingedChain>.
+"""
 class IRCLeakDict:
 
     def __init__(self,num_leakf_range,rnd_struct):

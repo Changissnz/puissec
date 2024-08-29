@@ -233,16 +233,8 @@ class IndexVecPermuter:
     def __next__(self):
         if self.finished:
             return None
-
-        """
-        if set(self.p) == {0} and self.initialized:
-            self.finished = True
-            return None
-        """
         
         px = deepcopy(self.p)
-
-
         index = 0 if self.head == 0 else len(self.p) - 1
         index_delta = 1 if self.head == 0 else -1
         px = self.next__(px,index,index_delta)
@@ -252,12 +244,6 @@ class IndexVecPermuter:
         return px2
 
     def next__(self,px,index,index_delta):
-        """
-        if index == -1: 
-            index = len(px) - 1
-        elif index >= len(self.p):
-            index = 0
-        """
         if index == -1 or index >= len(self.p): 
             self.finished = True
             return None

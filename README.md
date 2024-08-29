@@ -39,3 +39,9 @@ to implement.
 
 ### Update 08/20/2024
 The paper has two sections remaining to be written.
+
+### Update 08/29/2024
+
+The first draft of the paper has been finalized. 
+Project cleaning/review is planned. A lot of junk/comment 
+code has been deleted.

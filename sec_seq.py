@@ -360,9 +360,7 @@ class Sec:
             ##print("one bloom pt.")
             # next value, indices of derivators
             b1,b2 = self.__next__()
-            
             ##print("bloom index: ",c)
-            
             c += 1
             
             if c >= sz_limit: 

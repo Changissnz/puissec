@@ -1,5 +1,4 @@
 
-#from defaults import *
 from morebs2 import measures,numerical_generator
 from imod import * 
 
@@ -267,10 +266,7 @@ def exact_correlation_dep_Pr(d2_rsz,pred_corrmap,pred_opt2pr_map):
         # new key 
         vstr = matrix_methods.vector_to_string(pr_index,int)
 
-        # old key 
-        ##print("PR INDEX: ",pr_index)
-        ##print("PRED CORRMAP\n{}\n".format(pred_corrmap))
-
+        # old key
         pm1 = pred_corrmap[pr_index[0]]
         pm2 = pred_corrmap[pr_index[1]]
         v2 = sorted([pm1,pm2])
@@ -567,8 +563,6 @@ for more details.
 def variance_vec__pr(eq_value,size,variance,\
     rnd_struct=random):
     assert size > 0 
-
-    #assert abs(1 - eq_value * size) < 10 ** -4
     q = np.ones((size,)) * float(eq_value)
     if size == 1: return q 
 

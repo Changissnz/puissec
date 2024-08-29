@@ -558,7 +558,6 @@ class Cracker:
     """
     def load_cracklings_for_secset(self,targetdim_seq):
         self.cracklings.clear() 
-        print("TARGETDIMSEQ: ",targetdim_seq)
         for (nt_,d) in targetdim_seq: 
             self.load_crackling(nt_,d)
         return

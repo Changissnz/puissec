@@ -49,7 +49,6 @@ class IsoRingedChain:
     """
     @staticmethod
     def default_Sec2IsoRing(sec:Sec,bound,rnd_struct,rs_seed):
-        ##print("RND_STRUCT: ",rnd_struct)
 
         if type(rs_seed) != type(None): 
             rnd_struct.seed(rs_seed)
@@ -84,12 +83,10 @@ class IsoRingedChain:
             return 
 
         self.irl = [] 
-        ##print("RND STRUCT: ",rnd_struct)
         if type(rs_seed) != type(None):
             rnd_struct.seed(rs_seed)
 
         for s in self.ss.sequence:
-
             # get the dim. of s
             q = s.dim() 
             bound_ = np.ones((q,2)) * singleton_bound
@@ -143,7 +140,6 @@ class IsoRingedChain:
         irc.irl = ls 
         return irc
 
-# TODO: test this. 
 """
 A graph structure that serves as an 
 environment for activity programmed 
@@ -303,14 +299,6 @@ class SecNet:
     ######################## loc-set methods for 
     ######################## <Crackling>,<IsoRing>
 
-    # TODO: 
-    def locset(self,idn,is_isoring:bool):
-
-        if is_isoring:
-            new_loc = "TODO"
-            self.node_loc_assignment[idn]
-        return -1
-
     def rc_agent_locs_for_subgraph(self,sgc:SNGraphContainer):
         assert type(sgc) == SNGraphContainer
         k = set(sgc.d.keys())
@@ -460,8 +448,6 @@ class SecNet:
         assert node in self.entry_points
         assert type(c) == Crackling
         assert type(c.hs) == HypStruct
-        ## TODO: delete. 
-        ##assert type(c.td) == TDir
         
         # use the <HypStruct> for `c` to set 
         # <TDir>. 
@@ -553,10 +539,7 @@ def pickled_SecNet_sample_Q():
 
     for s_ in s.irc.irl:
             s_.explode_contents()
-    """
-    irc = s.irc
-    irc.pickle_thyself("codename__ASS_SHIT")
-    """
+
     s.pickle_thyself("codename__ASS_SHIT")
 
 """
@@ -610,7 +593,6 @@ sample for testing <TDirector> on Nv1.
 def SecNet_sample_TDirNv1():
     random.seed(100734)
     np.random.seed(371224)
-    ##print("SS")
     ss,sndg = SecSeq_sample_4(num_secs=25,singleton_range=DEFAULT_SINGLETON_RANGE,\
         num_conn=100,min_components=3,max_nconn_ratio=0.8,drange_max=4)
 
@@ -618,12 +600,10 @@ def SecNet_sample_TDirNv1():
     nsec_node_count = 34
     num_entry = 4
     rnd_struct = random
-    ##print("SN")
     sn = SecNet.generate(ss,sec_node_count,\
             nsec_node_count,num_entry,\
             1,rnd_struct,"pairing frame",223) 
 
-    ##print("exploding")
     for s_ in sn.irc.irl:
         ##print("exploding {}".format(s_.sec.idn_tag))
         s_.explode_contents(num_blooms=2)
@@ -638,7 +618,6 @@ def SecNet_sample_CSmall():
     ss,sndg = SecSeq_sample_4(num_secs=2,singleton_range=DEFAULT_SINGLETON_RANGE,\
         num_conn=50,min_components=1,max_nconn_ratio=0.4,drange_max=1)
 
-    #irc = IsoRingedChain(ss,DEFAULT_SINGLETON_RANGE,random,23)
     sec_nodeset = set()  
     sn = SecNet(ss,G,sec_nodeset,{0:2,1:4},\
         entry_points = 1,bound=DEFAULT_SINGLETON_RANGE,\
@@ -658,10 +637,7 @@ def SRefMap_sample1():
     sn = SecNet_sample1()
     return sn.srm 
     
-
-
 ###################
-
 
 def SecNet_sample_approxhyp():
 
@@ -672,8 +648,6 @@ def SecNet_sample_approxhyp():
             singleton_range=DEFAULT_SINGLETON_RANGE,\
             num_conn=1,min_components=1,max_nconn_ratio = 0.3,\
             drange_max=1)
-
-    print("LEN: ",len(ss))
 
     sn = SecNet.generate(ss,0,\
             1,1,10,random,"spine frame",223) 

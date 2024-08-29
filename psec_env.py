@@ -60,9 +60,6 @@ class Colocks:
                 s = s | {q2[c2]}
         return s 
 
-    # TODO: check Colocks
-
-
     """
     return:
     - 0 for no co-loc with `agent_idn` OR
@@ -83,7 +80,6 @@ class Colocks:
                 return 2
         return 0 
     
-
     @staticmethod
     def parse_coloc_str(s):
         s_ = matrix_methods.string_to_vector(s,int)
@@ -192,8 +188,6 @@ class SecEnv:
         # check status
         cd = self.crck.cstat()
         vs = set(cd.values())
-
-        print("CSTAT: ",cd) 
 
         # case: load new cracking targets
         if vs == {2} or not self.crck.initiated:
@@ -528,23 +522,6 @@ class SecEnv:
 
         self.crackling_stat_update()
         return
-
-    """
-    def crackling_stat_update(self,is_cset:bool):
-        ws = self.ci.cset if is_cset else \
-                self.ci.iset
-
-        for ws_ in ws:
-            s2 = Colocks.parse_coloc_str(ws_)
-            cr = self.crck.fetch_crackling(s2[0]) 
-            assert type(cr) != type(None)
-
-            if is_cset:
-                cr.cstat = True
-            else:
-                cr.istat = True
-    """
-
 
     def crackling_stat_update(self): 
 
