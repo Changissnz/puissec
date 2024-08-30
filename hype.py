@@ -31,6 +31,9 @@ class HypStruct:
         self.seq_idn = seq_idn
         self.target_index = targeted_index
         self.suspected_subbounds = suspected_subbounds
+        self.sec_dim = None
+        self.check_subbounds()
+
 
         # the probability/weight of each sub-bound
         assert type(sb_pr) == type(None) or \
@@ -46,6 +49,15 @@ class HypStruct:
         assert len(sb_pr) == len(suspected_subbounds)
         self.sb_pr = sb_pr
         self.hs_vec= hs_vec 
+        return
+
+    def check_subbounds(self):
+        assert len(self.suspected_subbounds) >= 1 
+        self.sec_dim = self.suspected_subbounds[0].shape[0]
+
+        for i in range(1,len(self.suspected_subbounds)):
+            bx = self.suspected_subbounds[i]
+            assert self.sec_dim == bx.shape[0] 
         return
 
     """

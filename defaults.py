@@ -118,3 +118,53 @@ def std_invert_map(m,value_is_list:bool=False):
         else:
             q[v] = [k]
     return q
+
+############################################
+
+## NOTE: function unused; may delete. 
+"""
+
+"""
+def custom_lcm(i1,i2):
+    assert type(i1) == type(i2)
+    assert type(i1) == int
+
+    def lcm_increment(mx1,mx2,fx1,fx2,is_mx1:bool):
+        if not is_mx1:
+            mx1,mx2 = mx2,mx1
+            fx1,fx2 = fx2,fx1
+
+        lcm_ = None 
+        if mx1 < mx2:
+            while mx1 < mx2:
+                mx1 += fx1
+                if mx1 == mx2:
+                    lcm_ = mx1
+
+        if not is_mx1:
+            return mx2,mx1,lcm_
+
+    if i1 // i2 == i1 / i2:
+        return i1
+    
+    if i2 // i1 == i2 / i1:
+        return i2
+
+    stat = True 
+    f1,f2 = None,None
+    if i1 > i2:
+        f1 = i2
+        f2 = i1
+    else:
+        f1 = i1 
+        f2 = i2
+
+    m1,m2 = f1,f2
+    lcm = None
+    while stat:
+        m1,m2,lcm = lcm_increment(m1,m2,f1,f2,True)
+        stat = type(lcm) == type(None)
+        if not stat: continue
+        m1,m2,lcm = lcm_increment(m1,m2,f1,f2,False)
+        stat = type(lcm) == type(None)
+    return lcm 

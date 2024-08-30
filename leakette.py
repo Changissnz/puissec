@@ -237,7 +237,7 @@ class LeakInfo:
             return DEFAULT_LEAKF_INDEX_RANKING[i],\
                 sx_
 
-        return np.nan
+        return np.nan,np.nan 
 
     def value_at_findex(self,f,i):
         vx = self.valuelist_at_findex(f,i)

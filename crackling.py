@@ -109,7 +109,6 @@ class Crackling:
             if verbose: 
                 print("-- TRAVEL {}->{}".format(l,l2))
             return 
-            ##assert False, "not programmed yet."
         return
 
     """
@@ -279,56 +278,113 @@ class HypInfer:
         return
 
     @staticmethod
-    def infer_by_LeakInfo(hypStruct,leak_info):
+    def infer_by_LeakInfo(hypStruct,leak_info,inference_type=1):
         assert type(hypStruct) == HypStruct
         assert type(leak_info) == LeakInfo
+        assert inference_type in {1,2}
+
+        ###
+        '''
         print("LEAK INFO")
         print(leak_info.leak_info)
         print("-------------------")
-        for lk1,lk2 in leak_info.leak_info.items():
-            for lk2_ in lk2:
-                hypStruct = HypInfer.infer_FX(\
-                    hypStruct,lk2_,lk1)
+        '''
+        ###
+
+        ## NOTE: model 1, 
+        ## for each leak, process all leaked values from 
+        ## it. Order of processing is by map-key order.
+        if inference_type == 1:
+            for lk1,lk2 in leak_info.leak_info.items():
+                for lk2_ in lk2:
+                    hypStruct = HypInfer.infer_FX(\
+                        hypStruct,lk2_,lk1)
+            return hypStruct
+
+        ## NOTE: model 2,
+        ## uses a vector of the best calculated leak values for
+        ## each index of S.V 
+        liv = HypInfer.best_LeakInfo_valuevec(hypStruct,leak_info)
+        hypStruct = HypInfer.apply_delta_on_HypStruct_by_best_valuevec(\
+            hypStruct,liv)
         return hypStruct
 
-    # TODO: test 
+    ############################ model 2
+
+    @staticmethod
+    def apply_delta_on_HypStruct_by_best_valuevec(hypStruct,bvv):
+        for bv in bvv:
+            hs  = HypInfer.infer_fx(hypStruct,bv[1],bv[0])
+        return hs
+
+
+    @staticmethod
+    def best_LeakInfo_valuevec(hypStruct,leak_info):
+        assert type(leak_info) == LeakInfo
+        d = hypStruct.dim() 
+        # every elmnt is (leak function identifier,leak value)
+        vx = [] 
+        for i in range(len(d)):
+            qr = leak_info.best_value_at_index(i)
+            vx.append(qr) 
+        return vx
+
+    #################################### model 1
     @staticmethod
     def infer_FX(hypStruct,leak_value,leak_idn):
         assert leak_idn in {0,1,2,3}
 
-        def exec_fn(sx):
-            if leak_idn == 0:
-                return adjust_bounds__F0(sx,leak_value)
-            elif leak_idn == 1:
-                return adjust_bounds__F1(sx,leak_value)
-            elif leak_idn == 2: 
-                return adjust_bounds__F2(sx,leak_value)
-            else: 
-                return adjust_bounds__F3(hs,sx,leak_value)
-        
-        ### NOTE: algorithm type: replacement scheme
-        """
-        for (i,s) in enumerate(hypStruct.suspected_subbounds):
-            s_ = exec_fn(s)
-            hypStruct.suspected_subbounds[i] = s_ 
-        return hypStruct
-        """
-
-        ### NOTE: algorithm type: new single scheme
-        hs = hypStruct.new_HypStruct_by_next_subbound()
-        outp = exec_fn(hs.suspected_subbounds[0])
-
         if leak_idn != 3:
-            hs.suspected_subbounds[0] = outp
+            hs = HypInfer.alter_all_delta(hypStruct,leak_idn,leak_value)
         else:
-            if type(outp) == type(None):
-                return hs
-
-            hs.suspected_subbounds = outp[0]
-            hs.hs_vec = [outp[1] for _ in range(len(hs.suspected_subbounds))]
-            hs.sb_pr = [1.0/len(hs.suspected_subbounds) for _ \
-                in range(len(hs.suspected_subbounds))]
+            hs = HypInfer.replace_all_delta(hypStruct,leak_idn,leak_value)
         return hs 
+
+
+    ##############################################################
+
+    """
+    leak_idn := int, one in [0...3]
+    sx := np.ndarray, proper bounds. 
+    leak_value := ?, leak value corresponding to `leak_idn`
+    """
+    @staticmethod
+    def exec_fn(leak_idn,sx,leak_value):
+        if leak_idn == 0:
+            return adjust_bounds__F0(sx,leak_value)
+        elif leak_idn == 1:
+            return adjust_bounds__F1(sx,leak_value)
+        elif leak_idn == 2: 
+            return adjust_bounds__F2(sx,leak_value)
+        else: 
+            return adjust_bounds__F3(sx,leak_value)
+
+    """
+    used for leak_idn in [0,1,2]
+    """
+    @staticmethod
+    def alter_all_delta(hypStruct,leak_idn,leak_value):
+        assert leak_value != 3
+        for (i,sb) in enumerate(hypStruct.suspected_subbounds): 
+            outp = HypInfer.exec_fn(leak_idn,sb,leak_value)
+            hypStruct.suspected_subbounds[i] = outp 
+        return hypStruct 
+
+    """
+    used for leak_idn := 3
+    """
+    @staticmethod
+    def replace_all_delta(hypStruct,leak_idn,leak_value):
+
+        hs = hypStruct.new_HypStruct_by_next_subbound()
+
+        outp = HypInfer.exec_fn(leak_idn,hs.suspected_subbounds[0],leak_value)
+
+        hs.suspected_subbounds = outp[0]
+        hs.hs_vec = [outp[1] for _ in range(len(hs.suspected_subbounds))]
+        hs.sb_pr = [1.0/len(hs.suspected_subbounds) for _ \
+            in range(len(hs.suspected_subbounds))]
+        return hs
 
 def closest_reference_to_bound_start(b,V_f):
 
@@ -350,42 +406,7 @@ def closest_reference_to_bound_start(b,V_f):
 
     return start_vec + null_vec 
 
-def adjust_bounds__F0(b,V_f):
-    ############### TODO: delete
-    ############### OLD VERSION
-    """
-    r = closest_reference_to_bound_start(b,V_f)
-    bx = deepcopy(b[:,1])
-
-    print("\t\tADJUSTING ",b) 
-    print("\t\tUNIT ",V_f)
-
-    qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
-    V_f = np.array(qi) 
-    ##print("UNIT2: ",V_f)
-
-    q = CVec__scan__kmult_search(bx,V_f,depth=1)
-    ##print("Q0: ",q)
-    q = q[0]
-    ##print("Q: ",q)
-
-    if type(q) in {type(None),tuple}: 
-        print("k-mult search failed.")
-        return b  
-
-    print("\t\tV_F: ",V_f)
-    print("\t\tQ: ",q)
-    nb = np.array([r,r+ V_f*q]).T
-    print("UPDATED:\n\t",nb)
-
-    for (i,x) in enumerate(nb): 
-        if abs(x[0] - x[1]) < 10 **-5:
-            x[1] = b[i,1]
-    return nb
-    """
-
-    ########## NOTE: new version
-
+def adjust_bounds__F0(b,V_f,adjust_increment):
     qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
     
     nb = deepcopy(b)
@@ -406,7 +427,7 @@ def adjust_bounds__F1(b,V_f):
 
 def adjust_bounds__F2(b,V_f):
     ##assert matrix_methods.is_proper_bounds_vector(V_f) 
-    print("V_F: ",V_f)
+    ##print("V_F: ",V_f)
     V_f = np.array(V_f)
     assert V_f.shape[1] == 2 and V_f.shape[0] > 0 
     b2 = deepcopy(b)
@@ -419,54 +440,6 @@ def adjust_bounds__F2(b,V_f):
         if stat: continue
         b2[i] = deepcopy(bx)
     return b2 
-
-# TODO: relocate
-"""
-
-"""
-def custom_lcm(i1,i2):
-    assert type(i1) == type(i2)
-    assert type(i1) == int
-
-    def lcm_increment(mx1,mx2,fx1,fx2,is_mx1:bool):
-        if not is_mx1:
-            mx1,mx2 = mx2,mx1
-            fx1,fx2 = fx2,fx1
-
-        lcm_ = None 
-        if mx1 < mx2:
-            while mx1 < mx2:
-                mx1 += fx1
-                if mx1 == mx2:
-                    lcm_ = mx1
-
-        if not is_mx1:
-            return mx2,mx1,lcm_
-
-    if i1 // i2 == i1 / i2:
-        return i1
-    
-    if i2 // i1 == i2 / i1:
-        return i2
-
-    stat = True 
-    f1,f2 = None,None
-    if i1 > i2:
-        f1 = i2
-        f2 = i1
-    else:
-        f1 = i1 
-        f2 = i2
-
-    m1,m2 = f1,f2
-    lcm = None
-    while stat:
-        m1,m2,lcm = lcm_increment(m1,m2,f1,f2,True)
-        stat = type(lcm) == type(None)
-        if not stat: continue
-        m1,m2,lcm = lcm_increment(m1,m2,f1,f2,False)
-        stat = type(lcm) == type(None)
-    return lcm 
 
 def adjust_range__F3(r,h_prev,h_ref):
     assert len(r) == 2 and r[0] <= r[1]
@@ -494,8 +467,8 @@ def adjust_range__F3(r,h_prev,h_ref):
     return range_seq 
 
 # NOTE: caution, different hop sizes not accounted for.
-def adjust_bounds__F3(hs,b,V_f):
-    print("V_F: ",V_f) 
+def adjust_bounds__F3(b,V_f):
+    ##print("V_F: ",V_f) 
     b2 = deepcopy(b)
     mlist = []
 
@@ -503,7 +476,6 @@ def adjust_bounds__F3(hs,b,V_f):
     for (i,bx) in enumerate(V_f):
         stat = np.any(np.isnan(bx))
         if stat: continue
-        print("BXX: ",bx)
         hs_counter[bx[2]] += 1
 
     if len(hs_counter) == 0:
