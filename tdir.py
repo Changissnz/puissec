@@ -275,7 +275,7 @@ class TDir:
         self.t = 0.0
         self.t_ = 0.0
 
-        self.active_stat = True 
+        self.active_stat = True # False 
         return
 
     def __str__(self):
@@ -407,7 +407,8 @@ class TDirector:
         self.tdts = tdts
         self.vantage_idn = vantage_idn
 
-        self.ref_nodes = [deepcopy(self.td.location)]
+        self.ref_nodes = None 
+        self.reset_ref_nodes()
         # log of <TDir> instances
         self.td_log = [] 
 
@@ -471,7 +472,7 @@ class TDirector:
             return
 
         self.ps = np.array([])
-        self.ref_nodes = []
+        self.reset_ref_nodes()
         return
 
     def update_tdir(self):
@@ -608,6 +609,10 @@ class TDirector:
             else:
                 break  
         return st
+
+    def reset_ref_nodes(self):
+        self.ref_nodes = [deepcopy(self.td.location)]
+
 
     ###################### section: SEC-node locator
 

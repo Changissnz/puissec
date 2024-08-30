@@ -241,7 +241,7 @@ class SecEnv:
             return True
 
         # TODO: review dec.
-        c.td_next(timespan,set_roam=True,\
+        c.td_next(timespan,\
             verbose=self.verbose)
 
     """

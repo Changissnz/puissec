@@ -27,6 +27,8 @@ class Crackling:
         # ?<TDirector> path is coordinated by <Cracker>?
         self.is_coordinated = False
 
+    ###################### functions to get/set <HypStruct>,<TDirector> variables
+
     def load_HypStruct(self,hs):
         assert type(hs) == HypStruct
         self.hs = hs 
@@ -51,10 +53,16 @@ class Crackling:
             return None
         return self.td.loc()  
 
+    def set_cvec(self,cvsz):
+        ciseq = default_cvec_iselector_seq()
+        cvec = CVec(cvis=ciseq,sz_limit=cvsz)
+        self.cvec = cvec 
+
+    ###################################### navigation methods
+
     """
     """
-    def td_next(self,timespan=1.0,set_roam:bool=True,\
-        verbose:bool=False):
+    def td_next(self,timespan=1.0,verbose:bool=False):
 
         if verbose:
             print("--> TD-NEXT FOR C={},N={}".format(self.cidn,\
@@ -111,6 +119,65 @@ class Crackling:
             return 
         return
 
+    def default_TD__search_for_target(self,verbose:bool=False):
+        assert self.td.obj_stat == "search for target"
+
+        # check if <TDir> is still active.
+        if not self.td.td.active_stat:
+            if verbose: 
+                print("NOT ACTIVE,SETTING EXTREME")
+            self.td.extloc_search__set_TDir(extf=max,rnd_struct=random)
+        
+        if verbose: 
+            print("path is ")
+            print(str(self.td.td.node_path))
+            print("------")
+        self.td.td.scaled__next__(timespan)
+        return
+
+    def default_TD__capture_target(self,verbose:bool):
+        assert self.td.obj_stat == "capture target" 
+
+        q = self.td.check_radar()
+        if verbose:
+            print("RADAR: ",len(q))
+
+        # CASE: no <Crackling>s in sight, switching 
+        # objective to "search for target"
+        if len(q) == 0:
+            if verbose:
+                print("SWITCHING OBJSTAT")
+            self.td.td.active_stat = False
+            self.td.switch_obj_stat()
+            return self.td_next(timespan)
+        
+        # CASE: <TDir> path is no longer active,
+        #       load a new path. 
+        if not self.td.td.active_stat:
+            ############### TODO: 
+            if verbose: 
+                print("\t\tPATH NOT ACTIVE...DEFSET")
+            dpd = self.td.default_crackling_pathdec(\
+                predicted_distance=1,rnd_struct=random)
+            try:
+                self.td.load_new_path(dpd)
+            except: 
+                if verbose:
+                    print("[!] FAILED TO SET NEW PATH.")
+
+        if verbose: 
+            print("PATH")
+            print(self.td.td.node_path)
+            print("============")
+
+        l = self.td.loc()
+        self.td.td.scaled__next__(timespan)
+        l2 = self.td.loc()
+
+        if verbose: 
+            print("-- TRAVEL {}->{}".format(l,l2))
+        return
+
     """
     used by <Crackling> instance to decide 
     to accept an entry point as a point based 
@@ -121,10 +188,7 @@ class Crackling:
         q = self.td.check_radar()
         return len(q) > 0
 
-    def set_cvec(self,cvsz):
-        ciseq = default_cvec_iselector_seq()
-        cvec = CVec(cvis=ciseq,sz_limit=cvsz)
-        self.cvec = cvec 
+    ################################## feedback-response functions 
 
     """
     p := vector, the attempted point
