@@ -246,7 +246,7 @@ class SecEnvClass(unittest.TestCase):
 
         for x in se.sn.irc.irl:
             x.explode_contents()
-        se.preprocess() \
+        se.preprocess()
         for i in range(4):
             se.run(1.0)
 
