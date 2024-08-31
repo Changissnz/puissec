@@ -368,7 +368,38 @@ class IsoRing:
 
     #########################################
 
+    # NOTE: rnd_struct not used 
+    def td_next(self,timespan:float,rnd_struct,verbose=False):
+        stat = self.default_secproc(timespan,rnd_struct,verbose)
+
+        # case: no SEC node for path, required to move
+        if not stat:
+            c = self.td.default_node_analysis()
+            if len(c) == 0:
+                if verbose: 
+                    print("? NO PATH ?")
+                    return 
+            c_ = [(k,v) for k,v in c.items()]
+            mq = max(c_,key=lambda x: x[1])
+            l = mq[0]
+
+            self.load_path_to_node(l)
+
+            q1 = self.td.loc() 
+            self.td.td.scaled__next__(timespan)
+            q2 = self.td.loc()
+
+            if verbose: 
+                print("MOVELOC {}-->{}\n============".format(q1,q2)) 
+            return  
+
+            
+
+
     # TODO: test
+    """
+    routes 
+    """
     def default_secproc(self,timespan:float,\
         rnd_struct,verbose=False):
         assert timespan >= 0.0
@@ -379,7 +410,6 @@ class IsoRing:
             print("\t\t----------DEFSECPROC,\nI={},OBJ={},STAT={},LOC={}".format(self.sec.idn_tag,\
                 self.td.obj_stat,stat,self.td.loc()))
             
-
         # switch obj.
         if stat:
             s1 = self.td.obj_stat
@@ -394,6 +424,12 @@ class IsoRing:
         ## case: change from `null radar`; fetch a 
         ##       new and active path.
         if stat and self.td.obj_stat == "avoid target":
+            sec_stat = self.td.is_loc_SEC()
+
+            # sub-case: instance already on SEC node 
+            if sec_stat: return sec_stat
+
+            # check to see if path to SEC already 
             pt = self.td.defsec_path(rnd_struct)
 
             if verbose:
@@ -401,7 +437,7 @@ class IsoRing:
                 print(pt)
 
             if type(pt) == type(None):
-                return 
+                return False
             self.td.load_new_path(pt)
 
         # set active stat of <TDir> to False
@@ -415,7 +451,8 @@ class IsoRing:
 
         if verbose: 
             print("MOVELOC {}-->{}\n============".format(q1,q2)) 
-        return
+        return True 
+
 
 ################################################
 

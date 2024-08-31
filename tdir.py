@@ -442,6 +442,12 @@ class TDirector:
     def loc(self):
         return self.td.location
 
+    def is_loc_SEC(self):
+        return self.is_node_SEC(self.loc())
+
+    def is_node_SEC(self,n):
+        return n in self.resource_sg.sn 
+
     def coloc(self):
         if type(self.resource_sg) != SNGraphContainer:
             return None
@@ -616,6 +622,11 @@ class TDirector:
 
     ###################### section: SEC-node locator
 
+    def default_node_analysis(self):
+        ta = self.targetnode_analysis(np.min)
+        td = self.destnode_sec_analysis_dict(np.mean)
+        return Counter(ta) + Counter(td)
+        
     # TODO: test 
     """
     return: 
@@ -652,6 +663,26 @@ class TDirector:
         vx = np.array(list(d.values()))
 
         return objf(vx) 
+
+    """
+    return: 
+    - dict, node -> objf1(destnode_sec_analysis(node).keys)
+    """
+    def destnode_sec_analysis_dict(self,objf1): 
+        assert objf1 in {np.min,np.mean}
+        d = {}
+        for n in self.resource_sg.d.keys():
+            dx = self.destnode_sec_analysis(n)
+            dxv = np.array(list(dx.values())) 
+            assert len(dxv) > 0
+
+            v = objf1(dxv)
+
+            # case: v == inf
+            if np.isinf(v): v = 0.0 
+
+            d[n] = v 
+        return d
 
     # TODO: test 
     """
@@ -792,6 +823,8 @@ class TDirector:
     event of ties. 
     """
     def defsec_path(self,rnd_struct):
+        # case: 
+
         q = []
         ##self.resource_sg = None
         if type(self.resource_sg) != SNGraphContainer:
@@ -843,7 +876,6 @@ class TDirector:
 
         dfsc = self.resource_sg.sp[self.loc()]
 
-
         # decision: if location is SEC, then 
         #           travel to it. Otherwise,
         #           select an NSEC for site of 
@@ -872,3 +904,12 @@ class TDirector:
 
         if nx not in dfsc.min_paths: return None
         return deepcopy(dfsc.min_paths[nx][0].invert())
+
+    def load_path_to_node(self,loc):
+        p = self.td.load_path_(self.resource_sg,loc) 
+        assert type(p) != type(None) 
+
+        self.node_path = p
+        self.index = 0
+
+    
