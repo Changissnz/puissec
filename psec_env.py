@@ -129,6 +129,10 @@ class SecEnv:
     def preprocess(self):
         self.load_IRCLD_into_SecNet()
         self.bi_update_to_cracker_hyp() 
+
+        self.instantiate_cracker_target()
+        self.instantiate_td_for_IRC(5,1.0)
+
         return
 
     def pickle_thyself(self,cpath,spath):
@@ -229,7 +233,7 @@ class SecEnv:
             if type(br) == type(None): 
                 ai = self.ci.agent_coloc_by_seti(cidn,True,False)
                 assert len(ai) == 1
-                self.make_bridge(cidn,ai.pop(),ssih=5)
+                self.make_bridge(cidn,ai.pop())
 
             iterations = int(round(self.ct_ratio * timespan))
             return self.run_CBridge(iterations,cidn)
@@ -385,12 +389,12 @@ class SecEnv:
     - iidn := identifier for <IsoRing>
     - ssih := hop value for <RSSI>.
     """
-    def make_bridge(self,cidn,iidn,ssih=5):
+    def make_bridge(self,cidn,iidn):
         c = self.crck.fetch_crackling(cidn)
         i = self.sn.irc.fetch_IsoRing(iidn)
         hs = c.hs
 
-        cb = CBridge(c,i,ssih,self.cbs_idn_ctr)
+        cb = CBridge(c,i,self.cbs_idn_ctr,1000,bool(self.verbose))
         cb.verbose = self.verbose
 
         self.cbs_idn_ctr += 1
@@ -409,8 +413,11 @@ class SecEnv:
         index = 0 if is_cidn else 1 
         q = []
         print("# BRIDGES: ",len(self.cbs))
+        print("IDN: ", idn, " CIDN: ",is_cidn)
         for cb in self.cbs:
-            idnx = cb.agent_idns()[index]
+            idnx = cb.agent_idns()
+            print("AGENT IDNS: ",idnx)
+            idnx = idnx[index]
             if idnx == idn: 
                 if not allb: return cb
                 q.append(cb)
@@ -445,16 +452,19 @@ class SecEnv:
                 print("\t-/-/-/-/")
             for i in range(next_rate):
                 print("ITER=",i)
+                #qc = next(cb_)
+                
                 try:
                     qc = next(cb_)
                 except:
                     return False
+                
 
                 stat = type(qc) != type(None)
                 if not stat: return False
             return True 
 
-        cb = self.fetch_bridge(iidn,False,True)
+        cb = self.fetch_bridge(iidn,True,True)
         print("FETCHING BRIDGE")
         print(cb)
 

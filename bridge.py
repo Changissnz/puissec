@@ -6,7 +6,7 @@ Connector b/t <Cracking> and its target <IsoRing>.
 class CBridge:
 
     def __init__(self,crackling,isoring,\
-        cidn=None,batch_size=1000,verbose=False):
+        cidn=None,batch_size=10,verbose=False):
         assert type(crackling) == Crackling
         assert type(isoring) == IsoRing 
 
@@ -17,7 +17,7 @@ class CBridge:
 
         self.load_crackf()
         self.cidn = cidn
-        self.bs = batch_size
+        self.batch_size = batch_size
         self.batch = None
 
         self.load_rssi_batch() 
@@ -29,8 +29,9 @@ class CBridge:
             self.crackling.hs,self.verbose)
 
     def load_rssi_batch(self):
+        q = self.batch_size 
         self.batch = rssi.ResplattingSearchSpaceIterator.\
-            iterate_one_batch(self.rssi,self.bs)
+            iterate_one_batch(self.rssi,self.batch_size)#self.bs)
 
     """
     return:
@@ -43,15 +44,20 @@ class CBridge:
         if self.rssi.terminated: 
             print("DONE")
             return 
+
+        print("BATCH")
+        print(self.batch)
+
+        """
         try:
             p = next(self.batch)
         except: 
             print("LOAD BATCH")
             self.load_rssi_batch()
-            return 
-        
+            #return 
+        """
 
-        #p = next(self.batch)
+        p = next(self.batch)
         if type(p) == None: 
             print("FINISHED!!")
             self.load_rssi_batch()

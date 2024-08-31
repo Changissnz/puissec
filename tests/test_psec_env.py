@@ -239,5 +239,18 @@ class SecEnvClass(unittest.TestCase):
             se.run(1.0)
             assert len(se.icrack) == 1
 
+    def test__SecEnv__run__case3__demo(self):
+
+        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+        se.verbose = 2 
+
+        for x in se.sn.irc.irl:
+            x.explode_contents()
+        se.preprocess() \
+        for i in range(4):
+            se.run(1.0)
+
+
+
 if __name__ == '__main__':
     unittest.main()

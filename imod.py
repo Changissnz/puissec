@@ -219,11 +219,17 @@ class Index2DMod:
         return q2_ 
 
 
+"""
+permuter class for a vector `vecsize_seq` with each 
+i'th element a positive integer signifying the number 
+of options available for the i'th element of an 
+output vector. 
+"""
 class IndexVecPermuter:
 
     def __init__(self,vecsize_seq,head=0):
         assert head in {0,-1}
-
+        assert min(vecsize_seq) > 0
         self.vss = vecsize_seq
         self.head = head 
         self.p = [0 for _ in range(len(self.vss))]
