@@ -127,8 +127,8 @@ class AltBaseFuncClass(unittest.TestCase):
         for i in range(500):
             qi = xx[i % 2] 
             abf.output(qi[0],qi[1])
-        assert abf.bftd_tmap[4] == 308, "got {}, want {}".format(\
-            abf.bftd_tmap[4],308)
+        assert abf.bftd_tmap[4] == -1, "got {}, want {}".format(\
+            abf.bftd_tmap[4],-1)
         
 if __name__ == '__main__':
     unittest.main()

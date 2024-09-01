@@ -955,16 +955,16 @@ def Sec_list_SEEDTYPE_PythonANDNumpy(num_secs,\
 
     secs = []
     for i in range(num_secs): 
-        dimension = rnd_struct.randrange(\
+        dimension = random.randrange(\
             dimension_range[0],dimension_range[1])
         
         c1,c2 = None,None
-        c1 = rnd_struct.uniform(optima_countermeasure_range[0][0],\
+        c1 = random.uniform(optima_countermeasure_range[0][0],\
             optima_countermeasure_range[0][1])
-        c2 = rnd_struct.uniform(optima_countermeasure_range[1][0],\
+        c2 = random.uniform(optima_countermeasure_range[1][0],\
             optima_countermeasure_range[1][1])
         countermeasure = (c1,c2)
-        num_optima = rnd_struct.randrange(num_optima_range[0],\
+        num_optima = random.randrange(num_optima_range[0],\
             num_optima_range[1])
         sec = Sec.generate_bare_instance(singleton_range,\
             dimension,num_optima,\
@@ -973,7 +973,7 @@ def Sec_list_SEEDTYPE_PythonANDNumpy(num_secs,\
     return secs
 
 def Sec_list_sample3(num_secs,\
-    singleton_range,rnd_struct):
+    singleton_range):
 
     dimension_range = (2,17)
     num_optima_range = (2,17)

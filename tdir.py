@@ -625,8 +625,20 @@ class TDirector:
     def default_node_analysis(self):
         ta = self.targetnode_analysis(np.min)
         td = self.destnode_sec_analysis_dict(np.mean)
-        return Counter(ta) + Counter(td)
+        print("TA")
+        print(ta)
+        print("TD")
+        print(td)
+
+        k = set(list(ta.keys()) + list(td.keys()))
+        d = {}
+        for k_ in k:
+            d[k_] = 0 
+            if k_ in ta: d[k_] = d[k_] + ta[k_]
+            if k_ in td: d[k_] = d[k_] + td[k_]
         
+        return d
+
     # TODO: test 
     """
     return: 

@@ -375,6 +375,7 @@ class IsoRing:
         # case: no SEC node for path, required to move
         if not stat:
             c = self.td.default_node_analysis()
+            print("LENC: ",c)
             if len(c) == 0:
                 if verbose: 
                     print("? NO PATH ?")
@@ -383,7 +384,7 @@ class IsoRing:
             mq = max(c_,key=lambda x: x[1])
             l = mq[0]
 
-            self.load_path_to_node(l)
+            self.td.load_path_to_node(l)
 
             q1 = self.td.loc() 
             self.td.td.scaled__next__(timespan)
@@ -534,7 +535,7 @@ pre-requisite method for the following:
 def SecSeq_sample_4(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
     num_conn=5000,min_components=4,max_nconn_ratio=0.4,drange_max=4):
 
-    s = Sec_list_sample3(num_secs,singleton_range,random)
+    s = Sec_list_sample3(num_secs,singleton_range)
     print("SECLIST: ",len(s))
     sndg = SecNetDepGen(s,random,min_components,\
             max_nconn_ratio,[1,drange_max])
@@ -551,7 +552,7 @@ def SecSeq_sample_5(num_secs=80,singleton_range=DEFAULT_SINGLETON_RANGE,\
     num_conn=5000,min_components=4,max_nconn_ratio=0.4,drange_max=4,\
     depconn_ratio=0.3,conn_types=[1,2,3]):
 
-    s = Sec_list_sample3(num_secs,singleton_range,random)
+    s = Sec_list_sample3(num_secs,singleton_range)
     sndg = SecNetDepGen(s,random,min_components,\
         max_nconn_ratio,[1,drange_max],depconn_ratio)
     sndg.assign_conn(num_conn,l=conn_types)

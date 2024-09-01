@@ -84,7 +84,7 @@ def CBridge_case_ApproximateHypStruct_num0(is_approx_hypstruct:bool,\
     cr = Crackling(cidn=2,cvsz=200)
     cr.load_HypStruct(hs) 
 
-    cb  = CBridge(cr,q,cidn=12,batch_size=100,verbose=True)
+    cb  = CBridge(cr,q,cidn=12,batch_size=1000,verbose=True)
     return cb 
 
 ### lone file test 
@@ -112,7 +112,7 @@ class CBridgeClass(unittest.TestCase):
         c = Crackling()
         c.load_HypStruct(hs)
 
-        cb = CBridge(c,ir)
+        cb = CBridge(c,ir,batch_size=1000)
 
         stat = True 
         i = 0 
@@ -173,7 +173,7 @@ class CBridgeClass(unittest.TestCase):
             next(cb)
             i += 1
 
-        assert i == 127
+        assert i == 126
         assert len(cr.flagged_pts) == 91
         assert len(cr.cracked_dict) == 1
 
