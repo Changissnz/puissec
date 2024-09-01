@@ -393,9 +393,8 @@ class SecEnv:
         c = self.crck.fetch_crackling(cidn)
         i = self.sn.irc.fetch_IsoRing(iidn)
         hs = c.hs
-
-        cb = CBridge(c,i,self.cbs_idn_ctr,1000,bool(self.verbose))
-        cb.verbose = self.verbose
+        cb = CBridge(c,i,self.cbs_idn_ctr,\
+            1000,self.verbose == 2)
 
         self.cbs_idn_ctr += 1
         self.cbs.append(cb) 
@@ -451,7 +450,8 @@ class SecEnv:
                 print("-- CBRIDGE OP: {}".format(cb_.agent_idns()))
                 print("\t-/-/-/-/")
             for i in range(next_rate):
-                print("ITER=",i)
+                if self.verbose: 
+                    print("ITER=",i)
                 #qc = next(cb_)
                 
                 try:
@@ -613,7 +613,7 @@ class SecEnv:
 
     ################ methods for leaking
 
-    # TODO: test 
+    # TODO: test OR delete. 
     def bi_update_to_cracker_hyp(self):
         bi = self.crck.bi
         assert type(bi) == BackgroundInfo
@@ -677,3 +677,15 @@ def SecEnv_sample_1(sn3=None):
 def SecEnv_sample_2():
     sn = SecNet_sample_CSmall()
     return SecEnv_sample_1(sn)
+
+# TODO: complete|delete.
+"""
+irc_args := (number of <Sec> sources,singleton_range,\
+    dimension_range,num_optima_range,optima_countermeasure_range)
+sn_args := (sec node count,nsec node count,num entry points,rnd_struct,path-in-mem size,*sngs_args)
+"""
+def generate_SecEnv(irc_args,sn_args):
+    sn = SecNet.generate(irc_args,sn_args)
+
+
+    return -1 

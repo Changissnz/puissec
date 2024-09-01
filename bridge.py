@@ -45,21 +45,12 @@ class CBridge:
             print("DONE")
             return 
 
-        print("BATCH")
-        print(self.batch)
-
-        """
-        try:
-            p = next(self.batch)
-        except: 
-            print("LOAD BATCH")
-            self.load_rssi_batch()
-            #return 
-        """
+        ##print("BATCH")
+        ##print(self.batch)
 
         p = next(self.batch)
         if type(p) == None: 
-            print("FINISHED!!")
+            if self.verbose: print("--- FINISHED. LOADING NEW BATCH.")
             self.load_rssi_batch()
             p = next(self.batch)
             if type(p) == type(None):

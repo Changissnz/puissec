@@ -437,6 +437,21 @@ class SecNet:
             rnd_struct=rnd_struct,path_size=path_size)
         return sn 
 
+    """
+    irc_args := (number of <Sec> sources,singleton_range,\
+        dimension_range,num_optima_range,optima_countermeasure_range)
+    sn_args := (sec node count,nsec node count,num entry points,rnd_struct,path-in-mem size,*sngs_args)
+    """
+    @staticmethod
+    def full_generate(irc_args,sn_args):
+
+        sec_list = Sec_list_SEEDTYPE_PythonANDNumpy(irc_args[0],\
+            irc_args[1],irc_args[2],irc_args[3],irc_args[4])
+
+        sn = SecNet.generate(sec_list,sn_args[0],\
+            sn_args[1],sn_args[2],sn_args[3],sn_args[4],*sn_args[5])
+        return sn 
+
     #################################################
     ###### methods for routing <Crackling>
     #################################################
