@@ -182,6 +182,8 @@ class BackgroundInfo:
             i2hm[k] = v2
         return i2hm 
 
+    ############################### generators: <IsoRingedChain>-to-<HypStruct> map
+
     # TODO: test this.
     """
 
@@ -324,6 +326,8 @@ class BackgroundInfo:
                 outp2[elmnt[1]] = [i,hs2]
             i += 1 
         return outp1,outp2
+
+    ########################### generator using <IsoRingedChain>+<SRefMap>
 
     @staticmethod
     def generate_instance(irc,srm):

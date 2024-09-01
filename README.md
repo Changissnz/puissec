@@ -45,3 +45,9 @@ The paper has two sections remaining to be written.
 The first draft of the paper has been finalized. 
 Project cleaning/review is planned. A lot of junk/comment 
 code has been deleted.
+
+### Update 09/01/2024
+
+Some additional work and thoughts are planned to be added to the paper. 
+These paper updates will roughly coincide with current developments 
+revolving around `psec_env.py`. 
