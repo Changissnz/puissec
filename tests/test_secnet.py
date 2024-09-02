@@ -81,5 +81,21 @@ class SecNetClass(unittest.TestCase):
                 assert sum(v_.pweights) <= 4
         return 
 
+    def test__SecNet__full_generate(self):
+
+        irc_args = (14,[0.25,2.],[3,17],[3,30],[(0.0,0.8),(0.3,0.9)])    
+
+        #sn_args := (sec node count,nsec node count,num entry points,rnd_struct,path-in-mem size,*sngs_args)
+        sngs_args = ("pairing frame",20,None)
+        sn_args = (14,20,4,10,random,sngs_args)
+
+        snet = SecNet.full_generate(irc_args,sn_args)
+
+        assert len(snet.irc) == 14
+        assert len(snet.node_loc_assignment) == 14 
+        assert len(snet.d) == 14 + 20 
+        assert len(snet.entry_points) == 4 
+
+
 if __name__ == '__main__':
     unittest.main()

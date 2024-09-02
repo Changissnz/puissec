@@ -441,9 +441,21 @@ class SecNet:
     NOTE: virtually identical to the above method `generate`, 
           excepts generates a graph from <SecNetFrameGen> 
           using some random struct.
+
+    
     """
     @staticmethod
     def generate__autograph(irc_args,sn_param_args):
+        """
+irc_sz = 13
+p_s,p_n = 1.0,1.3
+
+generate(irc,sec_node_count,\
+        nsec_node_count,num_entry,path_size,rnd_struct,*sngs_args):
+
+g = SecNetFrameGen.generate_graph__type_prop(irc_sz,p_s,p_n,random)
+        """ 
+
         return -1 
 
     """
@@ -456,7 +468,7 @@ class SecNet:
 
         sec_list = Sec_list_SEEDTYPE_PythonANDNumpy(irc_args[0],\
             irc_args[1],irc_args[2],irc_args[3],irc_args[4])
-
+        sec_list = SecSeq(sec_list)
         sn = SecNet.generate(sec_list,sn_args[0],\
             sn_args[1],sn_args[2],sn_args[3],sn_args[4],*sn_args[5])
         return sn 

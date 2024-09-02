@@ -15,6 +15,11 @@ class SecNetGenScheme:
         self.check_args()
         return
 
+    def __str__(self):
+        s = "*description*: " + self.description + "\n"
+        s += "*seed int*: " + str(self.rnd_seed)
+        return s
+
     def check_args(self):
         assert self.description in DEFAULT_SECNETFRAMEGEN_SCHEMES
         assert type(self.rnd_seed) == int
@@ -31,7 +36,7 @@ class SecNetGenScheme:
 
         l = sorted(list(DEFAULT_SECNETFRAMEGEN_SCHEMES)) 
         il = rnd_struct.randrange(0,len(l))
-        description = l[i1]
+        description = l[il]
         s = rnd_struct.randrange(seeded_int_range[0],\
             seeded_int_range[1])
 
@@ -77,13 +82,18 @@ class SecNetFrameGen:
     - set, sec_nodevec 
     """
     @staticmethod
-    def generate_graph__type_prop(irc_sz,p_s,p_n,rnd_struct):
+    def generate_graph__type_prop(irc_sz,p_s,p_n,rnd_struct,num_attempts=5):
+
+        if num_attempts < 0: return None
+
         assert irc_sz > 0
         assert min([p_s,p_n]) > 0.0
         assert p_s + p_n >= 1.0 
 
         # generate the <SecNetGenScheme>
         sngs = SecNetGenScheme.generate_instance(rnd_struct)
+        print("GENERATOR SCHEME")
+        print(sngs) 
 
         # declare and partition the nodeset for G
         lx = int(round(p_s * irc_sz))
@@ -92,12 +102,16 @@ class SecNetFrameGen:
         m = [i for i in range(lx + lx2)]
         rnd_struct.shuffle(m) 
 
-        sec_nodevec = m[:p_s]
-        nsec_nodevec = m[p_s:]
+        snv = m[:lx]
+        nsnv = m[lx:]
 
         snfg = SecNetFrameGen(snv,nsnv,sngs)
         snfg.construct_frame()
+        print("FINAL NUMBER OF COMPONENTS")
+        print(snfg.node_components)
 
+        if len(snfg.node_components) != 1:
+            return SecNetFrameGen(irc_sz,p_s,p_n,rnd_struct,num_attempts-1)
         return snfg.d,set(snfg.sec_nodevec) 
 
     def init_rand(self):

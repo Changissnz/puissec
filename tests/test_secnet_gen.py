@@ -93,6 +93,21 @@ class SecNetGenSchemeClass(unittest.TestCase):
             200: 2, 10: 2, 12: 2, 112: 2, 24: 2, 56: 2})
         assert v == d 
 
+    def test__SecNetGenScheme_generate_graph__type_prop(self):
+
+        irc_sz = 13
+        p_s,p_n = 1.0,1.3
+
+        g = SecNetFrameGen.generate_graph__type_prop(irc_sz,p_s,p_n,random)
+
+        assert len(g[0]) >= int(round(13 * 2.3)) 
+        assert len(g[1]) == 13 
+
+        for k,v in g[0].items():
+            assert len(v) > 0 
+
+
+
 class SecNetDepGenClass(unittest.TestCase):
 
     def test__SecNetDepGen__make_conn__case1(self):
