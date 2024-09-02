@@ -51,6 +51,9 @@ blackbox_df1 = lambda x: (x + random.random()) % 1.0
 
 DEFAULT_LEAKSZ_RANGE = [1,5]#,9]
 
+DEFAULT_SECNETFRAMEGEN_SCHEMES = \
+    {"spine frame", "pairing frame","pseudo random"}
+
 ############## miscellaneous functions
 
 def pickle_open_with_typecheck(fp,t): 

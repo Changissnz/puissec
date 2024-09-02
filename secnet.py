@@ -438,6 +438,15 @@ class SecNet:
         return sn 
 
     """
+    NOTE: virtually identical to the above method `generate`, 
+          excepts generates a graph from <SecNetFrameGen> 
+          using some random struct.
+    """
+    @staticmethod
+    def generate__autograph(irc_args,sn_param_args):
+        return -1 
+
+    """
     irc_args := (number of <Sec> sources,singleton_range,\
         dimension_range,num_optima_range,optima_countermeasure_range)
     sn_args := (sec node count,nsec node count,num entry points,rnd_struct,path-in-mem size,*sngs_args)

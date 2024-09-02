@@ -274,11 +274,6 @@ class BackgroundInfo:
             bx2[ir.sec.idn_tag] = b2 
         return bx1,bx2 
 
-    # NOTE: todo 
-    @staticmethod
-    def generate_IsoRing2HypStruct_map():
-        return -1 
-
     """
     `full_hypseq` var from the previous method is set to TRUE in this 
     method.
@@ -555,7 +550,45 @@ class Cracker:
 
         self.initiated = False 
         return
-    
+
+    # NOTE: CAUTION: 
+    ## the calculations in this method are to be used
+    ## sparingly, since the <generator method> wraps 
+    ## around objects that normally should never be 
+    ## possessed by a 3rd-party intruder's computer 
+    ## program.  
+    """
+    generates an instance based on arguments to two 
+    important components, <BackgroundInfo> and 
+    <IRC2HypStruct> maps. 
+
+    bi_args := ()
+    irc2hs_args := (naive|partially_naive,*args for scheme)
+
+    return: 
+    - <Cracker> 
+    """
+    @staticmethod 
+    def generate_instance_by_engineered_BI(irc2hs_args):
+
+        return -1
+
+# naive_IRC2HypStruct_map(irc,full_hypseq=True,\
+# naive_split=2,hop_size=5):
+
+#partially_naive_IRC2HypStruct_map(irc,\
+#       bound_length,rd_range,ra_range,rnd_struct):
+
+ # fill in...    
+
+## BackgroundInfo
+# generate_instance(irc,srm,add_noise_to_Pr:bool=False,\
+#        ooc_malpermute_degree:float=0.0,target_ratio:float=None,\
+#        vary_lk_sz:bool=False,srm_decmap_args=('cd',max,[0,1]),\
+#        rnd_struct=random)    
+
+#####################################################################
+
     # NOTE: pickle does not save crackling instances
     def pickle_thyself(self,fp_base):
         if not os.path.isdir(fp_base):

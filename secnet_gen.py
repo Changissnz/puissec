@@ -16,11 +16,29 @@ class SecNetGenScheme:
         return
 
     def check_args(self):
-        assert self.description in {"spine frame", "pairing frame","pseudo random"}
+        assert self.description in DEFAULT_SECNETFRAMEGEN_SCHEMES
         assert type(self.rnd_seed) == int
         if self.description == "pseudo random":
             assert type(self.additional_args) == float
             assert self.additional_args >= 0.0 and self.additional_args <= 1.0
+
+    @staticmethod
+    def generate_instance(rnd_struct,seeded_int_range=(1,1000)):
+        assert len(seeded_int_range) == 2 
+        assert type(seeded_int_range[0]) == type(seeded_int_range[1])
+        assert type(seeded_int_range[0]) == int
+        assert seeded_int_range[0] < seeded_int_range[1]
+
+        l = sorted(list(DEFAULT_SECNETFRAMEGEN_SCHEMES)) 
+        il = rnd_struct.randrange(0,len(l))
+        description = l[i1]
+        s = rnd_struct.randrange(seeded_int_range[0],\
+            seeded_int_range[1])
+
+        ft = None 
+        if description == "pseudo random":
+            ft = rnd_struct.uniform(0.,1.)
+        return SecNetGenScheme(description,s,ft)
 
 """
 generates frame according to instructions given by 
@@ -43,6 +61,44 @@ class SecNetFrameGen:
         self.node2sec_distance_map = defaultdict(defaultdict)
         self.init_search()
         return
+
+    # TODO: test this. 
+    """
+    generator method to output details for a graph 
+    to be used by <SecNet>; methodology of graph 
+    generator uses the conception of proportion
+    w.r.t. to the the number of 
+    <IsoRing> instances for the node count of the 
+    graph, and its allocated number of SEC and NSEC 
+    nodes.
+    
+    return:
+    - dict, graph 
+    - set, sec_nodevec 
+    """
+    @staticmethod
+    def generate_graph__type_prop(irc_sz,p_s,p_n,rnd_struct):
+        assert irc_sz > 0
+        assert min([p_s,p_n]) > 0.0
+        assert p_s + p_n >= 1.0 
+
+        # generate the <SecNetGenScheme>
+        sngs = SecNetGenScheme.generate_instance(rnd_struct)
+
+        # declare and partition the nodeset for G
+        lx = int(round(p_s * irc_sz))
+        lx2 = int(round(p_n * irc_sz))
+
+        m = [i for i in range(lx + lx2)]
+        rnd_struct.shuffle(m) 
+
+        sec_nodevec = m[:p_s]
+        nsec_nodevec = m[p_s:]
+
+        snfg = SecNetFrameGen(snv,nsnv,sngs)
+        snfg.construct_frame()
+
+        return snfg.d,set(snfg.sec_nodevec) 
 
     def init_rand(self):
         random.seed(self.sngs.rnd_seed) 
