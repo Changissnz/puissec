@@ -437,26 +437,36 @@ class SecNet:
             rnd_struct=rnd_struct,path_size=path_size)
         return sn 
 
+    # TODO: test this. 
     """
     NOTE: virtually identical to the above method `generate`, 
           excepts generates a graph from <SecNetFrameGen> 
           using some random struct.
 
+    irc_args := (number of <Sec> sources,singleton_range,\
+        dimension_range,num_optima_range,optima_countermeasure_range)
+    sn_param_args := (p_s,p_n,rnd_struct,num_entry,
+    superbound{Sec2IsoRing conversion}); arguments for <SecNetFrameGen>.
     
     """
     @staticmethod
     def generate__autograph(irc_args,sn_param_args):
-        """
-irc_sz = 13
-p_s,p_n = 1.0,1.3
+ 
+        sec_list = Sec_list_SEEDTYPE_PythonANDNumpy(irc_args[0],\
+            irc_args[1],irc_args[2],irc_args[3],irc_args[4])
+        sec_list = SecSeq(sec_list)
 
-generate(irc,sec_node_count,\
-        nsec_node_count,num_entry,path_size,rnd_struct,*sngs_args):
+        G = SecNetFrameGen.generate_graph__type_prop(len(sec_list),\
+            sn_param_args[0],sn_param_args[1],sn_param_args[2])
 
-g = SecNetFrameGen.generate_graph__type_prop(irc_sz,p_s,p_n,random)
-        """ 
+        assert sn_param_args[3] >= 0.0 and sn_param_args[3] <= 1.0 
+        num_entry = int(round(sn_param_args[3] * len(G[0])))
+        
+        rnd_seed = rnd_struct.randrange(0,1000) 
 
-        return -1 
+        return SecNet(sec_list,G[0],G[1],entry_points=num_entry,\
+            bound=sn_param_args[4],rnd_struct=sn_param_args[2],\
+            path_size=10)
 
     """
     irc_args := (number of <Sec> sources,singleton_range,\
