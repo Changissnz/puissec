@@ -186,10 +186,13 @@ class BackgroundInfo:
 
     # TODO: test this.
     """
-
-    full_hypseq := bool, True outputs a map that includes 
-                         all local optima.
-
+    - full_hypseq := bool, True outputs a map that includes 
+                         all local optima. False outputs a map
+                         with only the correct optimum index. 
+    - naive_split := int, positive, partitioning scheme for the super-bounds; 
+        (<HypStruct> --> the super-bound of a <IsoRing>'s <Sec>'s `seq` value). 
+    - hop_size := int, positive, the number of hops per dimension for an RSSI.
+    
     return:
     - sec idn -> sec dim. -> <HypStruct>
     """
@@ -205,10 +208,9 @@ class BackgroundInfo:
             l[irl_.sec.idn_tag] = m 
         return l 
 
-    # TODO: test this.
     '''
-    outputs a map 
-        sec. dimension -> <HypStruct>
+    return: 
+    - dict, sec. dimension -> <HypStruct>
     '''
     @staticmethod 
     def naive_IsoRing2HypStruct_map(ir:IsoRing,full_hypseq,\
@@ -245,7 +247,7 @@ class BackgroundInfo:
     """
     @staticmethod
     def partially_naive_IRC2HypStruct_map(irc,\
-        bound_length, rd_range,ra_range,rnd_struct):
+        bound_length,rd_range,ra_range,rnd_struct):
         
         assert type(irc) == IsoRingedChain
         assert min(rd_range) >= 0.0 and max(rd_range) <= 1.0
@@ -272,6 +274,10 @@ class BackgroundInfo:
             bx2[ir.sec.idn_tag] = b2 
         return bx1,bx2 
 
+    # NOTE: todo 
+    @staticmethod
+    def generate_IsoRing2HypStruct_map():
+        return -1 
 
     """
     `full_hypseq` var from the previous method is set to TRUE in this 
@@ -287,11 +293,12 @@ class BackgroundInfo:
     """
     @staticmethod 
     def partially_naive_IsoRing2HypStruct_map(ir:IsoRing,\
-        bound_length,r_d,r_a,rnd_struct):#,naive_split=1,hop_size=3):
+        bound_length,r_d,r_a,rnd_struct):
         assert min([r_d,r_a]) >= 0.0
         assert r_d + r_a <= 1.0 
 
         sds__ = ir.secdim_seq()
+
         def op_fx(fxid,seci):
             fgx = DEFAULT_HYPSTRUCT_GENSCHEMES[fxid]
             if fxid in {0,2}:
@@ -312,6 +319,7 @@ class BackgroundInfo:
         l0 = int(round(r_d * len(sds__))) 
         l1 = int(round(r_a * len(sds__))) 
         l2 = len(sds__) - (l0 + l1) 
+        # dummy, approximate 
         lx = [l0,l1,l2]
 
         sds = [vxx for vxx in enumerate(sds__)]
@@ -326,11 +334,32 @@ class BackgroundInfo:
                 outp2[elmnt[1]] = [i,hs2]
             i += 1 
         return outp1,outp2
+    
+    # TODO: used in conjunction w/ <partially_naive_IsoRing2HypStruct_map>
+    def populate_incomplete_IsoRing2HypStruct_map():
+        return -1 
 
     ########################### generator using <IsoRingedChain>+<SRefMap>
 
+    # NOTE: default generator. 
+    """
+    generates a <BackgroundInfo> instance from an <IsoRingedChain> 
+    and a corresponding <SRefMap>.
+
+    Details of variable values derived from the arguments: 
+    - dependency map (accurate), <Sec> idn. --> [other <Sec> idns required to be processed.]
+    - co-dependency map (accurate), <Sec> idn. --> [co-dependent <Sec>]
+    - decision map (?accurate?), uses <SRefMap> to produce a decision-map by
+        arguments ('cd',max,[0,1])
+    - leak map (of leaked info.); uses the function <BackgroundInfo.default_IsoRing_leak>
+        on each <IsoRing> for the map M: sec idn. -> opt. dim. -> leaked info.
+    """
     @staticmethod
-    def generate_instance(irc,srm):
+    def generate_instance(irc,srm,add_noise_to_Pr:bool=False,\
+        ooc_malpermute_degree:float=0.0,target_ratio:float=None,\
+        vary_lk_sz:bool=False,srm_decmap_args=('cd',max,[0,1]),\
+        rnd_struct=random):
+
         assert type(irc) == IsoRingedChain
         assert type(srm) == SRefMap
 
@@ -350,7 +379,7 @@ class BackgroundInfo:
             ##print(dx[k])
 
         # fetch the decision map
-        dec_map = srm.collect_prism_points__DecMap('cd',max,[0,1])
+        dec_map = srm.collect_prism_points__DecMap(*srm_decmap_args)#'cd',max,[0,1])
         stat = set(dec_map.keys()) == set(srm.dms.keys())
 
         # fill in the map for missing decisions; default is
@@ -360,11 +389,52 @@ class BackgroundInfo:
             for k,v in qx.items():
                 if k not in dec_map:
                     dec_map[k] = v
-        lm = BackgroundInfo.generate_background_leak(irc,random)
+        lm = BackgroundInfo.generate_background_leak(irc,random,\
+            targets=target_ratio,vary_lk_sz=vary_lk_sz)
+
+        # perform alterations onto <BackgroundInfo> vars here
+        if add_noise_to_Pr:
+            dm_pr = noise_on_opt_pr_map_SEEDTYPE_PythonANDNumpy(dm_pr,rnd_struct)
+
+        if ooc_malpermute_degree > 0.0:
+            dx,cs = BackgroundInfo.permute_depmap_AND_codepsets(dx,cs,\
+                occ_malpermute_degree,rnd_struct)
+
         return BackgroundInfo(dm_pr,dx,cs,dec_map,lm)
 
-    ###
+    """
+    used for malpermutating a calculated (precise) Order-of-Cracking for
+    a <BackgroundInfo> generated from a (<IsoRingedChain>,<SRefMap>). 
 
+    dm := dict, sec idn -> sec dim. -> opt. idn -> Pr. 
+    cds := list(set(codependent nodes))
+    occ_malpermute_degree := float, 0. <= x <= 1.0
+    rnd_struct := ? 
+    """
+    @staticmethod
+    def permute_depmap_AND_codepsets(dm,cds,occ_malpermute_degree,rnd_struct):
+
+        def delta_one(vx):
+            ld = np.array([len(v_) for v_ in vx])
+            num_total_swaps = np.cumprod(ld)
+            if len(num_total_swaps) == 0:
+                return None
+            num_total_swaps = num_total_swaps[-1]
+            swaps = int(round(num_total_swaps * occ_malpermute_degree))
+            vx = permute_setseq(vx,rnd_struct,swaps)
+            return vx 
+
+        for k in dm.keys():
+            v = dm[k]
+            q = delta_one(v)
+            if type(q) != type(None):
+                dm[k] = deepcopy(q)
+
+        q = delta_one(cds)
+
+        if type(q) != type(None): cds = deepcopy(q)
+        return dm,cds 
+    
     """
     return:
     - dict,
@@ -374,13 +444,15 @@ class BackgroundInfo:
 
     """
     @staticmethod
-    def generate_background_leak(irc,rnd_struct):
+    def generate_background_leak(irc,rnd_struct,\
+        targets=None,vary_lk_sz:bool=False):
         assert type(irc) == IsoRingedChain
         leak_map = {}
         ##print("LENGO: ",len(irc.irl))
         for irl_ in irc.irl:
             ##print("IRL_: ",irl_.sec.idn_tag)
-            dx = BackgroundInfo.leak_process_IsoRing(irl_,rnd_struct)
+            dx = BackgroundInfo.leak_process_IsoRing(irl_,rnd_struct,\
+                targets,vary_lk_sz) 
             leak_map[irl_.sec.idn_tag] = dx
         return leak_map
 
@@ -391,15 +463,31 @@ class BackgroundInfo:
             [1] <LeakInfo> 
     """
     @staticmethod 
-    def leak_process_IsoRing(ir,rnd_struct,targets=None):
+    def leak_process_IsoRing(ir,rnd_struct,targets=None,vary_lk_sz:bool=False):
         if type(targets) == type(None):
-            targets = ir.secdim_seq() 
+            targets = ir.secdim_seq()
+        elif type(targets) == float:
+            assert targets >= 0.0 and targets <= 1.0
+            t = ir.secdim_seq() 
+            l = int(round(len(t) * targets))
+            targets = []
+            while len(targets) < l:
+                ix = rnd_struct.randrange(0,len(t))
+                targets.append(t.pop(ix)) 
 
-        lk = BackgroundInfo.default_IsoRing_leak(rnd_struct)
+        l = 2 if not vary_lk_sz else \
+            rnd_struct.randrange(DEFAULT_LEAKSZ_RANGE[0],\
+            DEFAULT_LEAKSZ_RANGE[1] + 1)
+                
+        lk = BackgroundInfo.default_IsoRing_leak(rnd_struct,l=l)
         d = {}
         ##print("IR SEC: ",ir.sec.idn_tag)
         for i in range(len(ir.sec_cache)):
             ir.set_isorep(i)
+            q = len(ir.rep().seq)
+            # not a target dimension 
+            if q not in targets: continue 
+
             lk = BackgroundInfo.default_IsoRing_leak(rnd_struct)
             lk.leak_info(ir)
             ir.leak_stage -= 1
@@ -409,17 +497,14 @@ class BackgroundInfo:
             if ir.sec.idn_tag not in lk.leakm.d: 
                 continue 
             leakInfo = lk.leakm.d[ir.sec.idn_tag]
-            q = len(ir.rep().seq)
-            # not a target dimension 
-            if q not in targets: continue 
 
             d[q] = leakInfo
         return d
 
     @staticmethod
-    def default_IsoRing_leak(rnd_struct):
-        #assert type(ir) == IsoRing
-        return Leak.generate_Leak__type1(2,rnd_struct)
+    def default_IsoRing_leak(rnd_struct,l=2):
+        assert l >= DEFAULT_LEAKSZ_RANGE[0] and l <= DEFAULT_LEAKSZ_RANGE[1]
+        return Leak.generate_Leak__type1(l,rnd_struct)
 
 class CrackSoln:
 

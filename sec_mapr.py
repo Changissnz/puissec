@@ -241,6 +241,105 @@ def depchain_for_Sec(sec2dm,sec_id):
 
     return chain 
 
+########################### Order-of-Cracking permutation
+########################### PR. map noise-adder 
+
+# sec idn -> sec dim. -> opt. idn -> Pr. 
+def noise_on_opt_pr_map_SEEDTYPE_PythonANDNumpy(opm,rnd_struct): 
+
+    def apply_noise_on_idnANDdim(k,k2):
+        # retrieve dict
+        vx = opm[k][k2]
+        qr = [(v1,v2) for (v1,v2) in vx.items()]
+        q2 = [v[1] for v in qr]
+        if len(q2) == 0:
+            return 
+
+        # add noise
+        m = np.zeros((len(q2),2),dtype="float")
+        m[:,1] = 1.0 
+        no = Noiseano(m,rnd_struct=rnd_struct)
+        q2 = no.noisha(np.array(q2))
+
+
+        qr = [(v[0],q2[i]) for (i,v) in enumerate(qr)]
+
+        # normalize
+        s = sum(qr,key=lambda x:x[1])
+
+        if s == 0.0:
+            s = 1.0
+        qr = [(v[0],v[1]/s) for v in qr] 
+
+        # add back to dict
+        opm[k][k2] = dict(qr)
+
+    for k,v in opm.items():
+        for k2,_ in v.keys():
+            apply_noise_on_idnANDdim(k,k2)
+    return opm 
+
+"""
+***
+specialized for use with output from 
+`depchain_for_Sec`,`connected_subsets_of_codepmap`
+***
+
+- list, each element a Set(codependent) 
+"""
+def permute_setseq(setseq,rnd_struct,num_swaps:int):
+    assert type(setseq) == list
+    for s in setseq: assert type(s) == set and len(s) > 0 
+    assert num_swaps >= 0 and type(num_swaps) == int
+    actual_swaps = 0
+
+    """
+    exclude := None|(i'th index in `setseq`)
+
+    return:
+    - (i'th set of `setseq`, element in `setseq`[i])
+    """
+    def choose_with_exclude(exclude=None): 
+        # choose one i'th index. 
+        l = set([i for i in range(len(setseq))]) 
+        if type(exclude) != type(None):
+            l = l - set([exclude])
+
+        if len(l) == 0: 
+            return None,None
+        i = rnd_struct.randrange(0,len(l)) 
+        l = list(l)
+        i = l[i]
+
+        # choose a j'th index in the i'th set (ordered)
+        jx = list(setseq[i])
+        j = rnd_struct.randrange(0,len(jx))
+        return i, jx[j]
+
+    def swap_one():
+        i1,j1 = choose_with_exclude()
+        i2,j2 = choose_with_exclude(i1)
+
+        if type(i1) == type(None):
+            return False
+
+        if type(i2) == type(None):
+            return False
+
+        setseq[i1] = setseq[i1] - {j1}
+        setseq[i1] = setseq[i1] + {j2} 
+        setseq[i2] = setseq[i2] - {j2}
+        setseq[i2] = setseq[i2] + {j1} 
+        return True
+    
+    while num_swaps > 0:
+        stat = swap_one()
+        num_swaps -= 1 
+        if stat: actual_swaps += 1 
+    return setseq,actual_swaps
+
+
+
 ####################### range-of-interpretation
 ####################### formulations
 

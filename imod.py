@@ -262,7 +262,34 @@ class IndexVecPermuter:
             return self.next__(px,index,index_delta)
         return px
 
+"""
+simple class that builds on some code from external 
+library <morebs>
+"""
+class Noiseano:
 
+    def __init__(self,superbounds,rnd_struct=random):
+        assert matrix_methods.is_proper_bounds_vector(superbounds)
+        self.superbounds = superbounds
+        self.rnd_struct = rnd_struct 
+        return
 
+    def reset_bounds(self,bx):
+        assert matrix_methods.is_proper_bounds_vector(superbounds)
+        self.superbounds = bx 
+        return
 
+    def noisha(self,p):
+        assert len(p) == self.superbounds.shape[0]
 
+        # calculate max distance for p2 to p
+        q = matrix_methods.euclidean_point_distance(p,deepcopy(self.superbound[:,0]))
+        q2 = matrix_methods.euclidean_point_distance(p,deepcopy(self.superbound[:,1]))
+        q = max([q,q2])
+        q = round(self.rnd_struct.uniform(0.,1.) * q,5) 
+        
+        return numerical_generator.random_npoint_from_point_in_bounds_(self.superbound,p,\
+            q,roundDepth = 5)
+
+    def switch_bounds_stat(self,p):
+        return not (len(p) == self.superbounds.shape[0])

@@ -346,7 +346,7 @@ class Leak:
             [0] leak* function
             [1] `degree` argument of the leak* function. 
     """
-    def __init__(self,rnd_struct,fd_seq,leak_type="stationary"):
+    def __init__(self,rnd_struct,fd_seq):
         assert len(fd_seq) > 0, "leak cannot be empty"
 
         for fd in fd_seq:
@@ -363,7 +363,6 @@ class Leak:
                 assert len(fd[1]) == 3
             else: 
                 assert len(fd[1]) == 4
-        assert leak_type in {"stationary","mobile"}
 
         self.rnd_struct = rnd_struct
         self.fd_seq = fd_seq 
