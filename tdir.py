@@ -902,6 +902,8 @@ class TDirector:
         assert len(xs) > 0
 
         xs = [(k,abs(v - predicted_distance)) for k,v in xs.items()]
+        ## TODO: refactoradorii 
+        """
         q = sorted(xs,key=lambda y: y[1])
         i,sx = 1,q[0][1]
         stat = True
@@ -913,7 +915,10 @@ class TDirector:
         q = q[:i+1] 
         qi = rnd_struct.randrange(0,len(q)) 
         nx = q[qi][0]
-
+        """
+        ## 
+        nx_ = random_tiebreaker(xs,rnd_struct,False)         
+        nx = nx_[0] 
         if nx not in dfsc.min_paths: return None
         return deepcopy(dfsc.min_paths[nx][0].invert())
 
@@ -924,4 +929,7 @@ class TDirector:
         self.node_path = p
         self.index = 0
 
+    # TODO: 
+    def open_info_path_dec(self):
+        return -1
     

@@ -288,7 +288,7 @@ class BackgroundInfo:
     """
     @staticmethod 
     def partially_naive_IsoRing2HypStruct_map(ir:IsoRing,\
-        bound_length,r_d,r_a,rnd_struct):
+        bound_length,r_d,r_a,rnd_struct,prohibited_indices=None):
         assert min([r_d,r_a]) >= 0.0
         assert r_d + r_a <= 1.0 
 

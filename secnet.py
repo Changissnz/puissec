@@ -462,7 +462,7 @@ class SecNet:
         assert sn_param_args[3] >= 0.0 and sn_param_args[3] <= 1.0 
         num_entry = int(round(sn_param_args[3] * len(G[0])))
         
-        rnd_seed = rnd_struct.randrange(0,1000) 
+        rnd_seed = sn_param_args[2].randrange(0,1000) 
 
         return SecNet(sec_list,G[0],G[1],entry_points=num_entry,\
             bound=sn_param_args[4],rnd_struct=sn_param_args[2],\

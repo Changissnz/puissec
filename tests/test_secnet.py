@@ -81,7 +81,7 @@ class SecNetClass(unittest.TestCase):
                 assert sum(v_.pweights) <= 4
         return 
 
-    def test__SecNet__full_generate(self):
+    def test__SecNet__full_generate__case1(self):
 
         irc_args = (14,[0.25,2.],[3,17],[3,30],[(0.0,0.8),(0.3,0.9)])    
 
@@ -96,6 +96,20 @@ class SecNetClass(unittest.TestCase):
         assert len(snet.d) == 14 + 20 
         assert len(snet.entry_points) == 4 
 
+    def test__SecNet__generate__autograph__case1(self):
+
+        random.seed(2004)
+        np.random.seed(2024)
+
+        irc_args = (34,[0.25,2.],[3,17],[3,30],[(0.0,0.8),(0.3,0.9)])    
+        sn_param_args = (1.0,1.1,random,0.3,[0.25,2.])
+        ag = SecNet.generate__autograph(irc_args,sn_param_args)
+
+        assert len(ag.irc) == 34
+        assert len(ag.node_loc_assignment) == 34 
+        assert len(ag.d) == 34 + int(round(34 * 1.1)) 
+        assert len(ag.entry_points) == int(round(34 * 2.1 * 0.3)) 
+        return
 
 if __name__ == '__main__':
     unittest.main()

@@ -371,31 +371,31 @@ class IsoRing:
     # NOTE: rnd_struct not used 
     def td_next(self,timespan:float,rnd_struct,verbose=False):
         stat = self.default_secproc(timespan,rnd_struct,verbose)
+        if stat:
+            return 
 
-        # case: no SEC node for path, required to move
-        if not stat:
-            c = self.td.default_node_analysis()
-            print("LENC: ",c)
-            if len(c) == 0:
-                if verbose: 
-                    print("? NO PATH ?")
-                    return 
-            c_ = [(k,v) for k,v in c.items()]
-            mq = max(c_,key=lambda x: x[1])
-            l = mq[0]
-
-            self.td.load_path_to_node(l)
-
-            q1 = self.td.loc() 
-            self.td.td.scaled__next__(timespan)
-            q2 = self.td.loc()
-
+        # case: no SEC node for path, required to move        
+        c = self.td.default_node_analysis()
+        print("LENC: ",c)
+        if len(c) == 0:
             if verbose: 
-                print("MOVELOC {}-->{}\n============".format(q1,q2)) 
-            return  
+                print("? NO PATH ?")
+                return 
+        c_ = [(k,v) for k,v in c.items()]
+        
+        ##mq = max(c_,key=lambda x: x[1])
+        ##l = mq[0]
+        l = random_tiebreaker(c_,rnd_struct,max)[0]
 
-            
+        self.td.load_path_to_node(l)
 
+        q1 = self.td.loc() 
+        self.td.td.scaled__next__(timespan)
+        q2 = self.td.loc()
+
+        if verbose: 
+            print("MOVELOC {}-->{}\n============".format(q1,q2)) 
+        return  
 
     # TODO: test
     """

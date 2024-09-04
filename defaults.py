@@ -171,3 +171,25 @@ def custom_lcm(i1,i2):
         m1,m2,lcm = lcm_increment(m1,m2,f1,f2,False)
         stat = type(lcm) == type(None)
     return lcm 
+
+# TODO: demonstrate
+"""
+l := list, element is (item, item score).
+"""
+def random_tiebreaker(l,rnd_struct,is_max:bool):
+    if len(l) == 0: return None
+
+    mq = sorted(l,key=lambda x:x[1])
+    if is_max:
+        mq = mq[::-1] 
+
+    s = [mq.pop(0)]
+    stat = True 
+    while len(mq) > 0 and stat: 
+        stat = False
+        if mq[0][1] == s[-1][1]:
+            s.append(mq.pop(0))
+            stat = True 
+    
+    i = rnd_struct.randrange(0,len(s))
+    return s[i]

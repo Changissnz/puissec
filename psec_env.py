@@ -165,6 +165,19 @@ class SecEnv:
         self.td.pass_info__G(c,self.sn)
         return
 
+    # TODO: 
+    def pass_info(self):
+
+        return -1
+
+    """
+    passes information
+    """
+    # TODO: 
+    def pass_info_(self,i,c,is_IsoRing:bool,info_type:int):
+
+        return -1 
+
     ############### methods for instantiating and running
     ############### <Crackling> agents. 
 
@@ -342,7 +355,6 @@ class SecEnv:
         return
 
     ##################### methods to handle <IsoRing> decisions
-
 
     def iproc(self,timespan = 1.0):
         if self.verbose:
