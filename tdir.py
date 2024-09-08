@@ -276,6 +276,7 @@ class TDir:
         self.t_ = 0.0
 
         self.active_stat = True # False 
+        self.open_info_var = None
         return
 
     def __str__(self):

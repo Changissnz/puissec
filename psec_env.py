@@ -98,9 +98,14 @@ class SecEnv:
     crck := Cracker
     ct_ratio := (maximum number of cracking attempts by
                 <Crackling>) / (time := 1)
+    vb := int, verbosity in {0,1,2}
+    mode_open_info := (0|1|2,0|1|2);  
+        [0] corresponds to <SecNet>,
+        [1] corresponds to <Cracker>. 
+
     """
     def __init__(self,sn,crck,rnd_struct=random,\
-        ct_ratio=5000,vb=0):
+        ct_ratio=5000,vb=0,mode_open_info = (0,0)):
         assert type(sn) == SecNet
         assert type(crck) == Cracker
         assert ct_ratio >= 1
@@ -171,12 +176,46 @@ class SecEnv:
         return -1
 
     """
-    passes information
+    for an <IsoRing> identified by `i`, and a 
+    <Crackling> identified by `c`, method
+    passes information by one of:
+    i-->c,
+    c-->i,
+    according to `is_IsoRing`. The information 
+    passed is denoted by `info_type` in {0,1,2}:
+    
+    arguments:
+    - i := str|int, <IsoRing> idn
+    - c := str|int, <Crackling> idn
+    - is_IsoRing := bool, specifies directionality of info-pass.
+    - info_type := int, one of 0|1|2,
+        0 := no info passed,
+        1 := velocity passed,
+        2 := node location passed. 
+
+    return:
+    - bool, ?is info by type passed?
     """
     # TODO: 
     def pass_info_(self,i,c,is_IsoRing:bool,info_type:int):
+        assert info_type in {0,1,2}
+        if info_type == 0: return True
 
-        return -1 
+        # fetch the two agents `i`,`c`. 
+        i = self.fetch_subagent(i,True)
+        c = self.fetch_subagent(c,False)
+
+        if type(i) == type(None) or type(c) == type(None): return False
+
+        # case: I passes to C  
+        if is_IsoRing:
+            v = i.td.td.velocity if info_type == 1 else i.td.td.location
+            c.recv_open_info(info_type,v)
+            return True
+            
+        v = c.td.td.velocity if info_type == 1 else c.td.td.location
+        i.recv_open_info(info_type,v)
+        return True
 
     ############### methods for instantiating and running
     ############### <Crackling> agents. 
@@ -612,6 +651,11 @@ class SecEnv:
                 ti = crckling.hs.target_index
                 self.transfer_V(interdict,ti,q[0],q[1])                
         return
+
+    def fetch_subagent(self,agent_idn,is_IsoRing:bool):
+        if not is_IsoRing:
+            return self.crck.fetch_crackling(agent_idn)
+        return self.sn.fetch_IsoRing(agent_idn)
 
     def transfer_V(self,sidn,opt_index,svec,pr_score):
         psidn = Colocks.parse_coloc_str(sidn)
