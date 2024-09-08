@@ -565,7 +565,7 @@ class SecNet:
     #################### open info mode
     def clear_open_info(self):
         for ir in self.irc.irl:
-            ir.td.td.clear()
+            ir.td.td.open_info_var.clear()
 
 
 ############################################################

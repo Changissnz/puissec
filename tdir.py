@@ -942,6 +942,6 @@ class TDirector:
 
         # choose the farthest
         if self.vp() == "I":
-
+            return -1 
         return -1
     
