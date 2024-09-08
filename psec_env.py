@@ -111,6 +111,9 @@ class SecEnv:
         assert ct_ratio >= 1
         assert type(ct_ratio) == int 
         assert vb >= 0
+        assert type(mode_open_info) == tuple and len(mode_open_info) == 2
+        assert mode_open_info[0] in {0,1,2} and \
+            mode_open_info[1] in {0,1,2} 
 
         self.sn = sn
         self.crck = crck 
@@ -129,6 +132,7 @@ class SecEnv:
         self.ci = Colocks(set(),set())
         self.coloc_register()
         self.coloc_leak_update()
+        self.moi = mode_open_info
         return
 
     def preprocess(self):
@@ -170,10 +174,37 @@ class SecEnv:
         self.td.pass_info__G(c,self.sn)
         return
 
-    # TODO: 
-    def pass_info(self):
+    # TODO: test 
+    """
+    passes information between <IsoRing>s and 
+    <Crackling>s based on `self.moi`.
+    """
+    def pass_info(self,is_IsoRing:bool):
+        if self.moi == (0,0):
+            return
 
-        return -1
+        q = self.moi[0] if is_IsoRing else self.moi[1]
+        # pass IsoRing info to each <Crackling>
+        if is_IsoRing: 
+            for c in self.crck.cracklings:
+                # case: target IsoRing not found
+                if c.td.obj_stat == "search for target":
+                    continue
+                i = c.td.td.target_node
+                c_ = c.cidn 
+                self.pass_info_(i,c_,is_IsoRing,q)
+        else:
+            for ir in self.sn.irl:
+                # case: no cracklings in sight
+                if ir.td.obj_stat == "radar null":
+                    continue
+
+                # pass info from all visible <IsoRing>
+                qs = ir.check_radar(True)
+
+                for q_ in qs:
+                    self.pass_info_(q_,ir.sec.idn_tag,is_IsoRing,q)
+        return
 
     """
     for an <IsoRing> identified by `i`, and a 
@@ -196,7 +227,7 @@ class SecEnv:
     return:
     - bool, ?is info by type passed?
     """
-    # TODO: 
+    # TODO: test 
     def pass_info_(self,i,c,is_IsoRing:bool,info_type:int):
         assert info_type in {0,1,2}
         if info_type == 0: return True
@@ -226,14 +257,50 @@ class SecEnv:
             print("***************** ONE RUN,T={}".format(timespan))
             print()
 
-        self.cproc(timespan)
-        self.iproc(timespan)
+        #self.cproc(timespan)
+        #self.iproc(timespan)
+        self.run_(timespan)
         self.postmove_update() 
 
         if self.verbose: 
             print("\n********************************")
             print()
 
+        return
+
+    """
+    auxiliary method for the above method `run` that 
+    takes into account `open info`. 
+    """
+    def run_(self,timespan):
+        x0,x1 = None,None
+        b = False
+
+        # base case: no open info
+        if self.moi == (0,0): 
+            x0,x1 = self.cproc,self.iproc
+            b = True
+        elif self.moi[0] > self.moi[1]:
+            x0,x1 = self.cproc,self.iproc
+        elif self.moi[0] < self.moi[1]:
+            x0,x1 = self.iproc,self.cproc
+            b = True
+        else: 
+            q = self.rnd_struct.uniform(0.0,1.0)
+            if q >= 0.5:
+                x0,x1 = self.iproc,self.cproc 
+                b = True
+            else: 
+                x0,x1 = self.cproc, self.iproc
+
+        # move the first
+        x0(timespan)
+
+        # ?pass info?
+        self.pass_info(b)
+
+        # move the second
+        x1(timespan)
         return
 
     """
@@ -559,6 +626,10 @@ class SecEnv:
 
         self.coloc_register()
         self.coloc_leak_update()
+
+        # clear open information from last timespan
+        self.sn.clear_open_info()
+        self.crck.clear_open_info() 
         return
 
     # TODO: 

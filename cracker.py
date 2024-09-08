@@ -895,4 +895,8 @@ class Cracker:
         q = self.cracklings.pop(i)
         self.spent.append(q) 
         return
+
+    def clear_open_info(self):
+        for c in self.cracklings:
+            c.td.td.open_info_var.clear() 
     

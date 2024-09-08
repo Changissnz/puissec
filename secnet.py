@@ -562,6 +562,11 @@ class SecNet:
             l = self.node_loc_assignment[q]
             i.default_TDirector_instance(l,x,y)
 
+    #################### open info mode
+    def clear_open_info(self):
+        for ir in self.irc.irl:
+            ir.td.td.clear()
+
 
 ############################################################
 ############################################################

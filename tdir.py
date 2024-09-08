@@ -276,7 +276,7 @@ class TDir:
         self.t_ = 0.0
 
         self.active_stat = True # False 
-        self.open_info_var = None
+        self.open_info_var = [] 
         return
 
     def __str__(self):
@@ -508,7 +508,7 @@ class TDirector:
     return:
     - set, node locations
     """
-    def check_radar(self):
+    def check_radar(self,is_agent_idn:bool=False):
         
         assert type(self.resource_sg) != type(None) 
         
@@ -519,15 +519,25 @@ class TDirector:
             for k,v in self.resource_sg.crackling_locs.items():
                 stat = v[1] == self.vantage_idn
                 if stat:
-                    q.append(k)
+                    v_ = v[0] if not is_agent_idn else k
+                    q.append(v_)
             return set(q) 
         
         # check for target isoring loc
         else: 
             if self.td.target_node in self.resource_sg.ring_locs:
-                return set([self.resource_sg.ring_locs[\
-                    self.td.target_node]])
+                v_ = self.td.target_node if is_agent_idn else \
+                    self.resource_sg.ring_locs[self.td.target_node]
+                return set([v_])
             return set()
+
+    # NOTE: method specially for vantage_idn := I
+    def cracklings_in_sight(self):
+        if self.vp() != "I": return
+
+# <Crackling> idn -> (location,target node)
+
+
 
     #######################
     ######### loc search mode: used by agent A to achieve its objective.
@@ -738,10 +748,6 @@ class TDirector:
             d[n] = sx
         return d 
 
-    # TODO: future
-    def load_predicted_travel_at_node(self,n,npath):
-        return -1 
-
     """
     calculates distance of node `n` to each 
     of the sec nodes. 
@@ -839,7 +845,6 @@ class TDirector:
         # case: 
 
         q = []
-        ##self.resource_sg = None
         if type(self.resource_sg) != SNGraphContainer:
             print("NADA")
             return None 
@@ -932,5 +937,11 @@ class TDirector:
 
     # TODO: 
     def open_info_path_dec(self):
+        if len(self.open_info_var) == 0: 
+            return
+
+        # choose the farthest
+        if self.vp() == "I":
+
         return -1
     
