@@ -233,6 +233,7 @@ class SecEnv:
         if info_type == 0: return True
 
         # fetch the two agents `i`,`c`. 
+        i_,c_ = i,c 
         i = self.fetch_subagent(i,True)
         c = self.fetch_subagent(c,False)
 
@@ -241,11 +242,11 @@ class SecEnv:
         # case: I passes to C  
         if is_IsoRing:
             v = i.td.td.velocity if info_type == 1 else i.td.td.location
-            c.recv_open_info(info_type,v)
+            c.recv_open_info(info_type,i_,v)
             return True
             
         v = c.td.td.velocity if info_type == 1 else c.td.td.location
-        i.recv_open_info(info_type,v)
+        i.recv_open_info(info_type,c_,v)
         return True
 
     ############### methods for instantiating and running

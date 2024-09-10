@@ -531,14 +531,6 @@ class TDirector:
                 return set([v_])
             return set()
 
-    # NOTE: method specially for vantage_idn := I
-    def cracklings_in_sight(self):
-        if self.vp() != "I": return
-
-# <Crackling> idn -> (location,target node)
-
-
-
     #######################
     ######### loc search mode: used by agent A to achieve its objective.
     #########               - <Crackling> to locate target <IsoRing>.
@@ -776,7 +768,7 @@ class TDirector:
     ###################################################
     ######## methods used in <TDir> nodepath deltas. 
     
-    # TODO: test 
+    # TODO: un-used,test 
     """
     NOTE: class instances of <TDirector> do not remember
           `locset` as destination nodes for navigation.
@@ -908,21 +900,6 @@ class TDirector:
         assert len(xs) > 0
 
         xs = [(k,abs(v - predicted_distance)) for k,v in xs.items()]
-        ## TODO: refactoradorii 
-        """
-        q = sorted(xs,key=lambda y: y[1])
-        i,sx = 1,q[0][1]
-        stat = True
-        while stat and i < len(q):
-            stat = sx == q[0][1]
-            if stat:
-                i += 1
-
-        q = q[:i+1] 
-        qi = rnd_struct.randrange(0,len(q)) 
-        nx = q[qi][0]
-        """
-        ## 
         nx_ = random_tiebreaker(xs,rnd_struct,False)         
         nx = nx_[0] 
         if nx not in dfsc.min_paths: return None
@@ -930,18 +907,37 @@ class TDirector:
 
     def load_path_to_node(self,loc):
         p = self.td.load_path_(self.resource_sg,loc) 
-        assert type(p) != type(None) 
-
+        assert type(p) != type(None)
         self.node_path = p
         self.index = 0
 
-    # TODO: 
+    # TODO: complete
     def open_info_path_dec(self):
         if len(self.open_info_var) == 0: 
             return
-
-        # choose the farthest
-        if self.vp() == "I":
-            return -1 
         return -1
-    
+
+    # TODO: test 
+    """
+    return:
+    - dict, 
+
+    - set, probable nodes that the complementary agent/s
+           will be on at the end of a timespan.
+    """
+    def open_info_velocity_prediction(self,one_open_info_sample):
+        assert one_open_info_sample[0] == 1
+        q = self.resource_sg.ring_locs if \
+            self.vp() == "C" else \
+            self.resource_sg.crackling_locs
+        assert idn in q
+
+        f = lambda x: x if self.vp() == "C" else x[0]
+        x0 = f(q[idn])
+
+        # use `resource_sg` to determine all possible 
+        # nodes for next
+        dfsc = self.resource_sg[x0]
+        nsx = dfsc.nodeset_of_distance_d(\
+            one_open_info_sample[2])
+        return nsx

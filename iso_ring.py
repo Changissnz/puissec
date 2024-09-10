@@ -368,7 +368,6 @@ class IsoRing:
 
     #########################################
 
-    # NOTE: rnd_struct not used 
     def td_next(self,timespan:float,rnd_struct,verbose=False):
         stat = self.default_secproc(timespan,rnd_struct,verbose)
         if stat:
@@ -382,13 +381,9 @@ class IsoRing:
                 print("? NO PATH ?")
                 return 
         c_ = [(k,v) for k,v in c.items()]
-        
-        ##mq = max(c_,key=lambda x: x[1])
-        ##l = mq[0]
         l = random_tiebreaker(c_,rnd_struct,max)[0]
 
         self.td.load_path_to_node(l)
-
         q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)
         q2 = self.td.loc()
@@ -454,9 +449,9 @@ class IsoRing:
             print("MOVELOC {}-->{}\n============".format(q1,q2)) 
         return True 
 
-    def recv_open_info(self,open_info_type,info):
+    def recv_open_info(self,open_info_type,idn,info):
         assert open_info_type in {1,2}
-        self.td.td.open_info_var.append((open_info_type,info))
+        self.td.td.open_info_var.append((open_info_type,idn,info))
         return
 
 ################################################

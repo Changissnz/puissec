@@ -244,9 +244,9 @@ class Crackling:
         self.is_coordinated = True
         return
 
-    def recv_open_info(self,open_info_type,info):
+    def recv_open_info(self,open_info_type,idn,info):
         assert open_info_type in {1,2}
-        self.td.td.open_info_var.append((open_info_type,info)) 
+        self.td.td.open_info_var.append((open_info_type,idn,info)) 
         return
 
 """

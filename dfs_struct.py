@@ -205,7 +205,19 @@ class DFSCache:
                 q[k2][k] = v2
         return q
 
+    #### TODO: test, new additions
 
+    """
+    return:
+    - set, nodes that have shortest path of `d` to `start_node`
+    """
+    def nodeset_of_distance_d(self,d,cost_func=sum):
+        assert d > 0 and type(d) == int
+        nsd = set() 
+        for k,v in self.min_paths.items():
+            c = v[0].cost(cost_func)
+            if c == d: nsd = nsd | {k}
+        return nsd
 
     
 
