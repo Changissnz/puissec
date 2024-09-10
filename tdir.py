@@ -911,17 +911,68 @@ class TDirector:
         self.node_path = p
         self.index = 0
 
-    # TODO: complete
-    def open_info_path_dec(self):
-        if len(self.open_info_var) == 0: 
-            return
-        return -1
+    # TODO: test
+    """
+    outputs 
+    """
+    def open_info_pathdec(self,rnd_struct):
+
+        if len(self.open_info_var) == 0:
+            return None
+
+        # check `open_info_var` size based on `vp()`
+        v = self.vp()
+        if v == "C":
+            assert len(self.open_info_var) == 1
+
+        # collect all relevant nodes
+        ns = set() 
+        for (info_type,idn,value) in self.open_info_var:
+            if info_type == 0: continue 
+
+            if info_type == 2: 
+                ns = ns | {value}
+                continue
+            ns_ = self.open_info_velocity_prediction((info_type,idn,value))
+            ns = ns | ns_
+
+        # select the (node,path) based on `ns` and `vp()`
+        dfsc = self.resource_sg.sp[self.loc()]
+
+        # case: Crackling
+        if v == "C":
+            # case: certain
+            if len(ns) == 1:
+                ns_ = ns.pop()
+                if ns_ not in dfsc.min_paths:
+                    return None
+                return dfsc.min_paths[ns_][0].invert()
+            
+            # case: not certain
+            #       use rnd_struct
+            ns = sorted(list(ns))
+            i = rnd_struct.randrange(0,len(ns))
+            return dfsc.min_paths[ns[i]].invert() 
+
+        # case: IsoRing
+        #       calculate the nodes to avoid
+        avoid = ns - self.resource_sg.sn
+        c = self.td.default_node_analysis()
+        c_ = [(k,v) for k,v in c.items() if k not in avoid] 
+
+            # subcase: none, revert to default
+        if len(c_) == 0:
+            c_ = [(k,v) for k,v in c.items()]
+    
+        l = random_tiebreaker(c,rnd_struct,max)[0]
+        return dfsc.min_paths[l].invert() 
 
     # TODO: test 
     """
-    return:
-    - dict, 
+    arguments:
+    - one_open_info_sample := (info_type,idn,value)
 
+    return:
     - set, probable nodes that the complementary agent/s
            will be on at the end of a timespan.
     """
@@ -930,6 +981,7 @@ class TDirector:
         q = self.resource_sg.ring_locs if \
             self.vp() == "C" else \
             self.resource_sg.crackling_locs
+        idn = one_open_info_sample[1] 
         assert idn in q
 
         f = lambda x: x if self.vp() == "C" else x[0]
