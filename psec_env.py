@@ -494,7 +494,6 @@ class SecEnv:
 
         v = bool(self.verbose)
         ir.td_next(timespan,self.rnd_struct,v)
-        ##ir.default_secproc(timespan,self.rnd_struct,v) 
 
     ############ TODO: methods to handle <CBridge>s.
     ########################################################

@@ -67,60 +67,25 @@ class Crackling:
         if verbose:
             print("--> TD-NEXT FOR C={},N={}".format(self.cidn,\
                 self.td.loc()))
-                
             print("\tOBJSTAT: ",self.td.obj_stat)
 
         if self.td.obj_stat == "search for target":
-            
-            # check if <TDir> is still active.
-            if not self.td.td.active_stat:
-                print("NOT ACTIVE,SETTING EXTREME")
-                self.td.extloc_search__set_TDir(extf=max,rnd_struct=random)
-            print("path is ")
-            print(str(self.td.td.node_path))
-            print("------")
-            self.td.td.scaled__next__(timespan)
-            return
-        elif self.td.obj_stat == "capture target":
-            q = self.td.check_radar()
-            if verbose:
-                print("RADAR: ",len(q))
+            return self.default_TD__search_for_target(timespan,verbose)
+        return self.default_TD__capture_target(timespan,verbose)
 
-            if len(q) == 0:
-                if verbose:
-                    print("SWITCHING OBJSTAT")
-                self.td.td.active_stat = False
-                self.td.switch_obj_stat()
-                return self.td_next(timespan)
-            
-            if not self.td.td.active_stat:
-                ############### TODO: 
-                if verbose: 
-                    print("\t\tPATH NOT ACTIVE...DEFSET")
-                dpd = self.td.default_crackling_pathdec(\
-                    predicted_distance=1,rnd_struct=random)
-                try:
-                    self.td.load_new_path(dpd)
-                except: 
-                    if verbose:
-                        print("[!] FAILED TO SET NEW PATH.")
-    
-            if verbose: 
-                print("PATH")
-                print(self.td.td.node_path)
-                print("============")
+        #############################################
 
-            l = self.td.loc()
-            self.td.td.scaled__next__(timespan)
-            l2 = self.td.loc()
-
-            if verbose: 
-                print("-- TRAVEL {}->{}".format(l,l2))
-            return 
-        return
-
-    def default_TD__search_for_target(self,verbose:bool=False):
+    # TODO: unused. 
+    def default_TD__search_for_target(self,timespan,verbose:bool=False):
         assert self.td.obj_stat == "search for target"
+
+        q = self.td.check_radar()
+
+        if len(q) > 0:
+            if verbose: 
+                print("switching from [search]->[capture] target.")
+            self.td.switch_obj_stat()
+            return self.default_TD__capture_target() 
 
         # check if <TDir> is still active.
         if not self.td.td.active_stat:
@@ -132,10 +97,15 @@ class Crackling:
             print("path is ")
             print(str(self.td.td.node_path))
             print("------")
-        self.td.td.scaled__next__(timespan)
-        return
 
-    def default_TD__capture_target(self,verbose:bool):
+        v = len(self.td.td.node_path) - 1 
+        v = int(round(v / timespan)) 
+        self.td.td.velocity = v
+        self.td.td.scaled__next__(timespan)
+        return v
+
+    # TODO: unused 
+    def default_TD__capture_target(self,timespan,verbose:bool):
         assert self.td.obj_stat == "capture target" 
 
         q = self.td.check_radar()
@@ -145,26 +115,18 @@ class Crackling:
         # CASE: no <Crackling>s in sight, switching 
         # objective to "search for target"
         if len(q) == 0:
-            if verbose:
-                print("SWITCHING OBJSTAT")
-            self.td.td.active_stat = False
-            self.td.switch_obj_stat()
-            return self.td_next(timespan)
-        
-        # CASE: <TDir> path is no longer active,
-        #       load a new path. 
-        if not self.td.td.active_stat:
-            ############### TODO: 
             if verbose: 
-                print("\t\tPATH NOT ACTIVE...DEFSET")
-            dpd = self.td.default_crackling_pathdec(\
-                predicted_distance=1,rnd_struct=random)
-            try:
-                self.td.load_new_path(dpd)
-            except: 
-                if verbose:
-                    print("[!] FAILED TO SET NEW PATH.")
+                print("switching from [capture]->[search] target.")
+            self.td.switch_obj_stat()
+            return self.default_TD__search_for_target(timespan,verbose)
 
+        dpd = self.td.default_crackling_pathdec(\
+            predicted_distance=None,rnd_struct=random)        
+
+        # set the velocity equal to the path length
+        self.td.load_new_path(dpd)
+        v = len(dpd) -1 
+        self.td.td.velocity = int(round(v / timespan)) 
         if verbose: 
             print("PATH")
             print(self.td.td.node_path)
@@ -173,10 +135,9 @@ class Crackling:
         l = self.td.loc()
         self.td.td.scaled__next__(timespan)
         l2 = self.td.loc()
-
         if verbose: 
             print("-- TRAVEL {}->{}".format(l,l2))
-        return
+        return v
 
     """
     used by <Crackling> instance to decide 

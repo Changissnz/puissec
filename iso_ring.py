@@ -368,10 +368,30 @@ class IsoRing:
 
     #########################################
 
+    # TODO: code still needs to be refactored! 
     def td_next(self,timespan:float,rnd_struct,verbose=False):
+
+        # case: open info exists!
+        if len(self.td.td.open_info_var) > 0:
+            px = self.td.open_info_pathdec(rnd_struct)
+
+            if type(px) != type(None):
+                v = len(px) - 1
+                v = int(round(v/timespan))
+                self.td.load_path_to_node(px)
+                self.td.td.velocity = v
+                q1 = self.td.loc() 
+                self.td.td.scaled__next__(timespan)
+                q2 = self.td.loc()
+
+                if verbose: 
+                    print("MOVELOC {}-->{}\n============".format(q1,q2)) 
+                return v
+
+        # case: default path to SEC node
         stat = self.default_secproc(timespan,rnd_struct,verbose)
-        if stat:
-            return 
+        if stat > 0:
+            return stat 
 
         # case: no SEC node for path, required to move        
         c = self.td.default_node_analysis()
@@ -379,18 +399,20 @@ class IsoRing:
         if len(c) == 0:
             if verbose: 
                 print("? NO PATH ?")
-                return 
+                return 0 
         c_ = [(k,v) for k,v in c.items()]
         l = random_tiebreaker(c_,rnd_struct,max)[0]
 
         self.td.load_path_to_node(l)
+        v = int(round((len(l) - 1) / timespan))
+        self.td.td.velocity = v
         q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)
         q2 = self.td.loc()
 
         if verbose: 
             print("MOVELOC {}-->{}\n============".format(q1,q2)) 
-        return  
+        return v
 
     # TODO: test
     """
@@ -412,13 +434,10 @@ class IsoRing:
             self.td.switch_obj_stat()
             s2 = self.td.obj_stat 
             if verbose:
-                print("SWITCH {}: {}->{}".format(\
-                    self.sec.idn_tag,s1,s2))
-                
-        # decide how to proceed
+                print("switching from [{}]->[{}] target.".format(s1,s2))
 
-        ## case: change from `null radar`; fetch a 
-        ##       new and active path.
+        ## case: change from `null radar` to `avoid target`; 
+        ## fetch a new and active path.
         if stat and self.td.obj_stat == "avoid target":
             sec_stat = self.td.is_loc_SEC()
 
@@ -433,13 +452,17 @@ class IsoRing:
                 print(pt)
 
             if type(pt) == type(None):
-                return False
-            self.td.load_new_path(pt)
+                return 0 
+            self.td.load_new_path(pt)  
+            self.td.td.velocity = int(round((len(pt) - 1)/timespan))
 
+        # case: null radar 
         # set active stat of <TDir> to False
         if stat and self.td.obj_stat == "null radar":
             self.td.td.active_stat = False
-        
+            self.td.td.velocity = 0 
+
+        v = self.td.td.velocity
         # travel by <TDir>
         q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)
@@ -447,7 +470,7 @@ class IsoRing:
 
         if verbose: 
             print("MOVELOC {}-->{}\n============".format(q1,q2)) 
-        return True 
+        return v 
 
     def recv_open_info(self,open_info_type,idn,info):
         assert open_info_type in {1,2}

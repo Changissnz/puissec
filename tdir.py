@@ -252,6 +252,21 @@ class SNGraphContainer:
 
         return dx 
 
+    def radius(self):
+        return self.graph_distance_ext(min)
+
+    def diameter(self):
+        return self.graph_distance_ext(max) 
+
+    def graph_distance_ext(self,extf):
+        assert extf in {min,max}
+
+        em = self.eccentricity_map()
+        q = list(em.values())
+
+        if len(q) == 0: return -1
+        return extf(q) 
+
     #####################################
 
 """
@@ -480,6 +495,7 @@ class TDirector:
 
         self.ps = np.array([])
         self.reset_ref_nodes()
+        self.td.active_stat = False
         return
 
     def update_tdir(self):
@@ -491,8 +507,6 @@ class TDirector:
     - bool, ?switch objective?
     """
     def check_obj(self):
-        assert self.vp() in {"I","C"}
-
         q = self.check_radar()
         if self.obj_stat in {"radar null",\
                 "search for target"}:
@@ -872,9 +886,14 @@ class TDirector:
         return deepcopy(q[qi][1].invert()) 
 
     # TODO: test 
-    def default_crackling_pathdec(self,predicted_distance:int,\
-        rnd_struct,objf=np.min):
-        assert type(predicted_distance) == int and predicted_distance >= 0
+    def default_crackling_pathdec(self,predicted_distance:int=None,\
+        rnd_struct=random,objf=np.min):
+        if not (type(predicted_distance) == int and predicted_distance >= 0):
+            g_rad = self.resource_sg.radius()
+            if g_rad < 1:
+                predicted_distance = 1
+            else:  
+                predicted_distance = rnd_struct.randrange(1,g_rad+1) 
 
         cs = self.check_radar()
         if len(cs) == 0: return None
@@ -903,7 +922,7 @@ class TDirector:
         nx_ = random_tiebreaker(xs,rnd_struct,False)         
         nx = nx_[0] 
         if nx not in dfsc.min_paths: return None
-        return deepcopy(dfsc.min_paths[nx][0].invert())
+        return dfsc.min_paths[nx][0].invert()
 
     def load_path_to_node(self,loc):
         p = self.td.load_path_(self.resource_sg,loc) 
