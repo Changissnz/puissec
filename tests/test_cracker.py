@@ -53,7 +53,43 @@ class BackgroundInfoClass(unittest.TestCase):
         assert len(ph1[0]) == 6 
         return
 
+    def test__BackgroundInfo__naive_populate_IRC2HypStruct_map_case1(self):
+        sn = SecNet_sample_approxhyp()
 
+        irc = sn.irc 
+        bound_length = 1.0 
+        rd_range = [0.,0.5]
+        ra_range = [0.3,0.7]
+        rnd_struct = random 
+
+        irc2h_map = BackgroundInfo.partially_naive_IRC2HypStruct_map(\
+                irc,bound_length,rd_range,ra_range,rnd_struct)
+
+        dx = deepcopy(irc2h_map[0]) 
+        populate_ratio_range = [0.5,0.5]
+        m2 = BackgroundInfo.naive_populate_IRC2HypStruct_map(irc,dx,populate_ratio_range,\
+                rnd_struct=random,scramble=False)
+        m2_ = m2[0]
+
+        populate_ratio_range = [1.0,1.0]
+        dx2 = deepcopy(irc2h_map[0]) 
+        m3 = BackgroundInfo.naive_populate_IRC2HypStruct_map(irc,dx2,populate_ratio_range,\
+                rnd_struct=random,scramble=False)
+        m3_ = m3[0]
+
+        ir = sn.irc[0] 
+        for s in ir.sec_cache:
+            d = s.dim()
+            l = len(s.opm)
+
+            ##print("{}: {}".format(l / 2,len(m2_[d])))
+
+            # case 1 
+            assert abs(len(m2_[d]) - l / 2) <= 1.0
+            # case 2 
+            assert l == len(m3_[d])
+
+    # TODO: re-write
     """
     def test__BackgroundInfo__generate_instance_case1(self):
 

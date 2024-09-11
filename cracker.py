@@ -337,21 +337,24 @@ class BackgroundInfo:
         return outp1,outp2
 
     # TODO: test 
-    def naive_populate_IRC2HypStruct_map(self,irc,dx,populate_ratio_range,rnd_struct=random,\
+    @staticmethod
+    def naive_populate_IRC2HypStruct_map(irc,dx,populate_ratio_range,rnd_struct=random,\
         scramble:bool=False):
         for ir in irc.irl:
             dx_ = dx[ir.sec.idn_tag]
             f = rnd_struct.uniform(populate_ratio_range[0],populate_ratio_range[1])
             rs = rnd_struct if scramble else None
-            self.naive_populate_IsoRing2HypStruct_map(ir,dx_,f,rs)
-        return
+            dx_ = BackgroundInfo.naive_populate_IsoRing2HypStruct_map(ir,dx_,f,rs)
+            dx[ir.sec.idn_tag] = dx_ 
+        return dx 
     
     """
     for a map D: sec idn -> sec dim -> [<HypStruct>], fills in 
     each dimension's sequence of <HypStruct> with dummy
     <HypStruct> instances for unaccounted optima indices.
     """
-    def naive_populate_IsoRing2HypStruct_map(self,ir,dx,populate_ratio:float,\
+    @staticmethod
+    def naive_populate_IsoRing2HypStruct_map(ir,dx,populate_ratio:float,\
         rnd_struct=None):
 
         assert populate_ratio >= 0.0 and populate_ratio <= 1.0 
@@ -364,12 +367,17 @@ class BackgroundInfo:
             q = len(x.opm)
             rem = set([i for i in range(q)])
             
-            q = dx[d]
-            q = set([h.sec_dim for h in q])
-            rem = rem - q
+            q2 = dx[d]
+            q2 = set([h.target_index for h in q2])
+            rem = rem - q2
+            ##print("Q2: ",q2)
+            ##print("REM: ", rem)
+
                 # apply `populate_ratio` to the number of possible 
                 # local optima to be accounted for. 
             remsz = int(round(len(rem) * populate_ratio)) 
+            ##print("REMSZ: ",remsz)
+
             rem = sorted(list(rem))[:remsz] 
 
             # set the isorep, and generate dummy <HypStruct>s for each
