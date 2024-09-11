@@ -108,8 +108,9 @@ def one_correct_HypStruct_for_IsoRing(ir:IsoRing):
     sb_pr = np.array([1.0])
     return HypStruct(ir.sec.idn_tag,ti,sbs,sb_pr)
 
-def one_dummy_HypStruct_for_IsoRing(ir:IsoRing):
-    ti = ir.sec.seq_index()
+def one_dummy_HypStruct_for_IsoRing(ir:IsoRing,ti=None):
+    if type(ti) == type(None): 
+        ti = ir.sec.seq_index()
 
     seq = ir.sec.optima_points()[ti]
     b = np.zeros((len(seq),2),dtype=float)

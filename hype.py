@@ -135,7 +135,7 @@ class HypStruct:
         return 
 
     def __str__(self):
-        q = "sec: " + str(self.seq_idn) + " opt.: " + str(self.target_index)
+        q = "sec: " + str(self.seq_idn) + " opt.: " + str(self.target_index) + " dim.: " + str(self.sec_dim)
         q += "\n" + "sub-bounds"
         for s in self.suspected_subbounds:
             q += "\n\t" + str(s) 

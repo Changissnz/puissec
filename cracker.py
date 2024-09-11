@@ -242,6 +242,12 @@ class BackgroundInfo:
 
     """
 
+    - arguments: 
+    irc := IsoRingedChain
+    bound_length := arg. for functions to generate <HypStruct>s
+    rd_range := [f0,f1], ordered range for the ratio of dummy <HypStruct>s; f_i::float
+    ra_range := [f0,f1], ratio of approximate <HypStruct>s; f_i::float
+
     - return: 
     Sec idn. -> Sec dim. -> HypStruct
     """
@@ -288,7 +294,7 @@ class BackgroundInfo:
     """
     @staticmethod 
     def partially_naive_IsoRing2HypStruct_map(ir:IsoRing,\
-        bound_length,r_d,r_a,rnd_struct,prohibited_indices=None):
+        bound_length,r_d,r_a,rnd_struct):
         assert min([r_d,r_a]) >= 0.0
         assert r_d + r_a <= 1.0 
 
@@ -329,10 +335,53 @@ class BackgroundInfo:
                 outp2[elmnt[1]] = [i,hs2]
             i += 1 
         return outp1,outp2
+
+    # TODO: test 
+    def naive_populate_IRC2HypStruct_map(self,irc,dx,populate_ratio_range,rnd_struct=random,\
+        scramble:bool=False):
+        for ir in irc.irl:
+            dx_ = dx[ir.sec.idn_tag]
+            f = rnd_struct.uniform(populate_ratio_range[0],populate_ratio_range[1])
+            rs = rnd_struct if scramble else None
+            self.naive_populate_IsoRing2HypStruct_map(ir,dx_,f,rs)
+        return
     
-    # TODO: used in conjunction w/ <partially_naive_IsoRing2HypStruct_map>
-    def populate_incomplete_IsoRing2HypStruct_map():
-        return -1 
+    """
+    for a map D: sec idn -> sec dim -> [<HypStruct>], fills in 
+    each dimension's sequence of <HypStruct> with dummy
+    <HypStruct> instances for unaccounted optima indices.
+    """
+    def naive_populate_IsoRing2HypStruct_map(self,ir,dx,populate_ratio:float,\
+        rnd_struct=None):
+
+        assert populate_ratio >= 0.0 and populate_ratio <= 1.0 
+        for (i,x) in enumerate(ir.sec_cache):
+            d = x.dim()
+            assert d in dx, "map has incorrect form."
+            
+            # gather the remaining local optima to be
+            # accounted by <HypStruct>
+            q = len(x.opm)
+            rem = set([i for i in range(q)])
+            
+            q = dx[d]
+            q = set([h.sec_dim for h in q])
+            rem = rem - q
+                # apply `populate_ratio` to the number of possible 
+                # local optima to be accounted for. 
+            remsz = int(round(len(rem) * populate_ratio)) 
+            rem = sorted(list(rem))[:remsz] 
+
+            # set the isorep, and generate dummy <HypStruct>s for each
+            ir.set_isorep(i)
+            for r in rem:
+                hs = one_dummy_HypStruct_for_IsoRing(ir,r)
+                dx[d].append(hs)
+
+            if type(rnd_struct) != type(None):
+                rnd_struct.shuffle(dx[d]) 
+        
+        return dx  
 
     ########################### generator using <IsoRingedChain>+<SRefMap>
 

@@ -598,11 +598,18 @@ class SecEnv:
     ############## agent. 
     #####################################
 
+    """
+    loads a <TDirector> instance for each <IsoRing>
+    """
     def instantiate_td_for_IRC(self,rd,td):
         self.sn.load_TDirectors_for_IRC(rd,td)
         self.load_subgraphs_for_IRC() 
         return
 
+    """
+    loads the respective graph-in-sight for each
+    <IsoRing> 
+    """
     def load_subgraphs_for_IRC(self):
         for q in self.sn.irc.irl:
             td = q.fetch_td()
@@ -632,7 +639,12 @@ class SecEnv:
         self.crck.clear_open_info() 
         return
 
-    # TODO: 
+    """
+    registers the co-locations of (<IsoRing>,<Crackling>)
+    pairs based on SEC status of node:
+    - stat := cracking <--> SEC
+    - stat := interdiction <--> NSEC 
+    """
     def coloc_register(self):
 
         iset = set()
@@ -656,6 +668,9 @@ class SecEnv:
         self.crackling_stat_update()
         return
 
+    """
+    updates the (cstat,istat) of each <Crackling>
+    """
     def crackling_stat_update(self): 
 
         for c in self.crck.cracklings:
@@ -692,7 +707,6 @@ class SecEnv:
                 dx = dx | {s}
         return dx
 
-    # TODO: 
     def coloc_leak_update(self):
         if self.verbose: 
             print("--- PERFORMING LEAKS : ",len(self.ci.iset))
