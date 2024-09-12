@@ -265,7 +265,7 @@ def noise_on_opt_pr_map_SEEDTYPE_PythonANDNumpy(opm,rnd_struct):
         qr = [(v[0],q2[i]) for (i,v) in enumerate(qr)]
 
         # normalize
-        s = sum(qr,key=lambda x:x[1])
+        s = sum([qr_[0] for qr_ in qr])
 
         if s == 0.0:
             s = 1.0
@@ -275,7 +275,7 @@ def noise_on_opt_pr_map_SEEDTYPE_PythonANDNumpy(opm,rnd_struct):
         opm[k][k2] = dict(qr)
 
     for k,v in opm.items():
-        for k2,_ in v.keys():
+        for k2 in v.keys():
             apply_noise_on_idnANDdim(k,k2)
     return opm 
 
@@ -327,9 +327,9 @@ def permute_setseq(setseq,rnd_struct,num_swaps:int):
             return False
 
         setseq[i1] = setseq[i1] - {j1}
-        setseq[i1] = setseq[i1] + {j2} 
+        setseq[i1] = setseq[i1] | {j2} 
         setseq[i2] = setseq[i2] - {j2}
-        setseq[i2] = setseq[i2] + {j1} 
+        setseq[i2] = setseq[i2] | {j1} 
         return True
     
     while num_swaps > 0:

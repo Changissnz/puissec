@@ -43,6 +43,7 @@ class OrderOfCrackn:
         return
 
     def order_by_depchain_map(self,dcm):
+        print("DCMM: ",dcm)
         l = [(k,len(v)) for k,v in dcm.items()]
         l = sorted(l,key=lambda x:x[1])[::-1]
         ks = [l_[0] for l_ in l]
@@ -55,7 +56,8 @@ class OrderOfCrackn:
             v1 = dcm[k1]
             v2 = dcm[k2]
             vx1,vx2 = set(),set()
-
+            ##print("V1: ",v1)
+            ##print("V2: ",v2)
             for v1_ in v1:
                 vx1 = vx1 | v1_
             for v2_ in v2:
@@ -78,6 +80,7 @@ class OrderOfCrackn:
 
             vx = dcm[key][::-1]
             vx_ = []
+            ##print("VX: ",vx)
             for vx2 in vx:
                 vx_.extend(list(vx2))
 
@@ -405,6 +408,8 @@ class BackgroundInfo:
         arguments ('cd',max,[0,1])
     - leak map (of leaked info.); uses the function <BackgroundInfo.default_IsoRing_leak>
         on each <IsoRing> for the map M: sec idn. -> opt. dim. -> leaked info.
+        The argument `target_ratio` determines the number of opt. dim. per <Sec> idn 
+        that are assigned leaks. 
     """
     @staticmethod
     def generate_instance(irc,srm,add_noise_to_Pr:bool=False,\
@@ -450,7 +455,7 @@ class BackgroundInfo:
 
         if ooc_malpermute_degree > 0.0:
             dx,cs = BackgroundInfo.permute_depmap_AND_codepsets(dx,cs,\
-                occ_malpermute_degree,rnd_struct)
+                ooc_malpermute_degree,rnd_struct)
 
         return BackgroundInfo(dm_pr,dx,cs,dec_map,lm)
 
@@ -472,8 +477,10 @@ class BackgroundInfo:
             if len(num_total_swaps) == 0:
                 return None
             num_total_swaps = num_total_swaps[-1]
+            num_total_swaps += np.sum(ld) 
+
             swaps = int(round(num_total_swaps * occ_malpermute_degree))
-            vx = permute_setseq(vx,rnd_struct,swaps)
+            vx = permute_setseq(vx,rnd_struct,swaps)[0]
             return vx 
 
         for k in dm.keys():
@@ -526,7 +533,6 @@ class BackgroundInfo:
             while len(targets) < l:
                 ix = rnd_struct.randrange(0,len(t))
                 targets.append(t.pop(ix)) 
-
         l = 2 if not vary_lk_sz else \
             rnd_struct.randrange(DEFAULT_LEAKSZ_RANGE[0],\
             DEFAULT_LEAKSZ_RANGE[1] + 1)
@@ -625,8 +631,6 @@ class Cracker:
                [2] target_ratio:float=None,
                [3] vary_lk_sz:bool,
                [4] srm_decmap_args,
-               [5] rnd_struct=random
-
 
     irc2hs_args := 
                [0] naive|partially_naive

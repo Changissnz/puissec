@@ -132,6 +132,30 @@ class BackgroundInfoClass(unittest.TestCase):
                 assert len(v) == dv[k]
         assert bi.dec_map == {0: 2}
 
+    # NOTE: tests checks for correctness of optional argument
+    #       `malpermute_degree` in <BackgroundInfo.generate_instance>
+    def test__BackgroundInfo__generate_instance_case3(self):
+
+        s = SecNet_sample1(SecSeq_sample_2(7,31)) 
+        for s_ in s.irc.irl:
+            s_.explode_contents()
+
+        irc = s.irc
+        random.seed(773)
+
+        bi = BackgroundInfo.generate_instance(irc,s.srm,True,0.0,0.3)
+        assert type(bi) == BackgroundInfo
+        q1 = bi.dm
+        q1_ = bi.cdm
+
+        random.seed(773) 
+        bi = BackgroundInfo.generate_instance(irc,s.srm,True,0.5,1.0)
+        assert type(bi) == BackgroundInfo
+        q2 = bi.dm
+        q2_ = bi.cdm
+
+        assert q1 != q2
+        assert q1_ != q2_ 
 
     def test__BackgroundInfo__naive_IRC2HypStruct_map(self):
 
@@ -228,6 +252,32 @@ class OrderOfCracknClass(unittest.TestCase):
         assert bi.dm == {0: [{0}], \
                 1: [{1}, {0, 2}], 2: [{2}, {0}]}
         assert soln == [{0}, {2}, {1}]
+ 
+class CrackerClass(unittest.TestCase):
+
+    # NOTE: test partially checks for correctness; only asserts 
+    #       output of method is a <Cracker> 
+    def test__Cracker__generate_instance_by_engineered_BI__case1(self):
+
+        sn = SecNet_sample_TDirNv1()
+
+        irc = sn.irc
+        srm = sn.srm
+        rnd_struct = random
+
+        dmapargs = ['cd',max,[0,1]]
+        bi_args = [False,0.23,0.5,False,dmapargs] 
+        irc2hs_args = ["naive",True,1,5] 
+
+        crackling_sz = 6
+        radar_radius = 5
+        energy = 1000.0 
+
+        cr = Cracker.generate_instance_by_engineered_BI(irc,srm,\
+        rnd_struct,bi_args,irc2hs_args,crackling_sz,\
+        radar_radius,energy)
+
+        assert type(cr) == Cracker 
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,6 +1,6 @@
 # functions to modulate index vectors
 from morebs2 import relevance_functions,aprng_gauge,\
-    poly_interpolation,matrix_methods
+    poly_interpolation,matrix_methods,numerical_generator
 from custom_rnd import *
 
 def roundian(x,r):
@@ -283,12 +283,12 @@ class Noiseano:
         assert len(p) == self.superbounds.shape[0]
 
         # calculate max distance for p2 to p
-        q = matrix_methods.euclidean_point_distance(p,deepcopy(self.superbound[:,0]))
-        q2 = matrix_methods.euclidean_point_distance(p,deepcopy(self.superbound[:,1]))
+        q = matrix_methods.euclidean_point_distance(p,deepcopy(self.superbounds[:,0]))
+        q2 = matrix_methods.euclidean_point_distance(p,deepcopy(self.superbounds[:,1]))
         q = max([q,q2])
         q = round(self.rnd_struct.uniform(0.,1.) * q,5) 
         
-        return numerical_generator.random_npoint_from_point_in_bounds_(self.superbound,p,\
+        return numerical_generator.random_npoint_from_point_in_bounds_(self.superbounds,p,\
             q,roundDepth = 5)
 
     def switch_bounds_stat(self,p):
