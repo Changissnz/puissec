@@ -608,7 +608,8 @@ class Cracker:
         self.initiated = False 
         return
 
-    # NOTE: CAUTION: 
+    # TODO: test 
+    # NOTE: for real-life applications, 
     ## the calculations in this method are to be used
     ## sparingly, since the <generator method> wraps 
     ## around objects that normally should never be 
@@ -619,30 +620,50 @@ class Cracker:
     important components, <BackgroundInfo> and 
     <IRC2HypStruct> maps. 
 
-    bi_args := ()
-    irc2hs_args := (naive|partially_naive,*args for scheme)
+    bi_args := [0] add_noise_to_Pr:bool,
+               [1] ooc_malpermute_degree:float,
+               [2] target_ratio:float=None,
+               [3] vary_lk_sz:bool,
+               [4] srm_decmap_args,
+               [5] rnd_struct=random
+
+
+    irc2hs_args := 
+               [0] naive|partially_naive
+                
+                case: naive 
+               [1] full_hypseq:bool,
+               [2] naive_split:int, > 0 
+               [3] hop_size:int, > 0
+
+                case: partially naive 
+               [1] bound_length,
+               [2] rd_range,
+               [3] ra_range 
 
     return: 
     - <Cracker> 
     """
     @staticmethod 
-    def generate_instance_by_engineered_BI(irc2hs_args):
+    def generate_instance_by_engineered_BI(irc,srm,rnd_struct,bi_args,irc2hs_args,\
+        crackling_sz:int,radar_radius:int,energy:float):
 
-        return -1
+        assert irc2hs_args[0] in {"naive","partially naive"} 
 
-# naive_IRC2HypStruct_map(irc,full_hypseq=True,\
-# naive_split=2,hop_size=5):
+        bi = BackgroundInfo.generate_instance(irc,srm,\
+            bi_args[0],bi_args[1],bi_args[2],bi_args[3],\
+            bi_args[4],rnd_struct) 
 
-#partially_naive_IRC2HypStruct_map(irc,\
-#       bound_length,rd_range,ra_range,rnd_struct):
+        irc2hs = None
+        if irc2hs_args[0] == "naive":
+            irc2hs = BackgroundInfo.naive_IRC2HypStruct_map(\
+                irc,irc2hs_args[1],irc2hs_args[2],irc2hs_args[3])
+        else: 
+            irc2hs = BackgroundInfo.partially_naive_IRC2HypStruct_map(\
+                irc,irc2hs_args[1],irc2hs_args[2],irc2hs_args[3],rnd_struct) 
 
- # fill in...    
-
-## BackgroundInfo
-# generate_instance(irc,srm,add_noise_to_Pr:bool=False,\
-#        ooc_malpermute_degree:float=0.0,target_ratio:float=None,\
-#        vary_lk_sz:bool=False,srm_decmap_args=('cd',max,[0,1]),\
-#        rnd_struct=random)    
+        cr = Cracker(irc2hs,bi,crackling_sz,radar_radius,energy) 
+        return cr 
 
 #####################################################################
 
