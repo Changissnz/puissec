@@ -370,7 +370,6 @@ class IsoRing:
 
     # TODO: code still needs to be refactored! 
     def td_next(self,timespan:float,rnd_struct,verbose=False):
-
         # case: open info exists!
         if len(self.td.td.open_info_var) > 0:
             px = self.td.open_info_pathdec(rnd_struct)
@@ -404,7 +403,7 @@ class IsoRing:
         l = random_tiebreaker(c_,rnd_struct,max)[0]
 
         self.td.load_path_to_node(l)
-        v = int(round((len(l) - 1) / timespan))
+        v = int(round((len(self.td.td.node_path) - 1) / timespan))
         self.td.td.velocity = v
         q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)

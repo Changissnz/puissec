@@ -63,7 +63,7 @@ class Crackling:
     """
     """
     def td_next(self,timespan=1.0,verbose:bool=False):
-
+        print("TXXXX")
         if verbose:
             print("--> TD-NEXT FOR C={},N={}".format(self.cidn,\
                 self.td.loc()))
@@ -398,6 +398,10 @@ class HypInfer:
         for (i,sb) in enumerate(hypStruct.suspected_subbounds): 
             outp = HypInfer.exec_fn(leak_idn,sb,leak_value)
             hypStruct.suspected_subbounds[i] = outp 
+
+            # case: F0; set hop_size to 5 
+            if leak_idn == 0:
+                hypStruct.hs_vec[i] = 5
         return hypStruct 
 
     """
@@ -409,6 +413,10 @@ class HypInfer:
         hs = hypStruct.new_HypStruct_by_next_subbound()
 
         outp = HypInfer.exec_fn(leak_idn,hs.suspected_subbounds[0],leak_value)
+
+        # case: null change; return original 
+        if type(outp) == type(None):
+            return hs 
 
         hs.suspected_subbounds = outp[0]
         hs.hs_vec = [outp[1] for _ in range(len(hs.suspected_subbounds))]
@@ -436,7 +444,8 @@ def closest_reference_to_bound_start(b,V_f):
 
     return start_vec + null_vec 
 
-def adjust_bounds__F0(b,V_f,adjust_increment):
+# NOTE: set hop size to 5 
+def adjust_bounds__F0(b,V_f):
     qi = [vf if (not np.isnan(vf)) else 0.0 for vf in V_f] 
     
     nb = deepcopy(b)

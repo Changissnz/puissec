@@ -26,9 +26,7 @@ class HypInferClass(unittest.TestCase):
         crck = Cracker(ph1,bi,6) 
 
         se = SecEnv(sn,crck,vb=0)
-
-        se.load_IRCLD_into_SecNet()
-        se.instantiate_td_for_IRC(5,1.0)
+        se.preprocess()
 
         for _ in range(4):
             se.run(1.0)

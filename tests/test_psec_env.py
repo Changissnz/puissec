@@ -112,7 +112,7 @@ class SecEnvClass(unittest.TestCase):
         """
         ####
         q67 = se.coloc()
-        assert q67 == {'1,18,58'},"GOT {}".format(q67)
+        assert q67 == {'0,18,58'},"GOT {}".format(q67)
 
     def test__SecEnv__InstantiateCrackerANDSecNet__case2(self):
 
@@ -227,10 +227,11 @@ class SecEnvClass(unittest.TestCase):
         crck = Cracker(ph1,bi,6) 
 
         se = SecEnv(sn,crck,vb=2)
+        se.preprocess() 
 
-        se.load_IRCLD_into_SecNet()
+        #se.load_IRCLD_into_SecNet()
         #se.instantiate_cracker_target()
-        se.instantiate_td_for_IRC(5,1.0)
+        #se.instantiate_td_for_IRC(5,1.0)
 
         for _ in range(2):
             se.run(1.0)

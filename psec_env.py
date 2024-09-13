@@ -314,9 +314,8 @@ class SecEnv:
         vs = set(cd.values())
 
         # case: load new cracking targets
-        if vs == {2} or not self.crck.initiated:
+        if vs == {2}:
             print("NEW TARGET")
-            self.crck.initiated = True 
             stat = self.instantiate_cracker_target()
             if not stat: return False
             return self.cproc()
@@ -324,6 +323,7 @@ class SecEnv:
         # proceed to run all <Crackling> instances
         if self.verbose: 
             print("------------ CPROC\n")
+            print("* active <Cracklings>: ",len(self.crck.cracklings))
 
         for i in range(len(self.crck.cracklings)):
             self.cproc_(i,timespan)
@@ -339,6 +339,7 @@ class SecEnv:
         print()
         # done
         if s == 2: 
+            print("DONE")
             return False
 
         # continue cracking
@@ -377,9 +378,11 @@ class SecEnv:
         s = self.crck.next_target()
         if len(s) == 0: return False
 
+        self.crck.initiated = True 
         d = self.sn.isoringset_dim(s)
         dx = [(k,v) for k,v in d.items()]
-
+        print("INSTANTIATING CRACKER TARGET")
+        print(dx) 
         # load the cracklings
         self.crck.load_cracklings_for_secset(dx)
         self.update_cracklings_to_SecNet()
