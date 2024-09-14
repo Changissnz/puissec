@@ -499,6 +499,7 @@ class SecEnv:
 
         v = bool(self.verbose)
         vl = ir.td_next(timespan,self.rnd_struct,v)
+        print("VLLL: ",vl)
         self.sn.energy -= vl 
 
     ############ TODO: methods to handle <CBridge>s.

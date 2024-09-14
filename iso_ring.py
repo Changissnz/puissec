@@ -373,7 +373,7 @@ class IsoRing:
         # case: open info exists!
         if len(self.td.td.open_info_var) > 0:
             px = self.td.open_info_pathdec(rnd_struct)
-
+            print("IROPEN")
             if type(px) != type(None):
                 v = len(px) - 1
                 v = int(round(v/timespan))
@@ -385,16 +385,16 @@ class IsoRing:
 
                 if verbose: 
                     print("MOVELOC {}-->{}\n============".format(q1,q2)) 
+                print("VQ: ", v) 
                 return v
 
         # case: default path to SEC node
         stat = self.default_secproc(timespan,rnd_struct,verbose)
-        if stat > 0:
+        if stat > 0 or self.td.obj_stat == "radar null":
             return stat 
 
         # case: no SEC node for path, required to move        
         c = self.td.default_node_analysis()
-        print("LENC: ",c)
         if len(c) == 0:
             if verbose: 
                 print("? NO PATH ?")
@@ -434,7 +434,7 @@ class IsoRing:
             self.td.switch_obj_stat()
             s2 = self.td.obj_stat 
             if verbose:
-                print("switching from [{}]->[{}] target.".format(s1,s2))
+                print("switching from [{}]->[{}].".format(s1,s2))
 
         ## case: change from `null radar` to `avoid target`; 
         ## fetch a new and active path.
@@ -458,11 +458,12 @@ class IsoRing:
 
         # case: null radar 
         # set active stat of <TDir> to False
-        if stat and self.td.obj_stat == "null radar":
+        if self.td.obj_stat == "radar null": 
             self.td.td.active_stat = False
             self.td.td.velocity = 0 
 
         v = self.td.td.velocity
+
         # travel by <TDir>
         q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)
