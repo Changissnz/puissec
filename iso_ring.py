@@ -403,7 +403,8 @@ class IsoRing:
         l = random_tiebreaker(c_,rnd_struct,max)[0]
 
         self.td.load_path_to_node(l)
-        v = int(round((len(self.td.td.node_path) - 1) / timespan))
+        vl = len(self.td.td.node_path) - 1
+        v = int(round((vl) / timespan))
         self.td.td.velocity = v
         q1 = self.td.loc() 
         self.td.td.scaled__next__(timespan)
@@ -411,7 +412,7 @@ class IsoRing:
 
         if verbose: 
             print("MOVELOC {}-->{}\n============".format(q1,q2)) 
-        return v
+        return vl
 
     # TODO: test
     """
@@ -424,9 +425,9 @@ class IsoRing:
         
         stat = self.td.check_obj()
         if verbose:
-            print("\t\t----------DEFSECPROC,\nI={},OBJ={},STAT={},LOC={}".format(self.sec.idn_tag,\
-                self.td.obj_stat,stat,self.td.loc()))
-            
+            print("\t\t----------DEFSECPROC:\tOBJ={},DELTA={}".format(self.td.obj_stat,stat))
+
+
         # switch obj.
         if stat:
             s1 = self.td.obj_stat

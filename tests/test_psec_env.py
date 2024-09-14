@@ -251,6 +251,38 @@ class SecEnvClass(unittest.TestCase):
         for i in range(4):
             se.run(1.0)
 
+    def test__SecEnv__run__case4__fstat(self):
+        sn = SecNet_sample_TDirNv1()
+
+        irc = sn.irc
+        srm = sn.srm
+        rnd_struct = random
+
+        dmapargs = ['cd',max,[0,1]]
+        bi_args = [False,0.0,None,False,dmapargs] 
+        irc2hs_args = ["naive",True,1,5] 
+
+        crackling_sz = 6
+        radar_radius = 5
+        energy = 1000.0 
+
+        random.seed(224)
+        crck = Cracker.generate_instance_by_engineered_BI(irc,srm,\
+            rnd_struct,bi_args,irc2hs_args,crackling_sz,\
+            radar_radius,energy)
+
+        # open info mode
+        se = SecEnv(sn,crck,rnd_struct=random,\
+                ct_ratio=5000,vb=1,mode_open_info = (0,2))
+
+        se.preprocess() 
+        for _ in range(2):#30): 
+            se.run(1.0)
+
+        assert len(se.crck.cracklings) == 0
+        assert len(se.cbs) == 0
+        return
+
 
 
 if __name__ == '__main__':

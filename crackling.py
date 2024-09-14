@@ -14,7 +14,6 @@ class Crackling:
         # w/ `hs`+<LeakInfo>.
         self.hsi = None
         self.td = None
-        self.rss = None
         self.set_cvec(cvsz)
         # ?target has been cracked?
         self.astat = False
@@ -24,8 +23,11 @@ class Crackling:
         self.cstat = False
         # target has been ?interdicted?
         self.istat = False 
+        # instance has no more guesses from its RSSI 
+        self.fstat = False 
         # ?<TDirector> path is coordinated by <Cracker>?
         self.is_coordinated = False
+        
 
     ###################### functions to get/set <HypStruct>,<TDirector> variables
 
@@ -63,7 +65,6 @@ class Crackling:
     """
     """
     def td_next(self,timespan=1.0,verbose:bool=False):
-        print("TXXXX")
         if verbose:
             print("--> TD-NEXT FOR C={},N={}".format(self.cidn,\
                 self.td.loc()))
@@ -75,7 +76,8 @@ class Crackling:
 
         #############################################
 
-    # TODO: unused. 
+    """
+    """
     def default_TD__search_for_target(self,timespan,verbose:bool=False):
         assert self.td.obj_stat == "search for target"
 
@@ -98,11 +100,11 @@ class Crackling:
             print(str(self.td.td.node_path))
             print("------")
 
-        v = len(self.td.td.node_path) - 1 
-        v = int(round(v / timespan)) 
+        vl = len(self.td.td.node_path) - 1 
+        v = int(round(vl / timespan)) 
         self.td.td.velocity = v
         self.td.td.scaled__next__(timespan)
-        return v
+        return vl 
 
     # TODO: unused 
     def default_TD__capture_target(self,timespan,verbose:bool):
@@ -164,16 +166,11 @@ class Crackling:
         if not self.astat:
             self.astat = astat 
 
-        ##print("PP: {}\nQQ: {}".format(p,q))
         x = q[self.hs.target_index] 
         self.cvec.append(x,p)
         
         qx1 = self.cvec.cmp(measures.zero_div)
         qx2 = self.cvec.cmp(np.less_equal) 
-        ##print("QX1: ",qx1)
-        ##print("QX2: ",qx2)
-
-        ##s = [qx1[self.hs.target_index],qx2[self.hs.target_index]] 
         
         ## arg #1
         s = [np.sum(qx1) >= len(qx1) / self.cmp_deg,\
@@ -185,8 +182,7 @@ class Crackling:
             0.4,True)
         """
         if d: 
-            self.flagged_pts.append(np.copy(self.cvec.input_samples[-1]))#np.copy(self.cvec[-1]))
-            #self.flagged_pts.append(len(self.cvec) - 1)
+            self.flagged_pts.append(np.copy(self.cvec.input_samples[-1]))
         return d
 
     def register_lo_pr(self,prx):

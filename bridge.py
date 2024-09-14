@@ -20,6 +20,7 @@ class CBridge:
         self.batch_size = batch_size
         self.batch = None
 
+        self.cfail = False
         self.load_rssi_batch() 
         return
 

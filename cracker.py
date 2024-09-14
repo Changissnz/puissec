@@ -971,6 +971,12 @@ class Cracker:
         # continue travelling
         return -1 
 
+    def remove_cracklings__fstat(self):
+        for c in self.cracklings:
+            if c.fstat == True:
+                self.remove_spent_crackling(c.cidn)
+        return -1
+
     def remove_spent_crackling(self,cidn):
         i = self.fetch_crackling_index(cidn)
         if i == -1: return

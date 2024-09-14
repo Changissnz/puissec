@@ -133,6 +133,8 @@ class SecEnv:
         self.coloc_register()
         self.coloc_leak_update()
         self.moi = mode_open_info
+
+        self.tcum = 0.0 
         return
 
     def preprocess(self):
@@ -255,11 +257,9 @@ class SecEnv:
     # TODO: test 
     def run(self,timespan=1.0):
         if self.verbose: 
-            print("***************** ONE RUN,T={}".format(timespan))
+            print("***************** ONE RUN,T={},T_CUM={}".format(timespan,self.tcum))
             print()
 
-        #self.cproc(timespan)
-        #self.iproc(timespan)
         self.run_(timespan)
         self.postmove_update() 
 
@@ -267,6 +267,7 @@ class SecEnv:
             print("\n********************************")
             print()
 
+        self.tcum += timespan
         return
 
     """
@@ -366,8 +367,9 @@ class SecEnv:
             return True
 
         # TODO: review dec.
-        c.td_next(timespan,\
+        vm = c.td_next(timespan,\
             verbose=self.verbose)
+        self.crck.energy -= vm 
 
     """
     process that handles the instantiation
@@ -496,7 +498,8 @@ class SecEnv:
             return
 
         v = bool(self.verbose)
-        ir.td_next(timespan,self.rnd_struct,v)
+        vl = ir.td_next(timespan,self.rnd_struct,v)
+        self.sn.energy -= vl 
 
     ############ TODO: methods to handle <CBridge>s.
     ########################################################
@@ -526,7 +529,7 @@ class SecEnv:
     identifier `idn`. 
 
     return:
-    - <CBridge>|None
+    - list(<CBridge>)|None
     """
     def fetch_bridge(self,idn,is_cidn:bool=True,\
         allb:bool=False):
@@ -562,7 +565,9 @@ class SecEnv:
     for `next_rate` iterations.
 
     return:
-    - bool, ?is not early termination?
+    - list(<bool,int>), 
+        [0] ?is not early termination?
+        [1] number of iterations
     """
     def run_CBridge(self,next_rate,iidn):
 
@@ -570,6 +575,7 @@ class SecEnv:
             if self.verbose:
                 print("-- CBRIDGE OP: {}".format(cb_.agent_idns()))
                 print("\t-/-/-/-/")
+            j = 0
             for i in range(next_rate):
                 if self.verbose: 
                     print("ITER=",i)
@@ -578,12 +584,12 @@ class SecEnv:
                 try:
                     qc = next(cb_)
                 except:
-                    return False
-                
-
-                stat = type(qc) != type(None)
-                if not stat: return False
-            return True 
+                    # case: no more: failed cracking
+                    cb_.cfail = True
+                    cb_.crackling.fstat = True
+                    return False, j 
+                j = i + 1
+            return True,next_rate 
 
         cb = self.fetch_bridge(iidn,True,True)
         print("FETCHING BRIDGE")
@@ -593,7 +599,19 @@ class SecEnv:
         for cb_ in cb:
             v = rcb(cb_)
             statvec.append(v)
-        return statvec 
+
+            self.crck.energy -= v[1]
+
+        self.remove_spent_CBridge() 
+        return statvec
+
+    def remove_spent_CBridge(self):
+        cbs2 = []
+        for cb in self.cbs:
+            if cb.cfail == False:
+                cbs2.append(cb)
+        self.cbs = cbs2
+            
 
     #####################################
     ############## <TDirector> instantiation for
@@ -640,6 +658,9 @@ class SecEnv:
         # clear open information from last timespan
         self.sn.clear_open_info()
         self.crck.clear_open_info() 
+
+        # clear fstat cracklings
+        self.crck.remove_cracklings__fstat()
         return
 
     """

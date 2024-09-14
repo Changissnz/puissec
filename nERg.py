@@ -31,6 +31,11 @@ class NerG:
         self.ew = ew
         return
 
+    def __str__(self):
+        s = "ENERGY\n"
+        s += "\tlevel: " + str(self.v) + "\n"
+        return s
+
     def open_rf(self,rf):
         self.rf = rf
         if type(rf) == type(None):
