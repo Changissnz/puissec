@@ -281,7 +281,7 @@ class SecEnvClass(unittest.TestCase):
 
         assert len(se.crck.cracklings) == 0
         assert len(se.cbs) == 0
-
+        assert len(se.sn.occ_crackl) == 0 
         assert se.sn.energy.v == 999.0
         assert se.crck.energy.v == 870.0 
 

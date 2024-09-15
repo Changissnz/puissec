@@ -157,7 +157,6 @@ class SecNet:
         assert len(G) >= len(irc), "len G {} len IRC {}".format(len(G),len(irc))
 
         self.ss = irc
-        ##print("RNDSTRUCT#1: ",rnd_struct)
         self.irc = IsoRingedChain(irc,bound,rnd_struct,rnd_seed) 
         self.rnd_struct = rnd_struct 
         self.path_size = path_size 
@@ -195,8 +194,13 @@ class SecNet:
     ######################## status 
 
     def update_occ_crackl(self):
+        ks = []
         for k in self.occ_crackl.keys():
             v = self.occ_crackl[k] 
+            if v[0].fstat:
+                ks.append(k)
+                continue
+
             qv = (v[0],v[0].loc())
             self.occ_crackl[k] = qv 
 
@@ -207,6 +211,10 @@ class SecNet:
             tdx = v[0].td.td
             sgx = self.subgraph_for_TDir(tdx)
             v[0].td.load_graph(sgx)
+
+        # remove fstat <Crackling>s
+        for k in ks:
+            del self.occ_crackl[k]
         return 
 
     ## TODO: refactoradorii above function w/ this. 
@@ -562,10 +570,14 @@ class SecNet:
             l = self.node_loc_assignment[q]
             i.default_TDirector_instance(l,x,y)
 
+
+
     #################### open info mode
     def clear_open_info(self):
         for ir in self.irc.irl:
             ir.td.td.open_info_var.clear()
+
+    
 
 
 ############################################################

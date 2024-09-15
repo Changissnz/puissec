@@ -59,6 +59,15 @@ class SecMaprFunctionsClass(unittest.TestCase):
         cs = connected_subsets_of_codepmap(sm)
         assert len(cs) == 1
 
+    def test__SecMaprFunctions__permute_setseq__case1(self):
+        random.seed(51214)
+        sseq = [{0,1},{3,4,5},{6,8,7,10}]
+        rnd_struct = random
+        sseq2  = permute_setseq(sseq,rnd_struct,20)
+        ans = ([{0, 5}, {1, 4, 7}, {8, 10, 3, 6}], 20)
+        assert sseq2 == ans
+
+
 
 class PDMapIterClass(unittest.TestCase):
 
