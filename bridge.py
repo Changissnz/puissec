@@ -42,6 +42,8 @@ class CBridge:
         return (self.crackling.cidn,self.isoring.sec.idn_tag)
 
     def __next__(self):
+        print("RES CRACKLING")
+        print(self.crackling.cracked_dict)
         if self.rssi.terminated: 
             print("DONE")
             return 

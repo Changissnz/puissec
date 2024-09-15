@@ -60,16 +60,7 @@ class SecEnvClass(unittest.TestCase):
 
         radar_ans = {0:0,1:1}
         for q in se.sn.irc.irl:
-            #print("SEC {}".format(q.sec.idn_tag))
-            #print("RADIUS {}".format(q.td.td.radius))
-            #print("$$$$$$$$$$$$$$")
-            #print("* path")
-            #print(str(q.td.td.node_path))    
-            #print("SNGC")
-            #q.td.resource_sg.display(0)
             lx = q.td.check_radar()
-            ##print(lx)
-            ##print("-----##")
             lx_ans = radar_ans[q.sec.idn_tag]
             assert len(lx) == lx_ans
             assert len(q.td.resource_sg.ring_locs) == 2
@@ -144,44 +135,6 @@ class SecEnvClass(unittest.TestCase):
 
         assert rx == set(se.sn.irc.fetch_IsoRing(0).secdim_seq())
         assert set(qx.d.keys()) == {0}
-
-    ### TODO: incorrect
-    """
-    def test__SecEnv__leak_by_str_idn__case1(self):
-
-        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
-
-        for x in se.sn.irc.irl:
-            x.explode_contents() 
-
-        se.load_IRCLD_into_SecNet()
-        ##
-        se.instantiate_td_for_IRC(5,1.0)
-        se.instantiate_cracker_target()
-        ##
-
-        sidn = "0,0,32"
-        lbsi = se.leak_by_str_idn(sidn)
-
-        lbsi_ = se.crck.fetch_crackling(0).hs
-
-        ans1 = np.array([\
-            [0.13057814,0.17970186],\
-            [0.,0.5],\
-            [0.,0.5]])
-
-        ans2 = np.array([\
-            [0.,0.5],\
-            [0.,0.5],\
-            [0.,0.5]])
-
-        assert matrix_methods.equal_iterables(\
-            lbsi.suspected_subbounds[0],ans1), "got\n{}\nwant\n{}\n".format(\
-                lbsi.suspected_subbounds[0],ans1) 
-
-        assert matrix_methods.equal_iterables(\
-            lbsi_.suspected_subbounds[0],ans2) 
-    """
     
     # NOTE: print-test 
     def test__SecEnv__run__case1(self):
@@ -190,7 +143,7 @@ class SecEnvClass(unittest.TestCase):
         f = open('out_se.txt', 'w')
         sys.stdout = f
 
-        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+        se = SecEnv_sample_1(sn3=None)
         se.verbose = 2 
 
         for x in se.sn.irc.irl:
@@ -228,11 +181,6 @@ class SecEnvClass(unittest.TestCase):
 
         se = SecEnv(sn,crck,vb=2)
         se.preprocess() 
-
-        #se.load_IRCLD_into_SecNet()
-        #se.instantiate_cracker_target()
-        #se.instantiate_td_for_IRC(5,1.0)
-
         for _ in range(2):
             se.run(1.0)
 
@@ -242,7 +190,7 @@ class SecEnvClass(unittest.TestCase):
 
     def test__SecEnv__run__case3__demo(self):
 
-        se = SecEnv_sample_1(sn3=None)#SecNet_sample_TDirNv1())
+        se = SecEnv_sample_1(sn3=None)
         se.verbose = 2 
 
         for x in se.sn.irc.irl:
@@ -284,10 +232,57 @@ class SecEnvClass(unittest.TestCase):
         assert len(se.sn.occ_crackl) == 0 
         assert se.sn.energy.v == 999.0
         assert se.crck.energy.v == 870.0 
-
         return
 
+    ## 2 SEC, 2 node test
+    def test__SecEnv__run__case5__astat(self):
+        random.seed(224)
+        np.random.seed(220)
 
+        sl = Sec_list_sample3(2,[0.,1.])
+
+        sndg = SecNetDepGen(sl,random,2,0.75,[0,2])
+        sndg.assign_conn()
+        sq = sndg.sq
+        ss = SecSeq(sndg.sq)
+
+        sec_node_count = 2
+        nsec_node_count = 0
+        num_entry = 2
+        rnd_struct = random
+        sn = SecNet.generate(ss,sec_node_count,\
+            nsec_node_count,num_entry,\
+            1,rnd_struct,"pairing frame",117)  
+
+        irc = sn.irc
+        srm = sn.srm
+        rnd_struct = random
+
+        dmapargs = ['cd',max,[0,1]]
+        bi_args = [False,0.0,None,False,dmapargs] 
+        irc2hs_args = ["partially naive",0.5,[0.0,0.0],[1.0,1.0]] 
+
+        crackling_sz = 6
+        radar_radius = 5
+        energy = 1000.0 
+
+        crck = Cracker.generate_instance_by_engineered_BI(irc,srm,\
+            rnd_struct,bi_args,irc2hs_args,crackling_sz,\
+            radar_radius,energy)
+
+        se = SecEnv(sn,crck,rnd_struct=random,\
+            ct_ratio=5000,vb=1,mode_open_info = (0,0))
+        se.preprocess() 
+
+        for i in range(2):
+            se.run(1.0) 
+
+        assert len(se.crck.csoln) == 1
+
+        sec0 = ss[0] 
+        assert matrix_methods.equal_iterables(\
+                sec0.seq,se.crck.csoln.d[0][1]) 
+        assert abs(sec0.seq_pr() - se.crck.csoln.d[0][2]) <= 10 ** -5 
 
 if __name__ == '__main__':
     unittest.main()

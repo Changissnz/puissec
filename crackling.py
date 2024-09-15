@@ -28,7 +28,6 @@ class Crackling:
         # ?<TDirector> path is coordinated by <Cracker>?
         self.is_coordinated = False
         
-
     ###################### functions to get/set <HypStruct>,<TDirector> variables
 
     def load_HypStruct(self,hs):
@@ -264,7 +263,6 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
 def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
     hs:HypStruct,verbose=False): 
 
-    #ssih,\verbose=False):
     assert type(ir) == IsoRing
     assert type(hs) == HypStruct
 

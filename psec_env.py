@@ -580,7 +580,6 @@ class SecEnv:
             for i in range(next_rate):
                 if self.verbose: 
                     print("ITER=",i)
-                #qc = next(cb_)
                 
                 try:
                     qc = next(cb_)
@@ -589,7 +588,18 @@ class SecEnv:
                     cb_.cfail = True
                     cb_.crackling.fstat = True
                     return False, j 
+
                 j = i + 1
+                if cb_.crackling.astat:
+                    # add the result to <Cracker.csoln>
+                    ks = list(list(cb_.crackling.cracked_dict.items())[0])
+                    ks[0] = matrix_methods.string_to_vector(ks[0],float)
+                    sol = (cb_.crackling.hs.seq_idn,\
+                        cb_.crackling.hs.target_index,\
+                        ks[0],ks[1])
+                    self.crck.csoln += sol
+                    return False, j  
+
             return True,next_rate 
 
         cb = self.fetch_bridge(iidn,True,True)

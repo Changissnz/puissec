@@ -582,7 +582,11 @@ class CrackSoln:
         if t[0] in qx.d:
             qx.prev_soln[t[0]].append(qx.d[t[0]])
         qx.d[t[0]] = (t[1],t[2],t[3])
+        self = qx 
         return qx
+
+    def __len__(self):
+        return len(self.d)
 
     def match_pr(self):
         return -1
@@ -665,6 +669,7 @@ class Cracker:
         else: 
             irc2hs = BackgroundInfo.partially_naive_IRC2HypStruct_map(\
                 irc,irc2hs_args[1],irc2hs_args[2],irc2hs_args[3],rnd_struct) 
+            irc2hs = irc2hs[0] 
 
         cr = Cracker(irc2hs,bi,crackling_sz,radar_radius,energy) 
         return cr 
