@@ -45,20 +45,23 @@ class CBridge:
         print("RES CRACKLING")
         print(self.crackling.cracked_dict)
         if self.rssi.terminated: 
-            print("DONE")
+            if self.verbose: print("DONE")
             return 
 
-        ##print("BATCH")
-        ##print(self.batch)
-
-        p = next(self.batch)
-        if type(p) == None: 
-            if self.verbose: print("--- FINISHED. LOADING NEW BATCH.")
-            self.load_rssi_batch()
+        p = None
+        try:
             p = next(self.batch)
-            if type(p) == type(None):
+        except:
+            if self.verbose: print("--- LOADING NEW BATCH.")
+            self.load_rssi_batch()
+        
+        if type(p) == type(None):
+            try:
+                p = next(self.batch)
+            except:
+                if self.verbose: print("--- FINISHED.")
                 return None
-
+        
         if self.verbose:
             print('next point on bridge {}:\n{}'.format(\
                 self.agent_idns(),p))

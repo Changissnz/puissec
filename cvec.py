@@ -190,7 +190,7 @@ class CVec:
 
     """
     def __init__(self,input_samples = [],start_vec=np.array([]),\
-        cvis=[],sz_limit=20):#float('inf')):
+        cvis=[],sz_limit=20):
         print("setting sz_limit: ",sz_limit)
         assert matrix_methods.is_vector(start_vec)
         assert len(start_vec) == len(input_samples)

@@ -225,18 +225,12 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
             return 
         """
         q,stat = ir.register_attempt(p)
-        ##
+        ##??
         if verbose: 
             print("-- register")
             print("score: ",q[cracklng.hs.target_index])
-            print("stat: ",stat)
+            print("point: ", p, " stat: ",stat)
         
-        ##
-        """
-        if stat:
-            return None
-        """
-
         if verbose:
             print("cracking resp: ")
         

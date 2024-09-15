@@ -309,11 +309,12 @@ class IsoRing:
     def register_attempt(self,p):
         ##print("-- RA")
         q = self.register_attempt_(p)
-        stat = matrix_methods.equal_iterables(p,self.sec.seq)
+        
+        stat = matrix_methods.equal_iterables(p,self.sec.seq,roundPlaces=4)
         outstat = []
         ops = self.rep().optima_points()
         for ps in ops:
-            stat2 = matrix_methods.equal_iterables(p,ps)
+            stat2 = matrix_methods.equal_iterables(p,ps,roundPlaces=4)
             outstat.append(stat2)
         ##print("got outstat")
         ##print(outstat)

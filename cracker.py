@@ -278,9 +278,36 @@ class BackgroundInfo:
 
             b1,b2 = BackgroundInfo.partially_naive_IsoRing2HypStruct_map(\
                 ir,bound_length,r_d,r_a,rnd_struct)
+            ##??
+            """
+            print("&& LOADING &&")
+            for k, v in b1.items():
+                print("--- K: ", k)
+                for v_ in v: 
+                    print(v_) 
+                    print()
+                print("=========")
+            """
+            ##??
+            ##print(b1) 
+            bx1[ir.sec.idn_tag] = deepcopy(b1)
+            bx2[ir.sec.idn_tag] = deepcopy(b2)
 
-            bx1[ir.sec.idn_tag] = b1
-            bx2[ir.sec.idn_tag] = b2 
+        ##??
+        """
+        print("AFTER LOADING")
+        for k,v in bx1.items():
+            print("-- K: ",k)
+            for k2,v2 in v.items():
+                print("---- K2: ",k2)
+                for v2_ in v2: 
+                    print(v2_)
+                print("^^^^^^")
+            print("^^_^^_")
+        print("ALLLLLL")
+        """
+        ##??
+
         return bx1,bx2 
 
     """
@@ -313,7 +340,8 @@ class BackgroundInfo:
             lr = [rnd_struct.random() for d__ in range(d)]
             lr = np.array(lr)
             hs = rnd_struct.randrange(2,13)
-            return fgx(ir,seci,bound_length,lr,hs),hs 
+            hypStruct = fgx(ir,seci,bound_length,lr,hs)
+            return hypStruct,hs 
 
         # choose the dim 
         qx = [[],[],[]]
@@ -550,8 +578,6 @@ class BackgroundInfo:
             lk.leak_info(ir)
             ir.leak_stage -= 1
 
-            #print("LK-LEAKM") 
-            #print(lk.leakm.d)
             if ir.sec.idn_tag not in lk.leakm.d: 
                 continue 
             leakInfo = lk.leakm.d[ir.sec.idn_tag]
@@ -616,6 +642,22 @@ class Cracker:
         self.csoln = CrackSoln() 
 
         self.initiated = False 
+
+        ##??
+        """
+        print("IIII.CCCC")
+        ##print("&& LOADING &&")
+        for k, v in self.hyp_map.items():
+            print("--- K: ", k)
+            for k2,v2 in v.items(): 
+                print("---- K2: ",k2) 
+                for v2_ in v2:
+                    print(v2_)
+                    print()
+            print("=========")
+        """
+        ##??
+
         return
 
     # TODO: test 
@@ -668,9 +710,7 @@ class Cracker:
                 irc,irc2hs_args[1],irc2hs_args[2],irc2hs_args[3])
         else: 
             irc2hs = BackgroundInfo.partially_naive_IRC2HypStruct_map(\
-                irc,irc2hs_args[1],irc2hs_args[2],irc2hs_args[3],rnd_struct) 
-            irc2hs = irc2hs[0] 
-
+                irc,irc2hs_args[1],irc2hs_args[2],irc2hs_args[3],rnd_struct)[0]
         cr = Cracker(irc2hs,bi,crackling_sz,radar_radius,energy) 
         return cr 
 
@@ -779,7 +819,7 @@ class Cracker:
 
         return -1
 
-    def load_crackling(self,sec_idn,sec_dim):
+    def load_crackling(self,sec_idn,sec_dim,sz_limit=20):
 
         hs = self.next_hypstruct(sec_idn,sec_dim)
         print("HSSSS")
@@ -787,7 +827,7 @@ class Cracker:
         if type(hs) == type(None):
             return False
 
-        cr = Crackling(cidn=self.cidn_counter)
+        cr = Crackling(cidn=self.cidn_counter,cvsz=sz_limit)
         self.cidn_counter += 1
         cr.load_HypStruct(hs) 
         self.cracklings.append(cr) 

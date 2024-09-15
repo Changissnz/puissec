@@ -221,17 +221,17 @@ class SecEnvClass(unittest.TestCase):
 
         # open info mode
         se = SecEnv(sn,crck,rnd_struct=random,\
-                ct_ratio=5000,vb=1,mode_open_info = (0,2))
+                ct_ratio=1000,vb=1,mode_open_info = (0,2))
 
         se.preprocess() 
         for _ in range(2):#30): 
             se.run(1.0)
 
-        assert len(se.crck.cracklings) == 0
-        assert len(se.cbs) == 0
-        assert len(se.sn.occ_crackl) == 0 
+        assert len(se.crck.cracklings) == 1
+        assert len(se.cbs) == 1
+        assert len(se.sn.occ_crackl) == 1 
         assert se.sn.energy.v == 999.0
-        assert se.crck.energy.v == 870.0 
+        assert se.crck.energy.v == 0.0 
         return
 
     ## 2 SEC, 2 node test

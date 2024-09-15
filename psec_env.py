@@ -519,7 +519,8 @@ class SecEnv:
         i = self.sn.irc.fetch_IsoRing(iidn)
         hs = c.hs
         cb = CBridge(c,i,self.cbs_idn_ctr,\
-            1000,self.verbose == 2)
+            #2, True)#self.verbose == 2) 
+            self.ct_ratio,self.verbose == 2)
 
         self.cbs_idn_ctr += 1
         self.cbs.append(cb) 
@@ -571,7 +572,7 @@ class SecEnv:
         [1] number of iterations
     """
     def run_CBridge(self,next_rate,iidn):
-
+        
         def rcb(cb_):
             if self.verbose:
                 print("-- CBRIDGE OP: {}".format(cb_.agent_idns()))
@@ -580,14 +581,14 @@ class SecEnv:
             for i in range(next_rate):
                 if self.verbose: 
                     print("ITER=",i)
-                
-                try:
-                    qc = next(cb_)
-                except:
-                    # case: no more: failed cracking
-                    cb_.cfail = True
-                    cb_.crackling.fstat = True
-                    return False, j 
+                                
+                ### NOTE: new
+                qc = next(cb_) 
+                if type(qc) == type(None):
+                    if not cb_.crackling.astat:
+                        cb_.cfail = True
+                        cb_.crackling.fstat = True
+                        return False, j 
 
                 j = i + 1
                 if cb_.crackling.astat:
@@ -598,6 +599,7 @@ class SecEnv:
                         cb_.crackling.hs.target_index,\
                         ks[0],ks[1])
                     self.crck.csoln += sol
+                    self.crck.oopi += 1
                     return False, j  
 
             return True,next_rate 
@@ -862,6 +864,4 @@ sn_args := (sec node count,nsec node count,num entry points,rnd_struct,path-in-m
 """
 def generate_SecEnv(irc_args,sn_args):
     sn = SecNet.generate(irc_args,sn_args)
-
-
     return -1 
