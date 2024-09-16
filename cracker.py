@@ -765,10 +765,10 @@ class Cracker:
 
     targetdim_seq := list<(sec_idn,sec_dim)>
     """
-    def load_cracklings_for_secset(self,targetdim_seq):
+    def load_cracklings_for_secset(self,targetdim_seq,sz_limit=20,verbose=False):
         self.cracklings.clear() 
         for (nt_,d) in targetdim_seq: 
-            self.load_crackling(nt_,d)
+            self.load_crackling(nt_,d,sz_limit,verbose)
         return
 
     # TODO: uses <NerG> 
@@ -779,7 +779,7 @@ class Cracker:
 
         return -1
 
-    def load_crackling(self,sec_idn,sec_dim,sz_limit=20):
+    def load_crackling(self,sec_idn,sec_dim,sz_limit=20,verbose=False):
 
         hs = self.next_hypstruct(sec_idn,sec_dim)
         if type(hs) == type(None):
@@ -787,6 +787,11 @@ class Cracker:
 
         cr = Crackling(cidn=self.cidn_counter,cvsz=sz_limit)
         self.cidn_counter += 1
+
+        if verbose: 
+            print("LOADING NEW CRACKLING W/ HYP")
+            print(hs)
+
         cr.load_HypStruct(hs) 
         self.cracklings.append(cr) 
         return cr

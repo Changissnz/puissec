@@ -232,6 +232,7 @@ class SecEnvClass(unittest.TestCase):
         assert len(se.sn.occ_crackl) == 1 
         assert se.sn.energy.v == 999.0
         assert se.crck.energy.v == 0.0 
+        assert se.crck.is_terminated() 
         return
 
     ## 2 SEC, 2 node test

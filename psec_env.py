@@ -324,7 +324,7 @@ class SecEnv:
 
         # case: load new cracking targets
         if vs == {2}:
-            print("NEW TARGET")
+            if self.verbose: print("NEW TARGET")
             stat = self.instantiate_cracker_target()
             if not stat: return False
             return self.cproc()
@@ -348,7 +348,7 @@ class SecEnv:
         print()
         # done
         if s == 2: 
-            print("DONE")
+            if self.verbose: print("DONE")
             return False
 
         # continue cracking
@@ -394,7 +394,7 @@ class SecEnv:
         print("INSTANTIATING CRACKER TARGET")
         print(dx) 
         # load the cracklings
-        self.crck.load_cracklings_for_secset(dx)
+        self.crck.load_cracklings_for_secset(dx,verbose= self.verbose != 0)
         self.update_cracklings_to_SecNet()
         return True
 
@@ -633,7 +633,6 @@ class SecEnv:
                 cbs2.append(cb)
         self.cbs = cbs2
             
-
     #####################################
     ############## <TDirector> instantiation for
     ############## each <IsoRing>|<Crackling>
