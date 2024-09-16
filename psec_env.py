@@ -259,6 +259,14 @@ class SecEnv:
         if self.verbose: 
             print("***************** ONE RUN,T={},T_CUM={}".format(timespan,self.tcum))
             print()
+        
+        cterm = self.crck.is_terminated()
+        snterm = self.sn.is_terminated()
+        if cterm or snterm:
+
+            if self.verbose:
+                print("\t\tTERMINATION: C={},S={}".format(cterm,snterm))
+            return 
 
         self.run_(timespan)
         self.postmove_update() 

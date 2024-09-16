@@ -188,6 +188,7 @@ class SecNet:
             assert type(sngc) == SNGraphContainer
             self.sgc = sngc 
         self.energy = NerG(energy)
+        self.terminated = self.is_terminated()
         return
 
     ######################## location update and
@@ -570,7 +571,9 @@ class SecNet:
             l = self.node_loc_assignment[q]
             i.default_TDirector_instance(l,x,y)
 
-
+    def is_terminated(self):
+        self.terminated = self.energy.v <= 0.0 
+        return self.terminated 
 
     #################### open info mode
     def clear_open_info(self):

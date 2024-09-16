@@ -278,35 +278,9 @@ class BackgroundInfo:
 
             b1,b2 = BackgroundInfo.partially_naive_IsoRing2HypStruct_map(\
                 ir,bound_length,r_d,r_a,rnd_struct)
-            ##??
-            """
-            print("&& LOADING &&")
-            for k, v in b1.items():
-                print("--- K: ", k)
-                for v_ in v: 
-                    print(v_) 
-                    print()
-                print("=========")
-            """
-            ##??
-            ##print(b1) 
+
             bx1[ir.sec.idn_tag] = deepcopy(b1)
             bx2[ir.sec.idn_tag] = deepcopy(b2)
-
-        ##??
-        """
-        print("AFTER LOADING")
-        for k,v in bx1.items():
-            print("-- K: ",k)
-            for k2,v2 in v.items():
-                print("---- K2: ",k2)
-                for v2_ in v2: 
-                    print(v2_)
-                print("^^^^^^")
-            print("^^_^^_")
-        print("ALLLLLL")
-        """
-        ##??
 
         return bx1,bx2 
 
@@ -643,21 +617,7 @@ class Cracker:
 
         self.initiated = False 
 
-        ##??
-        """
-        print("IIII.CCCC")
-        ##print("&& LOADING &&")
-        for k, v in self.hyp_map.items():
-            print("--- K: ", k)
-            for k2,v2 in v.items(): 
-                print("---- K2: ",k2) 
-                for v2_ in v2:
-                    print(v2_)
-                    print()
-            print("=========")
-        """
-        ##??
-
+        self.terminated = self.is_terminated()
         return
 
     # TODO: test 
@@ -822,8 +782,6 @@ class Cracker:
     def load_crackling(self,sec_idn,sec_dim,sz_limit=20):
 
         hs = self.next_hypstruct(sec_idn,sec_dim)
-        print("HSSSS")
-        print(hs) 
         if type(hs) == type(None):
             return False
 
@@ -1032,4 +990,7 @@ class Cracker:
     def clear_open_info(self):
         for c in self.cracklings:
             c.td.td.open_info_var.clear() 
-    
+
+    def is_terminated(self):
+        self.terminated = self.energy.v <= 0.0 
+        return self.terminated 
