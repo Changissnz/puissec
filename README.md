@@ -51,3 +51,9 @@ code has been deleted.
 Some additional work and thoughts are planned to be added to the paper. 
 These paper updates will roughly coincide with current developments 
 revolving around `psec_env.py`. 
+
+### Update 09/17/2024
+Open development of project has been placed in the zone of uncertainty.
+Most of the bugs have been fixed. There is certainly room for improvement.
+Some concepts from the paper have not yet been implemented. The developer
+of this project has become preoccupied with other questions.

@@ -188,7 +188,7 @@ class SNGraphContainer:
         sx = set()
         print("[BUG] ALL CO-LOCS FOR {}:{}".format(aidn,is_crackling))
         print(q)
-        
+
         for k,v in q.items():
             v2 = v if is_crackling else v[0] 
             if l == v2: sx = sx | {k}
@@ -896,12 +896,18 @@ class TDirector:
     # TODO: test 
     def default_crackling_pathdec(self,predicted_distance:int=None,\
         rnd_struct=random,objf=np.min):
+        ## NOTE: open-ended question here. 
         if not (type(predicted_distance) == int and predicted_distance >= 0):
             g_rad = self.resource_sg.radius()
             if g_rad < 1:
                 predicted_distance = 1
             else:  
                 predicted_distance = rnd_struct.randrange(1,g_rad+1) 
+
+            predicted_distance = 0
+
+
+        print("CRCK PRED-DIST ",predicted_distance)
 
         cs = self.check_radar()
         if len(cs) == 0: return None
@@ -918,6 +924,7 @@ class TDirector:
         #           select an NSEC for site of 
         #           interception.
         if stat:
+            print("CRCK YES SEC")
             if cs not in dfsc.min_paths:
                 return None
             return dfsc.min_paths[cs][0].invert()
@@ -925,10 +932,13 @@ class TDirector:
         # run analysis on all nodes
         xs = self.targetnode_analysis(objf)
         assert len(xs) > 0
-
+        print("TARGETNODE ANALYSIS")
+        print(xs) 
         xs = [(k,abs(v - predicted_distance)) for k,v in xs.items()]
         nx_ = random_tiebreaker(xs,rnd_struct,False)         
         nx = nx_[0] 
+        print("\tNODE: ",nx) 
+        print("\t\t\t&&& &&& &&&\t\t\t")
         if nx not in dfsc.min_paths: return None
         return dfsc.min_paths[nx][0].invert()
 

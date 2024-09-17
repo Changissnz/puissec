@@ -676,8 +676,9 @@ class SecEnv:
     as each agent's <TDirector> graph. 
     """
     def postmove_update(self):
-        self.sn.update_occ_crackl()
+
         self.sn.update_nla() 
+        self.sn.update_occ_crackl()
 
         self.coloc_register()
         self.coloc_leak_update()

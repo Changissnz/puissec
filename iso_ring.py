@@ -376,7 +376,6 @@ class IsoRing:
             px = self.td.open_info_pathdec(rnd_struct)
             
             if verbose: print("\t\t\t[!] OPEN INFO")
-            print("IROPEN")
             if type(px) != type(None):
                 v = len(px) - 1
                 v = int(round(v/timespan))
@@ -404,7 +403,9 @@ class IsoRing:
                 return 0 
 
         c_ = [(k,v) for k,v in c.items()]
+        #*         
         l = random_tiebreaker(c_,rnd_struct,max)[0]
+        #*
         self.td.load_path_to_node(l)
         vl = len(self.td.td.node_path) - 1
         if verbose:
@@ -468,6 +469,11 @@ class IsoRing:
         if self.td.obj_stat == "radar null": 
             self.td.td.active_stat = False
             self.td.td.velocity = 0 
+
+        # case: avoid target, path finished
+        if self.td.obj_stat == "avoid target":
+            if not self.td.td.active_stat: 
+                self.td.td.velocity = 0 
 
         v = self.td.td.velocity
 

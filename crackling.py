@@ -123,7 +123,9 @@ class Crackling:
 
         dpd = self.td.default_crackling_pathdec(\
             predicted_distance=None,rnd_struct=random)        
-
+        print("DEFAULT CPATHDEC")
+        print(dpd)
+        
         # set the velocity equal to the path length
         self.td.load_new_path(dpd)
         v = len(dpd) -1 
