@@ -374,6 +374,8 @@ class IsoRing:
         # case: open info exists!
         if len(self.td.td.open_info_var) > 0:
             px = self.td.open_info_pathdec(rnd_struct)
+            
+            if verbose: print("\t\t\t[!] OPEN INFO")
             print("IROPEN")
             if type(px) != type(None):
                 v = len(px) - 1
@@ -400,11 +402,15 @@ class IsoRing:
             if verbose: 
                 print("? NO PATH ?")
                 return 0 
+
         c_ = [(k,v) for k,v in c.items()]
         l = random_tiebreaker(c_,rnd_struct,max)[0]
-
         self.td.load_path_to_node(l)
         vl = len(self.td.td.node_path) - 1
+        if verbose:
+            print("\t\tNEW PATH")
+            print(self.td.td.node_path)
+
         v = int(round((vl) / timespan))
         self.td.td.velocity = v
         q1 = self.td.loc() 

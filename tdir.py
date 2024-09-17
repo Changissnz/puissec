@@ -186,6 +186,9 @@ class SNGraphContainer:
             q = self.crackling_locs
             
         sx = set()
+        print("[BUG] ALL CO-LOCS FOR {}:{}".format(aidn,is_crackling))
+        print(q)
+        
         for k,v in q.items():
             v2 = v if is_crackling else v[0] 
             if l == v2: sx = sx | {k}
@@ -490,7 +493,7 @@ class TDirector:
     """
     def clear_data(self):
         if self.obj_stat in {"avoid target","capture target"}:
-            print("cannot delete data during avoid/capture ops.")
+            ##print("cannot delete data during avoid/capture ops.")
             return
 
         self.ps = np.array([])
@@ -642,10 +645,15 @@ class TDirector:
     def default_node_analysis(self):
         ta = self.targetnode_analysis(np.min)
         td = self.destnode_sec_analysis_dict(np.mean)
+        
+        ##
+        """
         print("TA")
         print(ta)
         print("TD")
         print(td)
+        """
+        ## 
 
         k = set(list(ta.keys()) + list(td.keys()))
         d = {}
@@ -925,10 +933,9 @@ class TDirector:
         return dfsc.min_paths[nx][0].invert()
 
     def load_path_to_node(self,loc):
-        p = self.td.load_path_(self.resource_sg,loc) 
+        p = self.td.load_path_(self.resource_sg,loc)
         assert type(p) != type(None)
-        self.node_path = p
-        self.index = 0
+        self.load_new_path(p)
 
     # TODO: test
     """

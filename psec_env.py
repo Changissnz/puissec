@@ -266,7 +266,12 @@ class SecEnv:
 
             if self.verbose:
                 print("\t\tTERMINATION: C={},S={}".format(cterm,snterm))
-            return 
+            return
+
+        # summarize co-locations
+        print("CO-LOCATIONS")
+        print(self.ci)
+        print()
 
         self.run_(timespan)
         self.postmove_update() 
@@ -371,7 +376,7 @@ class SecEnv:
         # interdiction
         if s == 0:
             if self.verbose:
-                print("-- INTERDICTION")
+                print("-- INTERDICTION BY C={},L={}".format(c.cidn,c.loc()))
             return True
 
         # TODO: review dec.
@@ -494,9 +499,11 @@ class SecEnv:
         if self.verbose:
             print("I={},L={},STAT={}".format(ir.sec.idn_tag,ir.td.loc(),\
                 cstat))
-            print("S.G. KEYS")
+        
+        if self.verbose == 2:
+            print("\t\tS.G. KEYS")
             print(ir.td.resource_sg.d.keys())
-            print("CLOCS")
+            print("\t\tCLOCS")
             print(ir.td.resource_sg.crackling_locs)
         
         # case: is being cracked --> immobilized.
@@ -613,8 +620,8 @@ class SecEnv:
             return True,next_rate 
 
         cb = self.fetch_bridge(iidn,True,True)
-        print("FETCHING BRIDGE")
-        print(cb)
+        ##print("FETCHING BRIDGE")
+        ##print(cb)
 
         statvec = []
         for cb_ in cb:
@@ -718,13 +725,13 @@ class SecEnv:
     def crackling_stat_update(self): 
 
         for c in self.crck.cracklings:
-            q = c.td.coloc()
-            c.cstat,c.istat = False,False 
-            if len(q) > 0:
-                if self.sn.is_secnode(c.loc()):
-                    c.cstat = True
-                else:
-                    c.istat = True
+            c.cstat,c.istat = False,False
+            s = self.ci.cstat(c.cidn,False)
+            if not s: continue
+            if s == 1:
+                c.istat = True
+            else:
+                c.cstat = True
         return
 
     #############
