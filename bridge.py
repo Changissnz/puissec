@@ -25,7 +25,6 @@ class CBridge:
         return
 
     def load_crackf(self):
-        print("LOADING ",self.verbose)
         self.rssi = default_base_RSSI(self.isoring,self.crackling,\
             self.crackling.hs,self.verbose)
 

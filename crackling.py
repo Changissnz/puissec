@@ -283,7 +283,7 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
 
     start_point = deepcopy(mpsb[:,0])
     rss = rssi.ResplattingSearchSpaceIterator(mpsb,\
-        start_point,SSIHop=ssih,resplattingMode = \
+        start_point,SSIHop=int(ssih),resplattingMode = \
             resplattingMode)
     ##print("DECLARED RSS")
     return rss
