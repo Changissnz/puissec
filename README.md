@@ -57,3 +57,11 @@ Open development of project has been placed in the zone of uncertainty.
 Most of the bugs have been fixed. There is certainly room for improvement.
 Some concepts from the paper have not yet been implemented. The developer
 of this project has become preoccupied with other questions.
+
+### Update 11/17/2025  
+I am not continuing on with this project. There are still technical bugs 
+in this open source state. After I personally reviewed the architectural 
+structure of this project, I've concluded I over-developed on some of the 
+aspects of network adversary simulation. This over-development has led to 
+some of the code very chunky to continue working with. And most importantly, 
+this project is a design to simulate network adversaries (not the real deal). 

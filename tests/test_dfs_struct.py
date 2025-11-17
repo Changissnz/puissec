@@ -1,6 +1,9 @@
 from tests.dfs_struct_samples import * 
 import unittest
 
+"""
+python3 -m tests.test_dfs_struct
+"""
 class DFSCacheClass(unittest.TestCase):
 
     def test__DFSCache_exec_DFS__search_head_type_1__case3(self):
