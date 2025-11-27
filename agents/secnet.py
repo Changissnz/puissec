@@ -601,7 +601,7 @@ def pickled_SecNet_sample_Q():
     s = SecNet_sample1(SecSeq_sample_2(9,55)) 
 
     for s_ in s.irc.irl:
-            s_.explode_contents()
+        s_.explode_contents()
 
     s.pickle_thyself("codename__ASS_SHIT")
 

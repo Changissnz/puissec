@@ -1,4 +1,4 @@
-from bloominhurst import * 
+from base.bloominhurst import * 
 import unittest
 
 ### lone file test 

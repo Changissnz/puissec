@@ -1,4 +1,4 @@
-from psec_env import * 
+from agents.psec_env import * 
 import unittest
 
 ### lone file test 

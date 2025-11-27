@@ -1,4 +1,4 @@
-from secnet_gen import * 
+from base.secnet_gen import * 
 import unittest
 
 ### lone file test 

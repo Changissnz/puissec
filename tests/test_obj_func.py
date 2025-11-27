@@ -1,4 +1,4 @@
-from obj_func import *
+from base.obj_func import *
 import unittest
 
 def point_pair_case_1():
@@ -13,6 +13,9 @@ def template_obj_func_test(arg1,arg2,p1,p2):
         x1.append(qx.output(p1,p2))    
     return x1 
 
+"""
+python3 -m tests.test_obj_func
+"""
 class ObjFuncClass(unittest.TestCase):
 
     def test__ObjFunc_output__case1(self):

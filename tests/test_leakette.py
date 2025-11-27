@@ -1,4 +1,4 @@
-from secnet import * 
+from agents.secnet import * 
 import unittest
 
 ### lone file test 

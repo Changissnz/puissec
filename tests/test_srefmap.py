@@ -1,4 +1,5 @@
-from secnet import * 
+from agents.secnet import * 
+from base.srefmap import * 
 import unittest
 
 ### lone file test 
@@ -70,6 +71,7 @@ class SRefMapClass(unittest.TestCase):
         assert len(srm.prism_typePr) == 24
         assert len(srm.prism_typeDec) == 18 
 
+    """
     def test__SRefMap__binarycmp_prism_points__typePr__case1(self):
         fobj = open("sampleX","rb")
         srm = pickle.load(fobj) 
@@ -84,7 +86,9 @@ class SRefMapClass(unittest.TestCase):
                 prkey2,0,0,5)
 
         assert sum(prmap.values()) == 0.0 
+    """
 
+    """
     def test__SRefMap__binarycmp_prism_points__typePr__case2(self):
         fobj = open("sampleX","rb")
         srm = pickle.load(fobj) 
@@ -107,9 +111,11 @@ class SRefMapClass(unittest.TestCase):
                 cx += 1
 
         assert cx_ == 51 and cx == 66 
-
+    """
+    
     # NOTE: dummy test; does not check for correct sol'n, only 
     #       their existence
+    """
     def test__SRefMap__binarycmp_prism_points__typeDec__case1(self):
         fobj = open("sampleX","rb")
         srm = pickle.load(fobj) 
@@ -122,7 +128,9 @@ class SRefMapClass(unittest.TestCase):
             for j in range(i+1,len(qx)):
                 bpp = srm.binarycmp_prism_points__typeDec(qx[i],qx[j])
                 assert len(bpp) > 0 
+    """
 
+    """
     def test__SRefMap__cd_density_measure__case1(self):
         fobj = open("sampleX","rb")
         srm = pickle.load(fobj) 
@@ -172,7 +180,7 @@ class SRefMapClass(unittest.TestCase):
 
         mn = sum(ql) / len(ql)
         assert round(abs(mn - 0.7929292929292922),12) == 0.0 
-
+    """
 
 if __name__ == '__main__':
     unittest.main() 

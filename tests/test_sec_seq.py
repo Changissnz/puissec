@@ -1,6 +1,11 @@
-from struct_samples import * 
+from agents.struct_samples import * 
 import unittest
 
+### lone file test 
+"""
+python3 -m tests.test_sec_seq
+"""
+###
 class SecClass(unittest.TestCase):
 
     def test__Sec__next__case1(self):

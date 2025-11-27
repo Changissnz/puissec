@@ -1,4 +1,4 @@
-from dfs_struct import *
+from base.dfs_struct import *
 
 """
 

@@ -1,6 +1,11 @@
-from pr_catgen import * 
+from base.pr_catgen import * 
 import unittest
 
+### lone file test 
+"""
+python3 -m tests.test_pr_catgen
+"""
+###
 class PRCatGenFunctionsClass(unittest.TestCase):
 
     def test__exact_correlation_dep_Pr(self):

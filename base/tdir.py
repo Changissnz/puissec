@@ -1,4 +1,4 @@
-from dfs_struct import *
+from .dfs_struct import *
 from morebs2 import measures
 
 DEFAULT_TDIRECTOR_OBJ_FUNCTIONS = [np.min,\

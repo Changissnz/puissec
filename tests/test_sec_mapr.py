@@ -1,5 +1,5 @@
-from secnet_gen import * 
-from iso_ring import * 
+from base.secnet_gen import * 
+from agents.iso_ring import * 
 import unittest
 
 ### lone file test 

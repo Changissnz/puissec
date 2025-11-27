@@ -1,4 +1,4 @@
-from custom_rnd import * 
+from base.custom_rnd import * 
 import unittest
 
 ### lone file test 
