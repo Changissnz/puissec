@@ -1,5 +1,5 @@
-from ep_corrmap import * 
-from bloominhurst import *
+from .ep_corrmap import * 
+from .bloominhurst import *
 from morebs2 import search_space_iterator
 
 default_rnd_boolean_index_splitter = lambda x: True if random.randrange(0,2) else False 

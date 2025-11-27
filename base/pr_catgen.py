@@ -1,6 +1,6 @@
 
 from morebs2 import measures,numerical_generator
-from imod import * 
+from .imod import * 
 
 """
 Contains basic functions for calculating 

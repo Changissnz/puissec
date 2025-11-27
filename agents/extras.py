@@ -2,7 +2,7 @@
 code used to generate examples in paper.
 """
 import time 
-from psec_env import * 
+from .psec_env import * 
 
 def example__node_analysis_1(): 
     # declare the SecNet

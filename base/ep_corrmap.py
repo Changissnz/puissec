@@ -1,4 +1,4 @@
-from pr_catgen import * 
+from .pr_catgen import * 
 
 ################################################### 
 

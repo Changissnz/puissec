@@ -1,7 +1,7 @@
 # functions to modulate index vectors
 from morebs2 import relevance_functions,aprng_gauge,\
     poly_interpolation,matrix_methods,numerical_generator
-from custom_rnd import *
+from .custom_rnd import *
 
 def roundian(x,r):
     rd = r[1] - r[0]

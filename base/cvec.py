@@ -1,5 +1,5 @@
 
-from defaults import * 
+from .defaults import * 
 from morebs2 import matrix_methods,rssi,measures
 
 # these two functions are used to assign boolean

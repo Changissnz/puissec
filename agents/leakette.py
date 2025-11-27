@@ -1,4 +1,4 @@
-from iso_ring import *
+from .iso_ring import *
 
 ########################### leak functions, uses 
 ########################### rnd_struct for decision-making

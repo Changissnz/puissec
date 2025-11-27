@@ -4,7 +4,7 @@ solution candidates to actual solution or
 assign each of those solution candidates a Pr. 
 value for their being the solution. 
 """
-from sec_mapr import * 
+from .sec_mapr import * 
 
 ######################## filter-functions for 
 ######################## sequences of possible-decision maps. 

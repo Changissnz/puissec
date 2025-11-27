@@ -1,7 +1,7 @@
-from leakette import * 
+from .leakette import * 
 from morebs2 import relevance_functions,hop_pattern
-from hype import * 
-from tdir import * 
+from base.hype import * 
+from base.tdir import * 
 
 class Crackling:
 

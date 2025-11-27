@@ -1,4 +1,4 @@
-from srefmap import * 
+from .srefmap import * 
 
 ############################################
 

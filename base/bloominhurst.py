@@ -1,4 +1,4 @@
-from imod import *
+from .imod import *
 
 DEFAULT_OPTIMA_BLOOM_SZ_DELTA_FUNC = lambda x: int(x * 2)
 

@@ -1,4 +1,4 @@
-from cracker import * 
+from .cracker import * 
 
 # TODO: unused, possibly delete. 
 class TDBridge:

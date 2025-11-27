@@ -1,7 +1,7 @@
 """
 file contains structures for depth-first search operation 
 """
-from defaults import * 
+from .defaults import * 
 
 class NodePath:
 

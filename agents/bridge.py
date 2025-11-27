@@ -1,4 +1,4 @@
-from crackling import * 
+from .crackling import * 
 
 """
 Connector b/t <Cracking> and its target <IsoRing>.

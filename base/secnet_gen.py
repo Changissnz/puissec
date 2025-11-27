@@ -1,5 +1,5 @@
-from dfs_struct import * 
-from sec_seq import * 
+from .dfs_struct import * 
+from .sec_seq import * 
 
 """
 serves as a descriptor for a methodology that 

@@ -1,6 +1,6 @@
 from collections import defaultdict 
-from bridge import * 
-from struct_samples import *
+from .bridge import * 
+from .struct_samples import *
 
 class IsoRingedChain:
 

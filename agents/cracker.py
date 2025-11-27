@@ -1,7 +1,7 @@
-from crackling import * 
-from secnet import * 
-from leakette import *
-from nERg import *  
+from .crackling import * 
+from .secnet import * 
+from .leakette import *
+from base.nERg import *  
 
 """
 splits a bound `bs` by a constant 

@@ -1,5 +1,5 @@
-from sec_seq import * 
-from secnet_gen import *
+from base.sec_seq import * 
+from base.secnet_gen import *
 
 def Sec_sample_1():
     sequence = np.array([0.4,1.8,2.0])

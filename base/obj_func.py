@@ -1,5 +1,5 @@
 from morebs2 import matrix_methods,modular_labeller
-from defaults import *
+from .defaults import *
 
 class ObjFunc:
     

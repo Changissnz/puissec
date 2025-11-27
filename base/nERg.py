@@ -1,4 +1,4 @@
-from dfs_struct import *
+from .dfs_struct import *
 
 """
 NOTE: used for ML purposes. 

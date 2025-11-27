@@ -1,6 +1,5 @@
-from defaults import *
+from .defaults import *
 from morebs2 import aprng_gauge
-#from lcg2h import *
 
 """
 The `Euler's number type q` function has 
