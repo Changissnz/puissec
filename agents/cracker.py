@@ -570,6 +570,11 @@ class CrackSoln:
         self.d = defaultdict(None)
         self.prev_soln = defaultdict(list) 
         return
+    
+    def __str__(self): 
+        S = "DICT\n" + str(self.d) + "\n" 
+        S += "PREVIOUS SOLN\n" + str(self.prev_soln) + "\n" 
+        return S 
 
     """
     - t := (sec idn.,opt. idn,expected sec value,pr of score)
@@ -616,7 +621,7 @@ class Cracker:
         self.csoln = CrackSoln() 
 
         self.initiated = False 
-
+        self.finstat = False 
         self.terminated = self.is_terminated()
         return
 
@@ -804,7 +809,7 @@ class Cracker:
     def next_hypstruct(self,sec_idn,sec_dim):
         if sec_idn not in self.hyp_map:
             return None
-        print("FAIL")
+
         if sec_dim not in self.hyp_map[sec_idn]:
             return None
 
@@ -964,6 +969,8 @@ class Cracker:
         return d
 
     def crackling_stat(self,index):
+        C = self.cracklings[index]
+
         # cracked
         if self.cracklings[index].astat:
             return 2
@@ -999,3 +1006,7 @@ class Cracker:
     def is_terminated(self):
         self.terminated = self.energy.v <= 0.0 
         return self.terminated 
+
+    def is_finished(self):
+        self.finstat = len(self.hyp_map_cache) == 0 and len(self.cracklings) == 0 
+        return self.finstat 

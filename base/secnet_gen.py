@@ -87,7 +87,7 @@ class SecNetFrameGen:
         if num_attempts < 0: return None
 
         assert irc_sz > 0
-        assert min([p_s,p_n]) > 0.0
+        assert min([p_s,p_n]) >= 0.0
         assert p_s + p_n >= 1.0 
 
         # generate the <SecNetGenScheme>
@@ -1018,9 +1018,9 @@ def Sec_list_SEEDTYPE_PythonANDNumpy(num_secs,\
     assert singleton_range[0] < singleton_range[1]
     assert dimension_range[0] < dimension_range[1]
     assert num_optima_range[0] < num_optima_range[1]
-    assert optima_countermeasure_range[0][0] < \
+    assert optima_countermeasure_range[0][0] <= \
         optima_countermeasure_range[0][1] 
-    assert optima_countermeasure_range[1][0] < \
+    assert optima_countermeasure_range[1][0] <= \
         optima_countermeasure_range[1][1] 
 
     secs = []

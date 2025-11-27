@@ -261,17 +261,19 @@ class SecEnv:
             print()
         
         cterm = self.crck.is_terminated()
+        fterm = self.crck.is_finished() 
         snterm = self.sn.is_terminated()
-        if cterm or snterm:
+        if cterm or snterm or fterm: 
 
             if self.verbose:
-                print("\t\tTERMINATION: C={},S={}".format(cterm,snterm))
+                print("\t\tTERMINATION: C0={},C1={},S0={}".format(cterm,fterm,snterm))
             return
 
         # summarize co-locations
-        print("CO-LOCATIONS")
-        print(self.ci)
-        print()
+        if self.verbose: 
+            print("CO-LOCATIONS")
+            print(self.ci)
+            print()
 
         self.run_(timespan)
         self.postmove_update() 
@@ -350,10 +352,9 @@ class SecEnv:
         if self.verbose:
             print("-- CSTAT ON {}: {}".format(c.cidn,s))
 
-        print()
         # done
         if s == 2: 
-            if self.verbose: print("DONE")
+            if self.verbose: print("\t[X] DONE")
             return False
 
         # continue cracking
@@ -396,8 +397,11 @@ class SecEnv:
         self.crck.initiated = True 
         d = self.sn.isoringset_dim(s)
         dx = [(k,v) for k,v in d.items()]
-        print("INSTANTIATING CRACKER TARGET")
-        print(dx) 
+
+        if self.verbose: 
+            print("INSTANTIATING CRACKER TARGET")
+            print(dx) 
+
         # load the cracklings
         self.crck.load_cracklings_for_secset(dx,verbose= self.verbose != 0)
         self.update_cracklings_to_SecNet()
@@ -418,7 +422,9 @@ class SecEnv:
     """
     def update_cracklings_to_SecNet(self):
         stat = True
-        print("\n\nUPDATING CRACKLINGS ",len(self.crck.cracklings))
+        if self.verbose: 
+            print("\n\nUPDATING CRACKLINGS ",len(self.crck.cracklings))
+
         for i in range(len(self.crck.cracklings)):
             stat2 = self.update_crackling_to_SecNet(i)
 
@@ -442,11 +448,15 @@ class SecEnv:
             self.sn.set_crackling(crcklng,x)
             tdirector = self.sn.tdirector_instance_for_crackling_at_entry_point(\
                 cidn,x,radius=self.crck.radar_radius)
-            print("X: ",x)
-            print(tdirector.loc())
-            print()
+            L = tdirector.loc()
             stat_ = self.crck.accept_TDirector_at_entry_point(cidn,tdirector)
-            print("ACCEPTING @ ENTRY POINT: ",stat_)
+
+            if self.verbose: 
+                print("\tentry point: ",x)
+                print("\tlocation: ", L)
+                print("\tACCEPTING @ ENTRY POINT: ",stat_)
+                print()
+
             if stat_: 
                 tdirector.switch_obj_stat()
                 self.crck.load_TDirector(cidn,tdirector)
@@ -514,7 +524,6 @@ class SecEnv:
 
         v = bool(self.verbose)
         vl = ir.td_next(timespan,self.rnd_struct,v)
-        print("VLLL: ",vl)
         self.sn.energy -= vl 
 
     ############ TODO: methods to handle <CBridge>s.
@@ -587,7 +596,7 @@ class SecEnv:
         [1] number of iterations
     """
     def run_CBridge(self,next_rate,iidn):
-        
+
         def rcb(cb_):
             if self.verbose:
                 print("-- CBRIDGE OP: {}".format(cb_.agent_idns()))
