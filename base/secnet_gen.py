@@ -111,7 +111,7 @@ class SecNetFrameGen:
         print(snfg.node_components)
 
         if len(snfg.node_components) != 1:
-            return SecNetFrameGen(irc_sz,p_s,p_n,rnd_struct,num_attempts-1)
+            return SecNetFrameGen.generate_graph__type_prop(irc_sz,p_s,p_n,rnd_struct,num_attempts-1)
         return snfg.d,set(snfg.sec_nodevec) 
 
     def init_rand(self):
@@ -120,7 +120,7 @@ class SecNetFrameGen:
     def init_search(self):
         self.node_components.extend([\
             set([n]) for n in self.sec_nodevec])
-        
+
         for x in self.nsec_nodevec:
             self.node2sec_distance_map[x] = defaultdict(int)
         for x in self.sec_nodevec:
@@ -324,6 +324,7 @@ class SecNetFrameGen:
         if sn == -1: return False
         sn_node = next(iter(self.node_components[sn]))
         component_index,min_node = self.next_conn_sf_()
+        if component_index == -1: return False 
         l = len(self.node_components) - 1
         self.df_update_distance__type_bicomponent(\
             sn,component_index,sn_node,min_node)
@@ -337,6 +338,8 @@ class SecNetFrameGen:
         component_index = len(self.node_components) - 1
         dx = self.component_nsec_node_distance_map(component_index,score_type=1)
         dx = [(k,v) for (k,v) in dx.items()]
+        if len(dx) == 0: 
+            return -1,-1 
         random.shuffle(dx)
         
         f = min if self.spine_counter == 0 else max

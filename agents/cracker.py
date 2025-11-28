@@ -149,6 +149,19 @@ class BackgroundInfo:
         self.expected_pr = None
         return
 
+    def __str__(self): 
+        S = "\tLONE PR MAP" + "\n" 
+        S += str(self.opm) + "\n"
+        S += "\tDEP PR MAP" + "\n" 
+        S += str(self.dm) + "\n"
+        S += "\tCODEP SETS" + "\n"
+        S += str(self.cdm) + "\n" 
+        S += "\tDEC MAP" + "\n"
+        S += str(self.dec_map) + "\n" 
+        S += "\tEXPECTED PR" + "\n"
+        S += str(self.expected_pr) + "\n"
+        return S 
+
     def load_expected_Pr(self,epr):
         self.expected_pr = epr
 

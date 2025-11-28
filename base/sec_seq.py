@@ -397,6 +397,11 @@ class Sec:
 
         # get the optima points for the `sz`
         # dimension
+
+        # NOTE: strange case 
+        if len(q[0]) == 0: 
+            return None,-1,-1 
+
         bps = deepcopy(self.obfsr.bpoints[self.obfsr.sz])
         assert bps.shape[0] == len(q[0])
 
@@ -424,7 +429,8 @@ class Sec:
         ##print("-- size of opt. map: ",len(optima_pr_map))
         s = Sec(nu_pt,deepcopy(self.singleton_range),\
             optima_pr_map,dep_map,codep_map,obfsr=self.obfsr)
-        sz0 = s.obfsr.sz
+        ## BUG: !! 
+        sz0 = s.dim() #s.obfsr.sz
 
         """
         print("-- RESETTING OSEEDS")

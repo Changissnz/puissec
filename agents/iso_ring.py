@@ -155,6 +155,13 @@ class IsoRing:
         self.sec_script = None
         self.leak_stage = 0
 
+    def __str__(self):
+        S = "\tISORING " + "\n" 
+        for s in self.sec_cache:
+            S += "\tdim " + str(s.dim()) + "\n" 
+            S += str(s.seq) + "\n" 
+        return S 
+
     def bounds_of_dim(self,d):
         bds = np.empty((d,2),dtype=float)
         q0 = min(self.bounds[:,0])
@@ -268,6 +275,9 @@ class IsoRing:
             sc.process_one_bloomiso(optima_size_limit - s)
             i += 1 
             s2 = sc.generate_next_Sec()
+            if type(s2[0]) == type(None): 
+                print("[BOG] strange buggiancas!!")
+                break 
             s2[0].idn_tag = sc.idn_tag 
             ts2 = s2[2]
             print("transition: {}->{}".format(s2[1],s2[2]))
@@ -275,7 +285,6 @@ class IsoRing:
             s = len(s2.opm)
             self.sec_cache.append(sc)
             self.sec_cache.append(s2)
-
             bof = self.next_bof(s2.dim(),rnd_struct)
             self.ofunc_cache.append(bof)
             if type(ts2) == type(None):

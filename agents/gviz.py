@@ -1,5 +1,5 @@
 # some basic methods for visualizing a graph 
-from defaults import * 
+from base.defaults import * 
 import networkx as nx 
 import matplotlib.pyplot as plt
 
