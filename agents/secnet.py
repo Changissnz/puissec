@@ -175,7 +175,6 @@ class SecNet:
             assert len(self.node_loc_assignment) == len(self.irc) 
             assert len(self.node_loc_assignment) == len(set(self.node_loc_assignment.values()))
 
-        self.rnd_struct = rnd_struct
         self.srm = self.load_srm()
         self.ss = None
         self.sgc = None

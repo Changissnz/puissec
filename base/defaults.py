@@ -54,6 +54,23 @@ DEFAULT_LEAKSZ_RANGE = [1,5]#,9]
 DEFAULT_SECNETFRAMEGEN_SCHEMES = \
     {"spine frame", "pairing frame","pseudo random"}
 
+# default settings for parameter-less SecNet generation 
+DEFAULT_SECNET_IRC_SIZE_RANGE = [1,30] 
+DEFAULT_SECNET_SINGLETON_RANGE = [-2.0,2.0] 
+DEFAULT_SECNET_DIMENSION_RANGE = [2,10] 
+DEFAULT_SECNET_OPTIMA_SIZE_RANGE = [1,8] 
+DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE = [0.0,1.0] 
+DEFAULT_SECNET_SECNODE_RATIO_RANGE = [0.0,1.0] 
+DEFAULT_SECNET_NSECNODE_RATIO_RANGE = [0.0,1.0] 
+DEFAULT_SECNET_RNDSTRUCT = random 
+DEFAULT_SECNET_ENTRY_SIZE_RATIO_RANGE = [0.0,1.0] 
+DEFAULT_SECNET_ISORING_SINGLETON_SUPERBOUND = [-2.0,2.0]
+
+# default settings for generating Cracker accomodating a SecNet 
+# NOTE: no naive IRC-to-HypStruct maps 
+DEFAULT_HYPSTRUCT_OF_ISORING__BOUND_LENGTH = 1.0 
+DEFAULT_CRACKER_CRACKLING_SIZE_RATIO = None # w.r.t. number of nodes in SecNet 
+
 ############## miscellaneous functions
 
 def pickle_open_with_typecheck(fp,t): 
