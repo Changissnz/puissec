@@ -150,6 +150,9 @@ class IsoRing:
         # cracked stat 
         self.cstat = False 
 
+        # partial cracked stat 
+        self.pcstat = False 
+
         # TODO: 
         self.td = None
         self.sec_script = None
@@ -396,7 +399,6 @@ class IsoRing:
 
                 if verbose: 
                     print("MOVELOC {}-->{}\n============".format(q1,q2)) 
-                print("VQ: ", v) 
                 return v
 
         # case: default path to SEC node

@@ -221,6 +221,14 @@ class SecNet:
     def update_nla(self):
         for k in self.node_loc_assignment.keys():
             s = self.irc.fetch_IsoRing(k) 
+
+            # NOTE: this condition is for one-crack termination: 
+            #       IsoRing is terminated once any of its <Sec> instances 
+            #       have been cracked. 
+            if s.pcstat and DEFAULT_ISORING__PARTIALCRACK_MODE: 
+                print("already `cracked`")
+                continue 
+
             self.node_loc_assignment[k] = s.loc() 
             if type(s.td) == type(None):
                 continue
@@ -531,6 +539,7 @@ class SecNet:
         td = TDirector(entry_point,target,"C",cidn,radius)
 
         sngc = self.subgraph_for_TDir(td.td)
+        print("loading for crackling")
         td.load_graph(sngc)
         return td
 

@@ -71,6 +71,8 @@ DEFAULT_SECNET_ISORING_SINGLETON_SUPERBOUND = [-2.0,2.0]
 DEFAULT_HYPSTRUCT_OF_ISORING__BOUND_LENGTH = 1.0 
 DEFAULT_CRACKER_CRACKLING_SIZE_RATIO = None # w.r.t. number of nodes in SecNet 
 
+DEFAULT_ISORING__PARTIALCRACK_MODE = True 
+
 ############## miscellaneous functions
 
 def pickle_open_with_typecheck(fp,t): 

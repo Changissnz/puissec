@@ -719,6 +719,11 @@ class SecEnv:
 
         # clear all cracklings for cracked IsoRings 
         self.crck.remove_cracklings__cracked_isorings(list(self.icrack.keys())) 
+
+        for k in self.icrack: 
+            q = self.sn.irc.fetch_IsoRing(k)
+            q.pcstat = True 
+
         return
 
     """

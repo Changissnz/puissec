@@ -1024,47 +1024,11 @@ class TDirector:
            will be on at the end of a timespan.
     """
     def open_info_velocity_prediction(self,one_open_info_sample):
-        print("OPEN INFO SAMPLE")
-        print(one_open_info_sample)
-        print("VP: ",self.vp())
 
-        ##assert one_open_info_sample[0] == 1
         q = self.resource_sg.ring_locs if \
             self.vp() == "C" else \
             self.resource_sg.crackling_locs
-        idn = one_open_info_sample[0] 
-        print("QQR")
-        print(self.resource_sg.ring_locs)
-        print("QQC")
-        print(self.resource_sg.crackling_locs)
-        print("QQQ")
-        print(q) 
-
-        '''
-        # <IsoRing> idn -> location 
-        self.ring_locs = ring_locs
-        # <Crackling> idn -> (location,target node)
-        self.crackling_locs = clocs
-        ''' 
-        
-        # NOTE: sanity check 
-        stat,x0 = False,None 
-        """
-        for k,v in q.items(): 
-            if self.vp() == "C": 
-                v_ = v[1]
-            else: 
-                v_ = v 
-            if v_ == idn: 
-                stat = True 
-            
-            if stat: 
-                if self.vp() == "C": 
-                    x0 = v[0]
-                else: 
-                    x0 = v 
-                break
-        """ 
+        idn = one_open_info_sample[0]         
         if not idn in q:
             print("STRANGGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
             return set() 
@@ -1074,15 +1038,8 @@ class TDirector:
         else: 
             x0 = q[idn][0]
 
-
-
         # use `resource_sg` to determine all possible 
-        # nodes for next
-        print("X00")
-        print(x0)
-        print("SPPP")
-        print(self.resource_sg.sp) 
-        
+        # nodes for next        
         dfsc = self.resource_sg.sp[x0]
         nsx = dfsc.nodeset_of_distance_d(\
             one_open_info_sample[2])
