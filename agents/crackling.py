@@ -123,8 +123,6 @@ class Crackling:
 
         dpd = self.td.default_crackling_pathdec(\
             predicted_distance=None,rnd_struct=random)        
-        print("DEFAULT CPATHDEC")
-        print(dpd)
         
         # set the velocity equal to the path length
         self.td.load_new_path(dpd)
@@ -202,9 +200,9 @@ class Crackling:
         self.is_coordinated = True
         return
 
-    def recv_open_info(self,open_info_type,idn,info):
-        assert open_info_type in {1,2}
-        self.td.td.open_info_var.append((open_info_type,idn,info)) 
+    def recv_open_info(self,idn,velocity,location):
+        ##assert open_info_type in {1,2}
+        self.td.td.open_info_var.append((idn,velocity,location))  
         return
 
 """

@@ -893,6 +893,11 @@ class Cracker:
     """
     def supergraph_info_update_to_Cracklings(self,G,targetsec_idn):
         assert type(G) == SNGraphContainer
+        print("SUPERGRAPH")
+        print(G.sp) 
+
+        print("\t\tTARGETSEC")
+        print(targetsec_idn)
 
         cx = self.cracklings_by_targetsec(targetsec_idn)
 

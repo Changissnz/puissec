@@ -388,7 +388,7 @@ class IsoRing:
             if type(px) != type(None):
                 v = len(px) - 1
                 v = int(round(v/timespan))
-                self.td.load_path_to_node(px)
+                self.td.load_new_path(px)
                 self.td.td.velocity = v
                 q1 = self.td.loc() 
                 self.td.td.scaled__next__(timespan)
@@ -495,9 +495,9 @@ class IsoRing:
             print("MOVELOC {}-->{}\n============".format(q1,q2)) 
         return v 
 
-    def recv_open_info(self,open_info_type,idn,info):
-        assert open_info_type in {1,2}
-        self.td.td.open_info_var.append((open_info_type,idn,info))
+    def recv_open_info(self,idn,velocity,location):
+        ##assert open_info_type in {1,2}
+        self.td.td.open_info_var.append((idn,velocity,location))
         return
 
 ################################################

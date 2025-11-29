@@ -334,12 +334,14 @@ class TDir:
     
     def load_path_(self,G,loc):
         if loc not in G.sp:
-            ##print("no location in DFS")
+            print("[?] no location in DFS, ",self.vantage_point, self.target_node) 
+            ##print(list(G.sp.keys()))
             return
 
         dfsc = G.sp[loc]
         if self.location not in dfsc.min_paths:
-            ##print("no path in DFS")
+            print("[?] no path in DFS, ",self.vantage_point, self.target_node) 
+            ##print(list(G.sp.keys()))
             return
 
         nodePath = dfsc.min_paths[self.location][0]
@@ -708,8 +710,15 @@ class TDirector:
         d = {}
         for n in self.resource_sg.d.keys():
             dx = self.destnode_sec_analysis(n)
+            if type(dx) == type(None): 
+                print("????? BUGGGGGGGGG")
+                continue 
+
+            if len(dx) == 0: 
+                print("BUGGGGGG")
+                continue 
+            
             dxv = np.array(list(dx.values())) 
-            assert len(dxv) > 0
 
             v = objf1(dxv)
 
@@ -951,24 +960,28 @@ class TDirector:
     """
     def open_info_pathdec(self,rnd_struct):
 
-        if len(self.open_info_var) == 0:
+        if len(self.td.open_info_var) == 0:
             return None
 
         # check `open_info_var` size based on `vp()`
         v = self.vp()
         if v == "C":
-            assert len(self.open_info_var) == 1
+            assert len(self.td.open_info_var) == 1
 
         # collect all relevant nodes
         ns = set() 
-        for (info_type,idn,value) in self.open_info_var:
-            if info_type == 0: continue 
+        #for (info_type,idn,value) in self.td.open_info_var:
+        for (idn,velocity,location) in self.td.open_info_var: 
+            #if info_type == 0: continue 
 
-            if info_type == 2: 
-                ns = ns | {value}
-                continue
-            ns_ = self.open_info_velocity_prediction((info_type,idn,value))
-            ns = ns | ns_
+            #if info_type == 2: 
+            #    ns = ns | {value}
+            #    continue
+            #ns_ = self.open_info_velocity_prediction((idn,value))
+            #ns = ns | ns_
+
+            ns_ = self.open_info_velocity_prediction((idn,velocity,location))
+            ns = ns | ns_ 
 
         # select the (node,path) based on `ns` and `vp()`
         dfsc = self.resource_sg.sp[self.loc()]
@@ -984,22 +997,22 @@ class TDirector:
             
             # case: not certain
             #       use rnd_struct
-            ns = sorted(list(ns))
+            ns = sorted(ns)
             i = rnd_struct.randrange(0,len(ns))
-            return dfsc.min_paths[ns[i]].invert() 
+            return dfsc.min_paths[ns[i]][0].invert() 
 
         # case: IsoRing
         #       calculate the nodes to avoid
         avoid = ns - self.resource_sg.sn
-        c = self.td.default_node_analysis()
+        c = self.default_node_analysis()
         c_ = [(k,v) for k,v in c.items() if k not in avoid] 
 
             # subcase: none, revert to default
         if len(c_) == 0:
             c_ = [(k,v) for k,v in c.items()]
     
-        l = random_tiebreaker(c,rnd_struct,max)[0]
-        return dfsc.min_paths[l].invert() 
+        l = random_tiebreaker(c_,rnd_struct,max)[0]
+        return dfsc.min_paths[l][0].invert() 
 
     # TODO: test 
     """
@@ -1011,19 +1024,66 @@ class TDirector:
            will be on at the end of a timespan.
     """
     def open_info_velocity_prediction(self,one_open_info_sample):
-        assert one_open_info_sample[0] == 1
+        print("OPEN INFO SAMPLE")
+        print(one_open_info_sample)
+        print("VP: ",self.vp())
+
+        ##assert one_open_info_sample[0] == 1
         q = self.resource_sg.ring_locs if \
             self.vp() == "C" else \
             self.resource_sg.crackling_locs
-        idn = one_open_info_sample[1] 
-        assert idn in q
+        idn = one_open_info_sample[0] 
+        print("QQR")
+        print(self.resource_sg.ring_locs)
+        print("QQC")
+        print(self.resource_sg.crackling_locs)
+        print("QQQ")
+        print(q) 
 
-        f = lambda x: x if self.vp() == "C" else x[0]
-        x0 = f(q[idn])
+        '''
+        # <IsoRing> idn -> location 
+        self.ring_locs = ring_locs
+        # <Crackling> idn -> (location,target node)
+        self.crackling_locs = clocs
+        ''' 
+        
+        # NOTE: sanity check 
+        stat,x0 = False,None 
+        """
+        for k,v in q.items(): 
+            if self.vp() == "C": 
+                v_ = v[1]
+            else: 
+                v_ = v 
+            if v_ == idn: 
+                stat = True 
+            
+            if stat: 
+                if self.vp() == "C": 
+                    x0 = v[0]
+                else: 
+                    x0 = v 
+                break
+        """ 
+        if not idn in q:
+            print("STRANGGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+            return set() 
+
+        if self.vp() == "C": 
+            x0 = q[idn]
+        else: 
+            x0 = q[idn][0]
+
+
 
         # use `resource_sg` to determine all possible 
         # nodes for next
-        dfsc = self.resource_sg[x0]
+        print("X00")
+        print(x0)
+        print("SPPP")
+        print(self.resource_sg.sp) 
+        
+        dfsc = self.resource_sg.sp[x0]
         nsx = dfsc.nodeset_of_distance_d(\
             one_open_info_sample[2])
         return nsx

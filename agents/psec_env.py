@@ -185,7 +185,7 @@ class SecEnv:
         if self.moi == (0,0):
             return
 
-        q = self.moi[0] if is_IsoRing else self.moi[1]
+        ##q = self.moi[0] if is_IsoRing else self.moi[1]
         # pass IsoRing info to each <Crackling>
         if is_IsoRing: 
             for c in self.crck.cracklings:
@@ -194,7 +194,7 @@ class SecEnv:
                     continue
                 i = c.td.td.target_node
                 c_ = c.cidn 
-                self.pass_info_(i,c_,is_IsoRing,q)
+                self.pass_info_(i,c_,is_IsoRing)##,q)
         else:
             for ir in self.sn.irc.irl:
                 # case: no cracklings in sight
@@ -205,7 +205,7 @@ class SecEnv:
                 qs = ir.td.check_radar(True)
 
                 for q_ in qs:
-                    self.pass_info_(q_,ir.sec.idn_tag,is_IsoRing,q)
+                    self.pass_info_(q_,ir.sec.idn_tag,is_IsoRing)##,q)
         return
 
     """
@@ -230,9 +230,9 @@ class SecEnv:
     - bool, ?is info by type passed?
     """
     # TODO: test 
-    def pass_info_(self,i,c,is_IsoRing:bool,info_type:int):
-        assert info_type in {0,1,2}
-        if info_type == 0: return True
+    def pass_info_(self,i,c,is_IsoRing:bool):#,info_type:int):
+        ##assert info_type in {0,1,2}
+        ##if info_type == 0: return True
 
         # fetch the two agents `i`,`c`. 
         i_,c_ = i,c 
@@ -243,12 +243,14 @@ class SecEnv:
 
         # case: I passes to C  
         if is_IsoRing:
-            v = i.td.td.velocity if info_type == 1 else i.td.td.location
-            c.recv_open_info(info_type,i_,v)
+            v = i.td.td.velocity #if info_type == 1 else i.td.td.location
+            l = i.td.td.location 
+            c.recv_open_info(i_,v,l)
             return True
             
-        v = c.td.td.velocity if info_type == 1 else c.td.td.location
-        i.recv_open_info(info_type,c_,v)
+        v = c.td.td.velocity #if info_type == 1 else 
+        l = c.td.td.location
+        i.recv_open_info(c_,v,l)
         return True
 
     ############### methods for instantiating and running
@@ -440,7 +442,6 @@ class SecEnv:
     pre-requisite method for above method. 
     """
     def update_crackling_to_SecNet(self,crackling_index):
-        print("\n\nUPDATING")
         crcklng = self.crck.cracklings[crackling_index]
         
         # find an entry point that crcklng accepts
@@ -513,7 +514,12 @@ class SecEnv:
         if self.verbose:
             print("I={},L={},STAT={}".format(ir.sec.idn_tag,ir.td.loc(),\
                 cstat))
-        
+
+        if cstat: 
+            if self.verbose: 
+                print("-- cracked, no more activity.")
+            return 
+
         if self.verbose == 2:
             print("\t\tS.G. KEYS")
             print(ir.td.resource_sg.d.keys())
@@ -793,7 +799,7 @@ class SecEnv:
             # case: cracked 
             if type(q) == tuple:
                 if self.verbose: 
-                    print("\t\t** CRACK BY INTERDICTION")
+                    print("\t\t** CRACK BY INTERDICTION @ ",interdict)
                 assert len(q) == 2
 
                 psidn = Colocks.parse_coloc_str(interdict)
@@ -808,7 +814,6 @@ class SecEnv:
                         self.crck.remove_spent_crackling(psidn[0])
                         continue 
 
-                print("\t\t\tINTERDICT: ",interdict) 
 
                 crckling = self.crck.fetch_crackling(psidn[0])
                 ti = crckling.hs.target_index
@@ -836,7 +841,7 @@ class SecEnv:
         ir = self.sn.irc.fetch_IsoRing(sec_idn)
         opt_dim = ir.secdim_seq()[ir.repi]
         self.crck.csoln = self.crck.csoln + (sec_idn,opt_index,svec,pr_score)
-        if psidn[0] not in self.icrack:
+        if sec_idn not in self.icrack:
             self.icrack[sec_idn] = {}
         
         self.crck.oopi += 1 
