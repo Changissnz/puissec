@@ -65,8 +65,8 @@ class Crackling:
     """
     def td_next(self,timespan=1.0,verbose:bool=False):
         if verbose:
-            print("--> TD-NEXT FOR C={},N={}".format(self.cidn,\
-                self.td.loc()))
+            print("--> TD-NEXT FOR C={},N={},I={}".format(self.cidn,\
+                self.td.loc(),self.td.td.target_node))
             print("\tOBJSTAT: ",self.td.obj_stat)
 
         if self.td.obj_stat == "search for target":
@@ -113,7 +113,7 @@ class Crackling:
         if verbose:
             print("RADAR: ",len(q))
 
-        # CASE: no <Crackling>s in sight, switching 
+        # CASE: no <IsoRings>s in sight, switching 
         # objective to "search for target"
         if len(q) == 0:
             if verbose: 

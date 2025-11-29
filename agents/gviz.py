@@ -25,12 +25,8 @@ def SecNet_graph_to_viz(g,secnodes,save_fig:str=""):
     for lk2 in lk:
         cx = "red" if lk2 in secnodes else "blue"
         x2 = (lk2, {"color": cx})
-        print("LK2: ",x2)
         lk_.append(x2)
     lk = lk_ 
-
-    print("LK")
-    print(lk)
 
     ex = []
     for k,v in g.items():

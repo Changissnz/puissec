@@ -3,6 +3,33 @@ from agents.psec_env import *
 import unittest,time 
 import sys
 
+def SecEnv_sample__9IR(vb=0): 
+    #s0,s1 = random.getstate(),np.random.get_state()
+    random.seed(12111)#(2004)
+    np.random.seed(32333)#(2024)
+
+    irc_args = (10,[0.0,2.],[2,4],[3,10],[(0.9,0.9),(0.9,0.9)])
+    sn_param_args = (0.0,5.,random,1.0,[0.0,2.])
+
+    sn = SecNet.generate__autograph(irc_args,sn_param_args)
+    for s_ in sn.irc.irl:
+        s_.explode_contents()
+
+    # displaying <IsoRingedChain> 
+    for x in sn.irc: 
+        x.set_isorep(0)
+
+    bi = BackgroundInfo.generate_instance(\
+        sn.irc,sn.srm)
+    i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn.irc,full_hypseq=True,\
+        naive_split=2)
+
+    crck = Cracker(i2hm,bi,5,radar_radius=30)  
+    se = SecEnv(sn,crck,vb=vb,mode_open_info=(1,1))
+    #random.setstate(s0)
+    #np.random.set_state(s1) 
+
+    return se 
 
 ### lone file test 
 """
@@ -284,6 +311,33 @@ class SecEnvClass(unittest.TestCase):
         assert matrix_methods.equal_iterables(\
                 sec0.seq,se.crck.csoln.d[0][1]) 
         assert abs(sec0.seq_pr() - se.crck.csoln.d[0][2]) <= 10 ** -5 
+
+    def test__SecEnv__run__case6__move_to_next_IsoRing(self):
+
+        se = SecEnv_sample__9IR(vb=0)
+
+        #random.seed(12111)
+        #np.random.seed(32333)
+
+        se.preprocess() 
+
+        for _ in range(15):
+            se.run(1.0)
+
+        assert len(se.icrack) == 1 and se.icrack[9] == {3:True}, "got {}".format(len(se.icrack)) 
+        assert len(se.crck.spent) == 1 
+        assert se.crck.oopi == 1 
+
+        q = se.crck.csoln.d 
+        assert len(q) == 1 and 9 in q 
+        assert (q[9][1] == np.array([0.45717,0.,0.])).all()
+        assert q[9][2] == np.float64(0.07692)
+
+        ir = se.sn.irc.fetch_IsoRing(9)
+        assert (q[9][1] == ir.sec.seq).all()
+
+        assert se.crck.cracklings[0].td.td.target_node == 8 
+        return 
 
 if __name__ == '__main__':
     unittest.main()

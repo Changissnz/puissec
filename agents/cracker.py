@@ -621,7 +621,7 @@ class Cracker:
         # <sec idn> -> <sec dim> -> list::<HypStruct> 
         self.hyp_map = hyp_map 
         # holds <HypStruct> instances attempted from `hyp_map`
-        self.hyp_map_cache = defaultdict(None)
+        self.hyp_map_cache = [] 
         self.bi = backgroundInfo
         self.crackling_sz = crackling_sz
         self.radar_radius = radar_radius
@@ -830,8 +830,8 @@ class Cracker:
             return None
 
         hs = self.hyp_map[sec_idn][sec_dim][0].new_HypStruct_by_next_subbound()
-        if type(hs) == type(None):
-            self.hyp_map[sec_idn][sec_dim].pop(0)
+        #if type(hs) == type(None):
+        self.hyp_map[sec_idn][sec_dim].pop(0)
         return hs
 
     #### TODO: new section; needs to be tested. 
@@ -974,6 +974,7 @@ class Cracker:
         assert type(c) != type(None)
         c.load_TDirector(td)
 
+    # NOTE: unused 
     def cstat(self):
         d = {}
         for i in range(len(self.cracklings)):
@@ -1003,13 +1004,19 @@ class Cracker:
         for c in self.cracklings:
             if c.fstat == True:
                 self.remove_spent_crackling(c.cidn)
-        return -1
+        return 
+
+    def remove_cracklings__cracked_isorings(self,cracked): 
+        for c in self.cracklings:
+            if c.td.td.target_node in cracked: 
+                self.remove_spent_crackling(c.cidn) 
 
     def remove_spent_crackling(self,cidn):
         i = self.fetch_crackling_index(cidn)
         if i == -1: return
         q = self.cracklings.pop(i)
         self.spent.append(q) 
+        self.hyp_map_cache.append(q.hs)
         return
 
     def clear_open_info(self):

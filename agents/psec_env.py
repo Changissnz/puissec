@@ -196,13 +196,13 @@ class SecEnv:
                 c_ = c.cidn 
                 self.pass_info_(i,c_,is_IsoRing,q)
         else:
-            for ir in self.sn.irl:
+            for ir in self.sn.irc.irl:
                 # case: no cracklings in sight
                 if ir.td.obj_stat == "radar null":
                     continue
 
                 # pass info from all visible <IsoRing>
-                qs = ir.check_radar(True)
+                qs = ir.td.check_radar(True)
 
                 for q_ in qs:
                     self.pass_info_(q_,ir.sec.idn_tag,is_IsoRing,q)
@@ -326,11 +326,11 @@ class SecEnv:
     """
     def cproc(self,timespan=1.0):
         # check status
-        cd = self.crck.cstat()
-        vs = set(cd.values())
+        L = len(self.crck.cracklings)
 
         # case: load new cracking targets
-        if vs == {2}:
+        ##if vs == {2}:
+        if L == 0: 
             if self.verbose: print("NEW TARGET")
             stat = self.instantiate_cracker_target()
             if not stat: return False
@@ -343,6 +343,10 @@ class SecEnv:
 
         for i in range(len(self.crck.cracklings)):
             self.cproc_(i,timespan)
+
+        if self.verbose: 
+            print("\t\t////////////\\\\\\\\\\\\\\\\\\\\\\\\")
+
         return True
 
     def cproc_(self,index,timespan=1.0):
@@ -392,7 +396,7 @@ class SecEnv:
     """
     def instantiate_cracker_target(self):
         s = self.crck.next_target()
-        if len(s) == 0: return False
+        if type(s) == type(None): return False
 
         self.crck.initiated = True 
         d = self.sn.isoringset_dim(s)
@@ -609,9 +613,12 @@ class SecEnv:
                 ### NOTE: new
                 qc = next(cb_) 
                 if type(qc) == type(None):
+                    if self.verbose: 
+                        print("[X] STRANGE CRACKING FAILURE [X]\n")
                     if not cb_.crackling.astat:
                         cb_.cfail = True
                         cb_.crackling.fstat = True
+                        
                         return False, j 
 
                 j = i + 1
@@ -642,11 +649,16 @@ class SecEnv:
         self.remove_spent_CBridge() 
         return statvec
 
+    """
+    removes spent CBridges and associated Cracklings targetting CBridge's IsoRing.
+    """
     def remove_spent_CBridge(self):
         cbs2 = []
+
         for cb in self.cbs:
             if cb.cfail == False:
                 cbs2.append(cb)
+
         self.cbs = cbs2
             
     #####################################
@@ -698,6 +710,9 @@ class SecEnv:
 
         # clear fstat cracklings
         self.crck.remove_cracklings__fstat()
+
+        # clear all cracklings for cracked IsoRings 
+        self.crck.remove_cracklings__cracked_isorings(list(self.icrack.keys())) 
         return
 
     """
@@ -793,6 +808,8 @@ class SecEnv:
                         self.crck.remove_spent_crackling(psidn[0])
                         continue 
 
+                print("\t\t\tINTERDICT: ",interdict) 
+
                 crckling = self.crck.fetch_crackling(psidn[0])
                 ti = crckling.hs.target_index
                 self.transfer_V(interdict,ti,q[0],q[1])                
@@ -801,17 +818,29 @@ class SecEnv:
     def fetch_subagent(self,agent_idn,is_IsoRing:bool):
         if not is_IsoRing:
             return self.crck.fetch_crackling(agent_idn)
-        return self.sn.fetch_IsoRing(agent_idn)
+        return self.sn.irc.fetch_IsoRing(agent_idn)
 
     def transfer_V(self,sidn,opt_index,svec,pr_score):
+        ###
+        '''
+        print("\t\t^^^^^^^^^^^^ TRANSFER V")
+        print("\t\t\t{}\t{}".format(sidn,opt_index))
+        print("\t\t\t{}".format(svec))
+        print("\t\t\t{}".format(pr_score))
+        print("\t\t^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        '''
+        ###
+
         psidn = Colocks.parse_coloc_str(sidn)
         sec_idn = psidn[1]
         ir = self.sn.irc.fetch_IsoRing(sec_idn)
         opt_dim = ir.secdim_seq()[ir.repi]
         self.crck.csoln = self.crck.csoln + (sec_idn,opt_index,svec,pr_score)
         if psidn[0] not in self.icrack:
-            self.icrack[psidn[0]] = {}
-        self.icrack[psidn[0]][opt_dim] = True 
+            self.icrack[sec_idn] = {}
+        
+        self.crck.oopi += 1 
+        self.icrack[sec_idn][opt_dim] = True 
 
     ################ methods for leaking
 
@@ -880,12 +909,9 @@ def SecEnv_sample_2():
     sn = SecNet_sample_CSmall()
     return SecEnv_sample_1(sn)
 
-# TODO: complete|delete.
-"""
-irc_args := (number of <Sec> sources,singleton_range,\
-    dimension_range,num_optima_range,optima_countermeasure_range)
-sn_args := (sec node count,nsec node count,num entry points,rnd_struct,path-in-mem size,*sngs_args)
-"""
-def generate_SecEnv(irc_args,sn_args):
-    sn = SecNet.generate(irc_args,sn_args)
-    return -1 
+
+# TODO: 
+def default_simple_generate_SecEnv(integer=None): 
+    if type(integer) == int:
+        random.seed(integer)
+        np.random.seed(integer) 

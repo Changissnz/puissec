@@ -40,16 +40,24 @@ class SecNetClass(unittest.TestCase):
     def test__Secnet__unpickle_thyself(self):
         fp = "codename__ASS_SHIT"
 
-        if os.path.isdir(fp):
-            sn = SecNet.unpickle_thyself(fp,\
-            DEFAULT_SINGLETON_RANGE,random,9)
-            assert type(sn) == SecNet
+        if not os.path.exists(fp):
+            pickled_SecNet_sample_Q()
+        
+        sn = SecNet.unpickle_thyself(fp,\
+        DEFAULT_SINGLETON_RANGE,random,9)
+        assert type(sn) == SecNet
         
         print("<SECNET> pickle function may not work!")
 
     def test__SecNet__subgraph_for_TDir(self):
         ##print("-- unpickling")
-        sn = SecNet.unpickle_thyself("codename__ASS_SHIT",\
+        fp = "codename__ASS_SHIT"
+
+        if not os.path.exists(fp):
+            pickled_SecNet_sample_Q()
+
+
+        sn = SecNet.unpickle_thyself(fp,\
                 DEFAULT_SINGLETON_RANGE,random,9)
         ##print("UNPICKLED")
 

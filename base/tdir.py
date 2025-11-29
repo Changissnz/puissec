@@ -334,23 +334,19 @@ class TDir:
     
     def load_path_(self,G,loc):
         if loc not in G.sp:
-            print("no location in DFS")
+            ##print("no location in DFS")
             return
 
         dfsc = G.sp[loc]
         if self.location not in dfsc.min_paths:
-            print("no path in DFS")
+            ##print("no path in DFS")
             return
-        ##print("YESLOC, loc {} target {}".format(self.location,loc))
 
         nodePath = dfsc.min_paths[self.location][0]
         return nodePath
         
     def search_for_target_node(self,G):
         assert type(G) == SNGraphContainer
-        ##print("LOCA: ",self.location)
-        ##print("TARGET NODE: ",self.target_node)
-        ##print("RING LOCS: ",G.ring_locs)
 
         # case: vp = I; literal node destination 
         if self.vantage_point == "I": 
@@ -383,7 +379,6 @@ class TDir:
 
     def scaled__next__(self,scale = 1.0):
         if not self.active_stat: 
-            print("NOT ACTIVE")
             return self.location,False
             
         tx = self.t + scale
@@ -625,6 +620,9 @@ class TDirector:
 
         if extf == max:
             rkx = rkx[::-1]
+        
+        if len(rkx) == 0: 
+            return set() 
 
         mx = rkx[0]
         st = set()
@@ -907,7 +905,7 @@ class TDirector:
             predicted_distance = 0
 
 
-        print("CRCK PRED-DIST ",predicted_distance)
+        ##print("CRCK PRED-DIST ",predicted_distance)
 
         cs = self.check_radar()
         if len(cs) == 0: return None
@@ -924,7 +922,7 @@ class TDirector:
         #           select an NSEC for site of 
         #           interception.
         if stat:
-            print("CRCK YES SEC")
+            ##print("CRCK YES SEC")
             if cs not in dfsc.min_paths:
                 return None
             return dfsc.min_paths[cs][0].invert()
@@ -932,13 +930,13 @@ class TDirector:
         # run analysis on all nodes
         xs = self.targetnode_analysis(objf)
         assert len(xs) > 0
-        print("TARGETNODE ANALYSIS")
-        print(xs) 
-        xs = [(k,abs(v - predicted_distance)) for k,v in xs.items()]
+        ##print("TARGETNODE ANALYSIS")
+        ##print(xs) 
+        xs = [(k,abs(v + predicted_distance)) for k,v in xs.items()]
         nx_ = random_tiebreaker(xs,rnd_struct,False)         
         nx = nx_[0] 
-        print("\tNODE: ",nx) 
-        print("\t\t\t&&& &&& &&&\t\t\t")
+        ##print("\tNODE: ",nx) 
+        ##print("\t\t\t&&& &&& &&&\t\t\t")
         if nx not in dfsc.min_paths: return None
         return dfsc.min_paths[nx][0].invert()
 
