@@ -1,4 +1,5 @@
 from .cracker import * 
+from .gviz import * 
 
 # TODO: unused, possibly delete. 
 class TDBridge:
@@ -902,6 +903,36 @@ class SecEnv:
         return hs_ 
 
     ################ end-round update 
+    """
+    vis data is solely focused with the active cracklings and those 
+    cracklings' target IsoRings. 
+    """
+    def to_vis_data(self): 
+
+        cmap,imap = set(),set() 
+
+        for c in self.crck.cracklings: 
+            # get crackling location 
+            cloc = c.td.td.location
+
+            # get target isoring 
+            t = c.td.td.target_node
+
+            # get isoring's location 
+            ir = self.sn.irc.fetch_IsoRing(t) 
+            irloc = ir.td.td.location
+
+            cmap |= {cloc} 
+            imap |= {irloc}
+
+        secnodes = self.sn.sec_nodeset
+        return cmap,imap,secnodes 
+
+    @staticmethod 
+    def visualize(se,save_fig="",no_show=False): 
+        g = se.sn.d 
+        secnodes,cr,ir = se.to_vis_data() 
+        SecEnv_data_to_viz(g,secnodes,cr_loc=cr,ir_loc=ir,save_fig=save_fig,no_show=no_show) 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):
