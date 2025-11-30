@@ -91,6 +91,7 @@ class SecNetFrameGen:
         assert p_s + p_n >= 1.0 
 
         # generate the <SecNetGenScheme>
+        print("CHECKPOINT 0")
         sngs = SecNetGenScheme.generate_instance(rnd_struct)
         print("GENERATOR SCHEME")
         print(sngs) 
@@ -105,12 +106,22 @@ class SecNetFrameGen:
         snv = m[:lx]
         nsnv = m[lx:]
 
+        print("CHECKPOINT 1") 
+        print("SNV: ", snv)
+        print("NSNV: ",nsnv)
+        print("SNGS: ",sngs)
         snfg = SecNetFrameGen(snv,nsnv,sngs)
         snfg.construct_frame()
         print("FINAL NUMBER OF COMPONENTS")
         print(snfg.node_components)
 
         if len(snfg.node_components) != 1:
+            print("SNV: ", snv)
+            print("NSNV: ",nsnv)
+            print("SNGS: ",sngs)
+            print("COMPONENTS")
+            print(snfg.node_components) 
+            print("----------------------------------")
             return SecNetFrameGen.generate_graph__type_prop(irc_sz,p_s,p_n,rnd_struct,num_attempts-1)
         return snfg.d,set(snfg.sec_nodevec) 
 
@@ -214,11 +225,17 @@ class SecNetFrameGen:
     ############## next connection by mode
 
     def construct_frame(self):
-        while self.next_conn():
-            continue
+        X = 50 
+        while self.next_conn() and X > 0:
+            # if fully connected graph, only 50 
+            # additional edges possible. 
+            if len(self.node_components) == 1: 
+                X -= 1 
+            
         return
 
     def next_conn(self):
+
         # base case: only 1 node
         if len(self.sec_nodevec) == 1 and \
             len(self.nsec_nodevec) == 0:
@@ -365,6 +382,13 @@ class SecNetFrameGen:
     ############################################################
 
     def next_conn_pr(self):
+
+        # case: break off adding more edges if graph is entirely 
+        #       connected
+        if len(self.node_components) == 1: 
+            print("XQ") 
+            return False 
+
         conn = self.connectivity() 
         ##print("next conn, pr: ", conn)
         nodepair = self.pr_nodepair() 

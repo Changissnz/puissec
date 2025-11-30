@@ -65,3 +65,8 @@ structure of this project, I've concluded I over-developed on some of the
 aspects of network adversary simulation. This over-development has led to 
 some of the code very chunky to continue working with. And most importantly, 
 this project is a design to simulate network adversaries (not the real deal). 
+
+### Update 11/30/2025 
+This is a buggy project, and it's not fit for serious use. But I have been 
+putting time into fixing some of the bugs. Goal is for there to be a graphical 
+user interface for it. 

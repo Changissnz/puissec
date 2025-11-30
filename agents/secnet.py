@@ -355,7 +355,7 @@ class SecNet:
         ocm = self.occ_crackl_map(set(self.d.keys()))
 
         self.sgc = SNGraphContainer(d2,deepcopy(self.sec_nodeset),\
-            ring_locs,ocm,deepcopy(self.entry_points))
+            ring_locs,ocm,deepcopy(self.entry_points),1)
         self.sgc.path_size = self.path_size
         self.sgc.DFSCache_fullproc() 
  
@@ -478,7 +478,7 @@ class SecNet:
             sn_param_args[0],sn_param_args[1],sn_param_args[2])
 
         assert sn_param_args[3] >= 0.0 and sn_param_args[3] <= 1.0 
-        num_entry = int(round(sn_param_args[3] * len(G[0])))
+        num_entry = int(ceil(sn_param_args[3] * len(G[0])))
         
         rnd_seed = sn_param_args[2].randrange(0,1000) 
 

@@ -113,19 +113,11 @@ class DFSCache:
 
         # case: move to random available node
         q = available.pop()
-        ##print("moving from {} to {}".format(self.reference,q))
 
-        #prev_cost = min(self.costfrom_table[self.reference].values())
         pcs = list(self.costs_to_node(self.reference).values())
         prev_cost = min(pcs) if len(pcs) > 0 else 0
         cost = self.ecf(self.reference,q,prev_cost)
-        ##print("costs: {} -> {} ".format(prev_cost,cost))
 
-        #qx = self.costfrom_table[q][self.reference] if self.reference in \
-        #    self.costfrom_table[q] else float('inf')
-        ##??
-        #self.costfrom_table[q][self.reference] = min([cost,qx]) 
-        #self.costfrom_table[q][self.reference] = cost 
         self.costfrom_table[self.reference][q] = cost 
 
             # update reference
@@ -143,20 +135,20 @@ class DFSCache:
     backtracing uses BFS algorithm;
     no loops! 
     """
-    def paths_to_head(self,node,num_paths=float('inf')):
+    def paths_to_head(self,node,num_paths=float('inf'),is_dfs:bool=False):
         paths = [NodePath(node)]
-        ## ??
-        #cft_copy = deepcopy(self.costfrom_table)
+
         cft_copy = self.invert_costtable() 
         results = [] 
-        ##print("HEAD", self.start_node ," NODE ",node)
+        x = 0 if not is_dfs else -1 
         while len(paths) > 0 and len(results) < num_paths:
             p = paths.pop(0)
+            print("PP")
+            print(p)
             t = p.tail()
             q = cft_copy[t]
 
             # check to see if path is result
-            ##print('\t\ttail: ',t)
             stat1 = p.tail() == self.start_node            
             if stat1:
                 results.append(p)
@@ -164,27 +156,19 @@ class DFSCache:
     
             pq = list(set(q.keys()) - set(p.p))
             pq = sorted(pq,key=lambda x: q[x])[::-1]
-            ##print('keys: {}'.format(pq))
             for k in pq:
                 v = q[k] 
-                ##print("k: {} v: {}".format(k,v))
                 p2 = p + (k,v)
-                #print("appending")
-                #print(p2)
-                paths.insert(0,p2)
-            ##print()
-            #print("len of cft_copy: ",len(cft_copy))
-            #del cft_copy[t]
+                paths.insert(x,p2)
         return results 
+        
 
-    def store_minpaths(self,ns=None,num_paths=1,cost_func=sum):
+    def store_minpaths(self,ns=None,num_paths=1,cost_func=sum,is_dfs:bool=False):
         if type(ns) == type(None):
             ns = set(self.ref_neighbors_travelled.keys())
 
         for k in ns:
-            paths = self.paths_to_head(k,num_paths)
-            ##print("num paths: ",len(paths))
-            #sorted_paths = paths
+            paths = self.paths_to_head(k,num_paths,is_dfs)
             sorted_paths = sorted(paths,key=lambda p: p.cost(cost_func))
             self.min_paths[k] = sorted_paths
         return

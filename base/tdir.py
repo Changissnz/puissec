@@ -11,7 +11,7 @@ type dict|defaultdict.
 class SNGraphContainer:
 
     def __init__(self,m,sec_nodeset,ring_locs,clocs,\
-        entry_points,path_size=10):
+        entry_points,path_size=5):
         assert type(m) in {dict,defaultdict}
         self.d = m
         self.sn = sec_nodeset 
@@ -103,8 +103,9 @@ class SNGraphContainer:
     def DFSCache_proc(self,n):
         dfsc = DFSCache(n,deepcopy(self.d),\
                 search_head_type=1)
+        
         dfsc.exec_DFS()
-        dfsc.store_minpaths(num_paths=self.path_size)
+        dfsc.store_minpaths(num_paths=self.path_size,is_dfs=False)
         self.sp[n] = dfsc
         return 
 
@@ -153,7 +154,7 @@ class SNGraphContainer:
 
         entry_points = self.entry_points.intersection(ns)
 
-        sgc = SNGraphContainer(sg,snx,nla,occm,entry_points)
+        sgc = SNGraphContainer(sg,snx,nla,occm,entry_points,1)
         sgc.sp = spx
         return sgc 
 
