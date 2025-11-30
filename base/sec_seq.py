@@ -39,23 +39,18 @@ class OptimaBloomFuncSecRep:
         self.tdim.append(self.sz)
         # get dim of OptimaBloomFunc
         self.sz = self.obf.oseeds.shape[1]
-        ##self.tdim.append(self.sz) 
 
-        ##print("SZ[0]: ",self.sz)
         self.sz = self.sz_map(self.sz)
-        ##print("SZ[1]: ",self.sz)
 
         if self.sz in self.tdim:
-            ##print("VIOLA")
             if attempts > 0:
                 return self.set_sz(attempts - 1)
             self.sz = None 
             return None 
 
-        ##print("SZ IS: {}".format(self.sz))
         return self.sz
 
-    # NOTE: wrong. 
+    # NOTE: unused 
     def iso_appear(self,i):
         assert i in self.bpoints
         return deepcopy(self.bpoints[i])
@@ -63,32 +58,20 @@ class OptimaBloomFuncSecRep:
     def __next__(self):
         self.obf.d = self.sz
 
-        #if self.sz in self.tdim:
-        #    return None
 
         d = next(self.obf)
         if type(d) == type(None):
-            ##print("[!!] TSTAT")
             self.tstat = True
             self.tdim.append(self.sz)
             return None
 
-        ##print("D: ", d)
         if self.sz not in self.bpoints:
-            ##print("D: ",d)
             self.bpoints[self.sz] = np.array([d])
         else:
             v = self.bpoints[self.sz]
             self.bpoints[self.sz] = np.vstack((v,d))
 
         self.assign_next_value_to_pred(d)
-        ##
-        """
-        print("BPOINTS")
-        print(self.bpoints)
-        print("------------")
-        """
-        ##
         return d
 
     """
@@ -103,7 +86,6 @@ class OptimaBloomFuncSecRep:
 
     def finalize_dcount(self,pred_opt2pr_map:defaultdict):
         # get the dimension of predecessor
-        ##print("SZ IS: ",self.sz)
         pr_vec,exact_corr = self.dpm.fin_count(self.corr_type,\
             self.sz,pred_opt2pr_map)
         self.set_dpm()
@@ -263,7 +245,6 @@ class Sec:
         # select the optima points 
         bds = np.array([deepcopy(singleton_range) for _ in range(dimension)])
         ps = generate_pointgen_stdrand(bds,num_optima,rnd_struct)
-        ##print(ps)
         
         # select a random optima
         qi = random.randrange(0,len(ps))
@@ -344,38 +325,25 @@ class Sec:
     """
     def __next__(self):
         q = next(self.obfsr)
-        ##print("NEXT: ",q) 
         if type(q) == type(None):
             return None,None
 
         q2 = np.array([self.obfsr.obf.prev_i1,self.obfsr.obf.prev_i2])
         self.dimso = len(q)
-        ##print("DIMSO: ",self.dimso)
         return q, q2
 
     def process_one_bloomiso(self,sz_limit=float('inf')):
         stat = True 
         c = 0 
         while stat: 
-            ##print("one bloom pt.")
             # next value, indices of derivators
             b1,b2 = self.__next__()
-            ##print("bloom index: ",c)
             c += 1
             
             if c >= sz_limit: 
                 self.obfsr.tstat = True 
                 break 
             
-            ##
-            """
-            print("SEC NEXT")
-            print(b1)
-            print()
-            print(b2)
-            print("-----")
-            """
-            ##
             stat = not (type(b1) == type(None))
             if not stat:
                 continue
@@ -432,15 +400,6 @@ class Sec:
         ## BUG: !! 
         sz0 = s.dim() #s.obfsr.sz
 
-        """
-        print("-- RESETTING OSEEDS")
-        print("\t-- ORIGINAL")
-        print(self.obfsr.obf.oseeds)
-        print("\t-- NEW")
-        print(bps)
-        print()
-        """
-        ##
         sr_mat = np.array([deepcopy(self.singleton_range) for _ in range(sz0)])
         self.obfsr.obf.reset_oseeds(bps,sr_mat,True)
         self.obfsr = None
@@ -507,3 +466,82 @@ class SecSeq:
     def construct_SRefMap(self):
         dmsm = self.sec_instances_to_supermap('d')
         return -1 
+
+#--------------------------------------------------------------------------------------------------------------
+# Sample <Sec>,<SecSeq> instances 
+#--------------------------------------------------------------------------------------------------------------
+
+
+def Sec_list_sample1(): 
+    random.seed(12)
+    np.random.seed(12)
+
+    singleton_range = [0.,1.] 
+    dimension = 5
+    num_optima = 2
+    countermeasure = (0.6,0.5) 
+    secs = []
+
+    for i in range(5): 
+        sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+        countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+    return secs 
+
+def Sec_list_sample2(num_secs=12,num_optima=12): 
+    random.seed(14)
+    np.random.seed(19)
+
+    singleton_range = [0.,1.] 
+    dimension = 5
+    countermeasure = (0.7,0.5) 
+    secs = []
+
+    for i in range(num_secs): 
+        sec = Sec.generate_bare_instance(singleton_range,dimension,num_optima,\
+        countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+        #print("sec {}".format(i))
+    return secs 
+
+def Sec_list_SEEDTYPE_PythonANDNumpy(num_secs,\
+    singleton_range,dimension_range,num_optima_range,\
+    optima_countermeasure_range):
+
+    assert singleton_range[0] < singleton_range[1]
+    assert dimension_range[0] < dimension_range[1]
+    assert num_optima_range[0] < num_optima_range[1]
+    assert optima_countermeasure_range[0][0] <= \
+        optima_countermeasure_range[0][1] 
+    assert optima_countermeasure_range[1][0] <= \
+        optima_countermeasure_range[1][1] 
+
+    secs = []
+    for i in range(num_secs): 
+        dimension = random.randrange(\
+            dimension_range[0],dimension_range[1])
+        
+        c1,c2 = None,None
+        c1 = random.uniform(optima_countermeasure_range[0][0],\
+            optima_countermeasure_range[0][1])
+        c2 = random.uniform(optima_countermeasure_range[1][0],\
+            optima_countermeasure_range[1][1])
+        countermeasure = (c1,c2)
+        num_optima = random.randrange(num_optima_range[0],\
+            num_optima_range[1])
+        sec = Sec.generate_bare_instance(singleton_range,\
+            dimension,num_optima,\
+            countermeasure,rnd_struct=np.random)
+        secs.append(sec)
+    return secs
+
+def Sec_list_sample3(num_secs,\
+    singleton_range):
+
+    dimension_range = (2,17)
+    num_optima_range = (2,17)
+    optima_countermeasure_range = ((0.,1.),(0.,1.))
+
+    return Sec_list_SEEDTYPE_PythonANDNumpy(num_secs,\
+    singleton_range,dimension_range,\
+    num_optima_range,optima_countermeasure_range)

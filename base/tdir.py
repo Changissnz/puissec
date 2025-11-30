@@ -111,7 +111,7 @@ class SNGraphContainer:
 
     def DFSCache_fullproc(self):
         for k in self.d.keys():
-            #print('dfs proc for {}'.format(k))
+            print('dfs proc for {}'.format(k))
             #print("path size: ",self.path_size)
             self.DFSCache_proc(k)
 

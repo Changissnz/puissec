@@ -929,10 +929,10 @@ class SecEnv:
         return cmap,imap,secnodes 
 
     @staticmethod 
-    def visualize(se,save_fig="",no_show=False): 
+    def visualize(se,save_fig="",ax=None): 
         g = se.sn.d 
         secnodes,cr,ir = se.to_vis_data() 
-        SecEnv_data_to_viz(g,secnodes,cr_loc=cr,ir_loc=ir,save_fig=save_fig,no_show=no_show) 
+        SecEnv_data_to_viz(g,secnodes,cr_loc=cr,ir_loc=ir,save_fig=save_fig,canvas_ax=ax) 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

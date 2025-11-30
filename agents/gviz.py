@@ -26,7 +26,7 @@ def default_Puissec_node_color_map(g,secnodes,cr_loc,ir_loc):
         color_map.append(x2) 
     return color_map 
 
-def SecEnv_data_to_viz(g,secnodes,cr_loc=set(),ir_loc=set(),save_fig:str="",no_show:bool=False):
+def SecEnv_data_to_viz(g,secnodes,cr_loc=set(),ir_loc=set(),save_fig:str="",canvas_ax=None):
     assert type(g) in {defaultdict,dict}
 
     color_map = default_Puissec_node_color_map(g,secnodes,cr_loc,ir_loc)
@@ -45,14 +45,14 @@ def SecEnv_data_to_viz(g,secnodes,cr_loc=set(),ir_loc=set(),save_fig:str="",no_s
     ncs = [cm[1]["color"] for cm in color_map]
     lsx = dict([(cm[0],str(cm[0])) for cm in color_map]) 
 
-    nx.draw_networkx_nodes(G, pos, node_color = ncs)
-    nx.draw_networkx_labels(G, pos, labels = lsx, font_size = 12)
-    nx.draw_networkx_edges(G, pos, edge_color = 'black')
+    nx.draw_networkx_nodes(G, pos, node_color = ncs,ax=canvas_ax)
+    nx.draw_networkx_labels(G, pos, labels = lsx, font_size = 12,ax=canvas_ax)
+    nx.draw_networkx_edges(G, pos, edge_color = 'black',ax=canvas_ax) 
 
     if save_fig != "":
         plt.savefig(save_fig)
 
-    if no_show: 
+    if type(canvas_ax) != type(None): 
         return G 
 
     plt.show()
