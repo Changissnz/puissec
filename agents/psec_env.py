@@ -950,9 +950,15 @@ def SecEnv_sample_2():
     sn = SecNet_sample_CSmall()
     return SecEnv_sample_1(sn)
 
-
 # TODO: 
-def default_simple_generate_SecEnv(integer=None): 
+def default_simple_generate_SecEnv(integer=None,is_naive_hypothesis_type:bool=False,\
+    mode_open_info=(1,1)):  
     if type(integer) == int:
         random.seed(integer)
         np.random.seed(integer) 
+
+    sn = default_generate_SecNet(rnd_struct=DEFAULT_SECNET_RNDSTRUCT)
+    crck = default_generate_Cracker(sn,rnd_struct=DEFAULT_SECNET_RNDSTRUCT,\
+        is_naive_hypothesis_type=is_naive_hypothesis_type) 
+
+    return SecEnv(sn,crck,vb=2,mode_open_info=(1,1)) 

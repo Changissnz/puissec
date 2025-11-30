@@ -1035,3 +1035,23 @@ class Cracker:
     def is_finished(self):
         self.finstat = len(self.hyp_map_cache) == 0 and len(self.cracklings) == 0 
         return self.finstat 
+
+
+def default_generate_Cracker(sn,rnd_struct=DEFAULT_SECNET_RNDSTRUCT,\
+    is_naive_hypothesis_type:bool=False): 
+
+    bi = BackgroundInfo.generate_instance(\
+            sn.irc,sn.srm)
+
+    if is_naive_hypothesis_type: 
+        i2hm = BackgroundInfo.naive_IRC2HypStruct_map(sn.irc,full_hypseq=True,\
+            naive_split=2)
+    else: 
+        bound_length = DEFAULT_HYPSTRUCT_PARTIALLY_NAIVE_BOUND_LENGTH
+        i2hm,_ = BackgroundInfo.partially_naive_IRC2HypStruct_map(sn.irc,\
+            bound_length,[0.,1.],[0.,1.],rnd_struct)
+
+    crck_size_ratio = rnd_struct.uniform(DEFAULT_CRACKER_CRACKLING_SIZE_RATIO[0],\
+        DEFAULT_CRACKER_CRACKLING_SIZE_RATIO[1])
+    crackling_sz = ceil(len(sn.irc) * crck_size_ratio)
+    return Cracker(i2hm,bi,crackling_sz,radar_radius=DEFAULT_TDIR_RADIUS)  

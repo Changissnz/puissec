@@ -1,6 +1,7 @@
 from collections import defaultdict 
 from .bridge import * 
 from .struct_samples import *
+from math import ceil 
 
 class IsoRingedChain:
 
@@ -406,7 +407,8 @@ class SecNet:
 
         # choose random values
         if type(entry_points) == int:
-            assert entry_points > 0 and entry_points <= len(q)
+            assert entry_points > 0 and entry_points <= len(q), "entry points {} total permissible {}".\
+                format(entry_points,len(q))
             eps = [] 
             while entry_points > 0: 
                 i = self.rnd_struct.randrange(0,len(q))
@@ -727,3 +729,51 @@ def SecNet_sample_approxhyp():
         s_.explode_contents()
 
     return sn 
+
+
+def default_generate_IRC_args(rnd_struct=DEFAULT_SECNET_RNDSTRUCT): 
+
+    num_rings = rnd_struct.randrange(DEFAULT_SECNET_IRC_SIZE_RANGE[0],DEFAULT_SECNET_IRC_SIZE_RANGE[1] + 1)
+    singleton_range = DEFAULT_SECNET_SINGLETON_RANGE 
+    dimension_range = DEFAULT_SECNET_DIMENSION_RANGE 
+    num_optima_range = DEFAULT_SECNET_OPTIMA_SIZE_RANGE
+
+    o1 = (rnd_struct.uniform(DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[0],\
+        DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[1]),\
+        rnd_struct.uniform(DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[0],\
+        DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[1])) 
+    o2 = (rnd_struct.uniform(DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[0],\
+        DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[1]),\
+        rnd_struct.uniform(DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[0],\
+        DEFAULT_SECNET_OPTIMA_COUNTERMEASURE_RANGE[1]))
+
+    if o1[1] < o1[0]: o1 = (o1[1],o1[0]) 
+    if o2[1] < o2[0]: o2 = (o2[1],o2[0]) 
+
+    optima_countermeasure_range = [o1,o2] 
+
+    return (num_rings,singleton_range,dimension_range,num_optima_range,\
+        optima_countermeasure_range)
+
+def default_generate_SecNet_args(num_rings,rnd_struct): 
+
+    p_s = rnd_struct.uniform(0.,1.) 
+    p_n = rnd_struct.uniform(0.,1.) 
+    t = p_s + p_n 
+    assert p_s + p_n > 0. 
+    p_s /= t 
+    p_n /= t 
+
+    c = rnd_struct.uniform(DEFAULT_SECNET_TOTALNODE_RATIO_RANGE[0],DEFAULT_SECNET_TOTALNODE_RATIO_RANGE[1]) 
+    p_s *= c 
+    p_n *= c 
+
+    num_entry = rnd_struct.uniform(DEFAULT_SECNET_ENTRY_SIZE_RATIO_RANGE[0],DEFAULT_SECNET_ENTRY_SIZE_RATIO_RANGE[1])
+    #num_entry = ceil(num_rings * ne_ratio)
+    superbound = DEFAULT_SECNET_ISORING_SINGLETON_SUPERBOUND
+    return (p_s,p_n,rnd_struct,num_entry,superbound) 
+
+def default_generate_SecNet(rnd_struct=DEFAULT_SECNET_RNDSTRUCT):
+    irc_args = default_generate_IRC_args(rnd_struct)
+    sn_param_args = default_generate_SecNet_args(irc_args[0],rnd_struct)
+    return SecNet.generate__autograph(irc_args,sn_param_args)
