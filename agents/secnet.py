@@ -152,7 +152,7 @@ class SecNet:
         node_loc_assignment= None,entry_points=3,\
         bound=DEFAULT_SINGLETON_RANGE,\
         rnd_struct=random,rnd_seed=9,\
-        path_size=10,sngc=None,energy=1000.0):
+        path_size=1,sngc=None,energy=1000.0):
         
         assert len(irc) > 0 and type(irc) == SecSeq
         assert len(G) >= len(irc), "len G {} len IRC {}".format(len(G),len(irc))
@@ -355,8 +355,7 @@ class SecNet:
         ocm = self.occ_crackl_map(set(self.d.keys()))
 
         self.sgc = SNGraphContainer(d2,deepcopy(self.sec_nodeset),\
-            ring_locs,ocm,deepcopy(self.entry_points),1)
-        self.sgc.path_size = self.path_size
+            ring_locs,ocm,deepcopy(self.entry_points),self.path_size)
         self.sgc.DFSCache_fullproc() 
  
     def to_graphvars(self,dx=None):
@@ -484,7 +483,7 @@ class SecNet:
 
         return SecNet(sec_list,G[0],G[1],entry_points=num_entry,\
             bound=sn_param_args[4],rnd_struct=sn_param_args[2],\
-            path_size=10)
+            path_size=1)
 
     """
     irc_args := (number of <Sec> sources,singleton_range,\

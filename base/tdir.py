@@ -105,13 +105,14 @@ class SNGraphContainer:
                 search_head_type=1)
         
         dfsc.exec_DFS()
-        dfsc.store_minpaths(num_paths=self.path_size,is_dfs=False)
+        dfsc.store_minpaths(num_paths=self.path_size,is_dfs=True)
         self.sp[n] = dfsc
         return 
 
     def DFSCache_fullproc(self):
         for k in self.d.keys():
-            ##print('dfs proc for {}'.format(k))
+            #print('dfs proc for {}'.format(k))
+            #print("path size: ",self.path_size)
             self.DFSCache_proc(k)
 
     def subgraph_by_radius_at_refnode(self,r,radius):

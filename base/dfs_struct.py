@@ -140,17 +140,18 @@ class DFSCache:
 
         cft_copy = self.invert_costtable() 
         results = [] 
-        x = 0 if not is_dfs else -1 
+        x = 0 if is_dfs else -1 
         while len(paths) > 0 and len(results) < num_paths:
             p = paths.pop(0)
-            print("PP")
-            print(p)
+           # print("PP")
+           # print(p)
             t = p.tail()
             q = cft_copy[t]
 
             # check to see if path is result
             stat1 = p.tail() == self.start_node            
             if stat1:
+                #print("adding, {}/{}".format(num_paths,len(results)))
                 results.append(p)
                 continue
     
