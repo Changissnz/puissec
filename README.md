@@ -73,3 +73,7 @@ user interface for it.
 ...
 Graphical user interface is now up. But there are some bugs in the system. And 
 there are also missing features in the GUI simulation. 
+
+### Update 12/1/2025 
+Open development of project has officially terminated. There are serious 
+deficits in the `TDirector` class. 

@@ -9,15 +9,22 @@ def default_Puissec_node_color_map(g,secnodes,cr_loc,ir_loc):
     nodes = list(g.keys())
 
     for n in nodes: 
-        # case: Crackling and IsoRing are on the same node 
-        if n in cr_loc and n in ir_loc: 
+        # case: Crackling and IsoRing are on the same secured node 
+        if n in cr_loc and n in ir_loc and n in secnodes: 
+            x2 = (n, {"color": "gray"})
+        # case: Crackling and IsoRing are on the same non-secured node              
+        elif n in cr_loc and n in ir_loc: 
             x2 = (n, {"color": "black"}) 
+
         # case: Crackling location 
         elif n in cr_loc: 
             x2 = (n,{"color":"green"}) 
         # case: IsoRing location 
-        elif n in ir_loc: 
-            x2 = (n,{"color":"orange"}) 
+        elif n in ir_loc:
+            if n in secnodes:  
+                x2 = (n,{"color":"purple"}) 
+            else: 
+                x2 = (n,{"color":"pink"}) 
         # case: Sec node 
         elif n in secnodes: 
             x2 = (n,{"color":"red"}) 
