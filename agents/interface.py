@@ -57,9 +57,10 @@ class PuissecApplication(tk.Frame):
 
     def init_primary_window_details(self):
         bold_font = font.Font(family="Arial", size=12, weight="bold")
-        self.open_button = tk.Button(self, text="OpEn GRaf FiLe", command=self.open_file__psec_env)
+        self.open_button = tk.Button(self, text="OpEn GRaf FiLe", command=self.open_SecEnv)
         self.generate_button = tk.Button(self, text="Generraciones", command=self.generate_SecEnv) 
-        
+        self.run_button = tk.Button(self,text="run one", command=self.run_SecEnv_one_time)
+
     def set_primary_window_details(self): 
         fig = Figure(figsize=(6,6),dpi=100)
         self.canvass = FigureCanvasTkAgg(fig, master=self)
@@ -68,27 +69,46 @@ class PuissecApplication(tk.Frame):
         G = nx.Graph()
         nx.draw(G, with_labels=True, font_weight='bold', ax=self.canvass_ax)
         self.canvass.get_tk_widget().grid()
-        self.open_button.grid() 
-        self.generate_button.grid()
+        self.open_button.grid(row=0,column=0) 
+        self.generate_button.grid(row=1,column=0)
+        self.run_button.grid(row=2,column=0) 
 
     # TODO: 
     def open_SecEnv(self):
+        dirname = filedialog.askdirectory(title="Select a Folder")
+        if dirname: 
+            raise ValueError("implement this.")
         return 
 
     def generate_SecEnv(self):
         self.se = default_simple_generate_SecEnv(integer=None,\
             is_naive_hypothesis_type=False,mode_open_info=(1,1))
-        self.canvass_ax.clear() 
-        SecEnv.visualize(self.se,ax=self.canvass_ax)  
-        self.canvass.draw()  # it needs it in this place
+        self.visualize_SecEnv()
         return 
-    
-    def change_graph(self,D): 
-        G = dict_to_networkx(D)
-        self.canvass_ax.clear()
-        self.canvass_ax.set_visible(True)
-        nx.draw(G, with_labels=True, font_weight='bold', ax=self.canvass_ax)
-        self.canvass.draw()
+
+    def run_SecEnv_one_time(self):
+        if type(self.se) == type(None): 
+            return 
+        
+        self.se.run(1.0)
+        self.update_SecEnv() 
+        return
+
+    def visualize_SecEnv(self): 
+        self.canvass_ax.clear() 
+        self.G,self.pos = SecEnv.visualize(self.se,ax=self.canvass_ax)  
+        self.canvass.draw()  # it needs it in this place
+        self.se.preprocess() 
+
+    def update_SecEnv(self):
+
+        g = self.se.sn.d 
+        secnodes,cr_loc,ir_loc = self.se.to_vis_data() 
+        color_map = default_Puissec_node_color_map(g,secnodes,cr_loc,ir_loc)
+        ncs = [cm[1]["color"] for cm in color_map]
+
+        nx.draw_networkx_nodes(self.G, self.pos, node_color = ncs,ax=self.canvass_ax)
+        self.canvass.draw() 
 
 def run_puissec_app(): 
     app = PuissecApplication()

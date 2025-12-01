@@ -270,7 +270,9 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
     ##mpsb = hs.most_probable_subbound()
     ssih = hs.hs_vec[ix] 
     if verbose: 
+        # NOTE: bug somewhere here 
         print("[X] declarationes de RSSI aufbund")
+        print("---- bug somewhere here.")
         print(mpsb)
         print("-------------------------------------")
 
@@ -278,6 +280,7 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
     print(mpsb)
     print("-------------------------------------")
 
+    mpsb = np.sort(mpsb,axis=1) 
 
     start_point = deepcopy(mpsb[:,0])
     rss = rssi.ResplattingSearchSpaceIterator(mpsb,\

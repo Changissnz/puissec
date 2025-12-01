@@ -932,7 +932,7 @@ class SecEnv:
     def visualize(se,save_fig="",ax=None): 
         g = se.sn.d 
         secnodes,cr,ir = se.to_vis_data() 
-        SecEnv_data_to_viz(g,secnodes,cr_loc=cr,ir_loc=ir,save_fig=save_fig,canvas_ax=ax) 
+        return SecEnv_data_to_viz(g,secnodes,cr_loc=cr,ir_loc=ir,save_fig=save_fig,canvas_ax=ax) 
 
 def SecEnv_sample_1(sn3=None):
     if type(sn3) == type(None):

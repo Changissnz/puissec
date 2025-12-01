@@ -53,6 +53,6 @@ def SecEnv_data_to_viz(g,secnodes,cr_loc=set(),ir_loc=set(),save_fig:str="",canv
         plt.savefig(save_fig)
 
     if type(canvas_ax) != type(None): 
-        return G 
+        return G, pos 
 
     plt.show()
