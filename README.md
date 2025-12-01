@@ -70,3 +70,6 @@ this project is a design to simulate network adversaries (not the real deal).
 This is a buggy project, and it's not fit for serious use. But I have been 
 putting time into fixing some of the bugs. Goal is for there to be a graphical 
 user interface for it. 
+...
+Graphical user interface is now up. But there are some bugs in the system. And 
+there are also missing features in the GUI simulation. 

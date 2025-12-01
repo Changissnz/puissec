@@ -153,7 +153,6 @@ class IsoRing:
         # partial cracked stat 
         self.pcstat = False 
 
-        # TODO: 
         self.td = None
         self.sec_script = None
         self.leak_stage = 0

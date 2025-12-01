@@ -218,14 +218,8 @@ def IsoRing_and_Crackling_to_base_RChainHead(ir:IsoRing,cracklng:Crackling,verbo
             print("IR registers attempt")
             print(p)
 
-        # NOTE: uncomment in real simulations.
-        """
-        if cracklng.astat:
-            print("TERMINATED")
-            return 
-        """
         q,stat = ir.register_attempt(p)
-        ##??
+
         if verbose: 
             print("-- register")
             print("score: ",q[cracklng.hs.target_index])
@@ -260,14 +254,11 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
     assert type(ir) == IsoRing
     assert type(hs) == HypStruct
 
-    ##print("\t-- converting to RCH")
     rch = IsoRing_and_Crackling_to_base_RChainHead(ir,cracklng,verbose)
-    ##print("\t-- CONVERTED")
     resplattingMode = ("relevance zoom",rch)
 
     ix = hs.most_probable_subbound_i()
     mpsb = deepcopy(hs.suspected_subbounds[ix])
-    ##mpsb = hs.most_probable_subbound()
     ssih = hs.hs_vec[ix] 
     if verbose: 
         # NOTE: bug somewhere here 
@@ -286,7 +277,6 @@ def default_base_RSSI(ir:IsoRing,cracklng:Crackling,\
     rss = rssi.ResplattingSearchSpaceIterator(mpsb,\
         start_point,SSIHop=int(ssih),resplattingMode = \
             resplattingMode)
-    ##print("DECLARED RSS")
     return rss
 
 """
@@ -303,14 +293,6 @@ class HypInfer:
         assert type(hypStruct) == HypStruct
         assert type(leak_info) == LeakInfo
         assert inference_type in {1,2}
-
-        ###
-        '''
-        print("LEAK INFO")
-        print(leak_info.leak_info)
-        print("-------------------")
-        '''
-        ###
 
         ## NOTE: model 1, 
         ## for each leak, process all leaked values from 
